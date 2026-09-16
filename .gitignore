@@ -24,6 +24,8 @@ dist/
 # Logs and coverage
 *.log
 coverage/
+*.tsbuildinfo
+*.zip
 
 # OS files
 .DS_Store
