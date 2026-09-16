@@ -7,7 +7,9 @@ Money Saathi is a mobile-first personal finance dashboard for tracking spending,
 - Next.js App Router
 - React and TypeScript
 - Tailwind CSS
-- Neon-backed project configuration
+- IndexedDB local-first storage
+- Integer chetrum money model
+- No account, cloud database, or third-party trackers in V1
 
 ## Development
 

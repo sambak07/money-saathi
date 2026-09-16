@@ -1,232 +1,56 @@
 'use client'
 
-import { useMemo, useState } from 'react'
-import {
-  ArrowDownLeft,
-  ArrowUpRight,
-  BarChart3,
-  ClipboardList,
-  Download,
-  Filter,
-  Bell,
-  CalendarDays,
-  ChevronRight,
-  CircleHelp,
-  FileDown,
-  Fingerprint,
-  Home,
-  LockKeyhole,
-  MoreHorizontal,
-  PieChart,
-  Plus,
-  Search,
-  Settings,
-  ShieldCheck,
-  Sparkles,
-  Target,
-  WalletCards,
-  X,
-} from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { ArrowDownLeft, ArrowUpRight, BarChart3, Home, Plus, Target, WalletCards, X, Trash2 } from 'lucide-react'
+import { currentBalance, monthlyExpenses, monthlyIncome, monthlySavings, savingsRate, totalExpenses, totalIncome } from '@/lib/analytics'
+import { formatCurrency, toChetrum } from '@/lib/currency'
+import { getSettings, saveSettings } from '@/lib/settings'
+import { createTransaction, todayLocal, transactionRepository, type Transaction } from '@/lib/transactions'
 
-type Transaction = {
-  id: number
-  title: string
-  category: string
-  date: string
-  amount: number
-  type: 'income' | 'expense'
-  color: string
-  icon: string
-}
-
-type AuditEvent = {
-  id: number
-  type: string
-  action: string
-  summary: string
-  resource: string
-  time: string
-  source: string
-  metadata: string
-}
-
-const initialAuditEvents: AuditEvent[] = [
-  { id: 1, type: 'SECURITY', action: 'PIN_REGISTERED', summary: 'PIN protection enabled for Money Saathi', resource: 'Account security', time: 'Today · 6:42 PM', source: 'This device', metadata: 'Authentication method: PIN · Sensitive values redacted' },
-  { id: 2, type: 'TRANSACTION', action: 'TRANSACTION_CREATED', summary: 'Added Monthly salary', resource: 'Transaction #1', time: 'Today · 6:38 PM', source: 'This device', metadata: 'Type: income · Category: Salary · Amount: Nu. 125,000' },
-  { id: 3, type: 'TRANSACTION', action: 'TRANSACTION_CREATED', summary: 'Added Groceries at Big Mart', resource: 'Transaction #2', time: 'Today · 1:14 PM', source: 'This device', metadata: 'Type: expense · Category: Food & Groceries · Amount: Nu. 4,850' },
-  { id: 4, type: 'SETTINGS', action: 'PRIVACY_VIEWED', summary: 'Viewed privacy and security settings', resource: 'Settings', time: 'Yesterday · 8:02 PM', source: 'This device', metadata: 'No sensitive data recorded' },
-]
-
-const initialTransactions: Transaction[] = [
-  { id: 1, title: 'Monthly salary', category: 'Salary', date: 'Today', amount: 125000, type: 'income', color: 'sage', icon: '↗' },
-  { id: 2, title: 'Groceries at Big Mart', category: 'Food & Groceries', date: 'Today', amount: 4850, type: 'expense', color: 'amber', icon: '⌁' },
-  { id: 3, title: 'Apartment rent', category: 'Housing', date: 'Yesterday', amount: 18000, type: 'expense', color: 'lavender', icon: '⌂' },
-  { id: 4, title: 'Fuel top up', category: 'Transport', date: '12 Sep', amount: 2400, type: 'expense', color: 'peach', icon: '↗' },
-]
-
-const navItems = [
-  { label: 'Home', icon: Home },
-  { label: 'Transactions', icon: WalletCards },
-  { label: 'Reports', icon: BarChart3 },
-  { label: 'Budget', icon: Target },
-  { label: 'Audit trail', icon: ClipboardList },
-  { label: 'Settings', icon: Settings },
-]
-
-function formatNu(value: number) {
-  return `Nu. ${value.toLocaleString('en-IN')}`
-}
-
-function StatCard({ label, value, note, positive, icon: Icon }: { label: string; value: string; note: string; positive?: boolean; icon: typeof ArrowDownLeft }) {
-  return (
-    <div className="stat-card">
-      <div className="stat-card__top"><span>{label}</span><span className={`stat-icon ${positive ? 'stat-icon--positive' : ''}`}><Icon size={16} /></span></div>
-      <strong>{value}</strong>
-      <small className={positive ? 'positive' : ''}>{note}</small>
-    </div>
-  )
-}
-
-function TransactionRow({ transaction }: { transaction: Transaction }) {
-  return (
-    <div className="transaction-row">
-      <div className={`transaction-avatar ${transaction.color}`}>{transaction.icon}</div>
-      <div className="transaction-copy"><strong>{transaction.title}</strong><span>{transaction.category} · {transaction.date}</span></div>
-      <strong className={transaction.type === 'income' ? 'amount-income' : ''}>{transaction.type === 'income' ? '+' : '-'}{formatNu(transaction.amount).replace('Nu. ', 'Nu. ')}</strong>
-      <button className="icon-button" aria-label={`More options for ${transaction.title}`}><MoreHorizontal size={17} /></button>
-    </div>
-  )
-}
+const categories = [{ id: 'salary', label: 'Salary' }, { id: 'rental', label: 'Rental income' }, { id: 'food', label: 'Food & groceries' }, { id: 'housing', label: 'Housing / EMI' }, { id: 'transport', label: 'Fuel & transport' }, { id: 'other', label: 'Other' }]
+const navItems = [{ label: 'Home', icon: Home }, { label: 'Transactions', icon: WalletCards }, { label: 'Reports', icon: BarChart3 }, { label: 'Budget', icon: Target }]
 
 export default function Page() {
   const [active, setActive] = useState('Home')
+  const [transactions, setTransactions] = useState<Transaction[]>([])
+  const [openingBalance, setOpeningBalance] = useState(0)
   const [showAdd, setShowAdd] = useState(false)
-  const [entryType, setEntryType] = useState<'income' | 'expense'>('expense')
-  const [transactions, setTransactions] = useState(initialTransactions)
+  const [type, setType] = useState<'income' | 'expense'>('expense')
   const [amount, setAmount] = useState('')
-  const [title, setTitle] = useState('')
-  const [accessOpen, setAccessOpen] = useState(false)
-  const [accessMode, setAccessMode] = useState<'register' | 'unlock'>('register')
-  const [passcode, setPasscode] = useState('')
-  const [confirmPasscode, setConfirmPasscode] = useState('')
-  const [registered, setRegistered] = useState(false)
-  const [unlocked, setUnlocked] = useState(true)
-  const [accessError, setAccessError] = useState('')
-  const [biometricReady, setBiometricReady] = useState(false)
-  const [auditEvents, setAuditEvents] = useState(initialAuditEvents)
-  const [auditFilter, setAuditFilter] = useState('All events')
-  const [auditSearch, setAuditSearch] = useState('')
-  const [expandedAudit, setExpandedAudit] = useState<number | null>(null)
+  const [categoryId, setCategoryId] = useState('food')
+  const [note, setNote] = useState('')
+  const [date, setDate] = useState(todayLocal())
+  const [loaded, setLoaded] = useState(false)
 
-  function recordAudit(event: Omit<AuditEvent, 'id' | 'time'>) {
-    setAuditEvents(current => [{ ...event, id: Date.now(), time: 'Just now' }, ...current])
-  }
+  useEffect(() => { Promise.all([transactionRepository.list(), getSettings()]).then(([items, settings]) => { setTransactions(items); setOpeningBalance(settings.openingBalanceChetrum); setLoaded(true) }) }, [])
+  const income = useMemo(() => monthlyIncome(transactions), [transactions])
+  const expenses = useMemo(() => monthlyExpenses(transactions), [transactions])
+  const savings = useMemo(() => monthlySavings(transactions), [transactions])
+  const rate = useMemo(() => savingsRate(transactions), [transactions])
 
-  function exportAudit(format: 'csv' | 'json') {
-    const payload = format === 'json'
-      ? JSON.stringify(auditEvents, null, 2)
-      : ['time,type,action,summary,resource,source,metadata', ...auditEvents.map(event => [event.time, event.type, event.action, event.summary, event.resource, event.source, event.metadata].map(value => `"${value.replaceAll('"', '""')}"`).join(','))].join('\\n')
-    const blob = new Blob([payload], { type: format === 'json' ? 'application/json' : 'text/csv' })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url; link.download = `money-saathi-audit.${format}`; link.click(); URL.revokeObjectURL(url)
-  }
-
-  const visibleAuditEvents = useMemo(() => {
-    const query = auditSearch.trim().toLowerCase()
-    return auditEvents.filter(event => {
-      const matchesType = auditFilter === 'All events' || event.type === auditFilter
-      const matchesSearch = !query || [event.type, event.action, event.summary, event.resource, event.source, event.metadata].some(value => value.toLowerCase().includes(query))
-      return matchesType && matchesSearch
-    })
-  }, [auditEvents, auditFilter, auditSearch])
-
-  const totals = useMemo(() => {
-    const income = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0)
-    const expenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0)
-    return { income, expenses, saved: income - expenses }
-  }, [transactions])
-
-  function addTransaction(event: React.FormEvent) {
+  async function addTransaction(event: React.FormEvent) {
     event.preventDefault()
-    const parsed = Number(amount)
-    if (!parsed || parsed <= 0) return
-    const transactionTitle = title || (entryType === 'income' ? 'New income' : 'New expense')
-    const transaction = { id: Date.now(), title: transactionTitle, category: entryType === 'income' ? 'Other income' : 'Other', date: 'Today', amount: parsed, type: entryType, color: entryType === 'income' ? 'sage' : 'peach', icon: entryType === 'income' ? '↗' : '⌁' } as Transaction
-    setTransactions(current => [transaction, ...current])
-    recordAudit({ type: 'TRANSACTION', action: 'TRANSACTION_CREATED', summary: `Added ${transactionTitle}`, resource: `Transaction #${transaction.id}`, source: 'This device', metadata: `Type: ${entryType} · Amount: ${formatNu(parsed)} · Sensitive values redacted` })
-    setAmount(''); setTitle(''); setShowAdd(false)
+    if (!amount || Number(amount) <= 0) return
+    const transaction = createTransaction({ type, amountChetrum: toChetrum(amount), categoryId, date, paymentMethod: 'Cash', note: note.trim(), isRecurring: false })
+    await transactionRepository.save(transaction)
+    setTransactions(current => [transaction, ...current]); setAmount(''); setNote(''); setShowAdd(false)
   }
+  async function removeTransaction(id: string) { if (window.confirm('Delete this transaction? This cannot be undone.')) { await transactionRepository.remove(id); setTransactions(current => current.filter(item => item.id !== id)) } }
+  async function changeOpeningBalance() { const value = window.prompt('Opening balance in Ngultrum', String(openingBalance / 100)); if (value !== null && Number(value) >= 0) { const next = toChetrum(value); setOpeningBalance(next); await saveSettings({ key: 'app', openingBalanceChetrum: next, currency: 'BTN', sampleData: false }) } }
 
-  function openAccess(mode: 'register' | 'unlock') {
-    setAccessMode(mode)
-    setAccessError('')
-    setPasscode('')
-    setConfirmPasscode('')
-    setAccessOpen(true)
-  }
-
-  function savePasscode(event: React.FormEvent) {
-    event.preventDefault()
-    if (!/^\\d{4,6}$/.test(passcode)) return setAccessError('Use a 4 to 6 digit PIN.')
-    if (accessMode === 'register' && passcode !== confirmPasscode) return setAccessError('PINs do not match.')
-    setRegistered(true)
-    setUnlocked(true)
-    recordAudit({ type: 'SECURITY', action: accessMode === 'register' ? 'PIN_REGISTERED' : 'UNLOCKED', summary: accessMode === 'register' ? 'PIN protection enabled for Money Saathi' : 'Unlocked Money Saathi with PIN', resource: 'Account security', source: 'This device', metadata: 'Authentication method recorded without storing the PIN or passcode' })
-    setAccessOpen(false)
-    setPasscode('')
-    setConfirmPasscode('')
-  }
-
-  async function registerFingerprint() {
-    if (!window.PublicKeyCredential) return setAccessError('Fingerprint unlock is not supported in this browser. Use your PIN.')
-    try {
-      await navigator.credentials.create({ publicKey: { challenge: crypto.getRandomValues(new Uint8Array(32)), rp: { name: 'Money Saathi' }, user: { id: crypto.getRandomValues(new Uint8Array(16)), name: 'money-saathi-user', displayName: 'Money Saathi user' }, pubKeyCredParams: [{ type: 'public-key', alg: -7 }], authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'required' }, timeout: 60000 } })
-      setBiometricReady(true)
-      setAccessError('Fingerprint unlock is ready on this device.')
-    } catch {
-      setAccessError('Fingerprint setup was cancelled. You can continue with your PIN.')
-    }
-  }
-
-  function logout() {
-    recordAudit({ type: 'SECURITY', action: 'LOCKED', summary: 'Locked Money Saathi', resource: 'Account security', source: 'This device', metadata: 'Session state changed; secrets and tokens are never stored' })
-    setUnlocked(false)
-    setAccessOpen(false)
-    setAccessMode('unlock')
-  }
-
-  return (
-    <main className="app-shell">
-      <aside className="sidebar">
-        <div className="brand"><div className="brand-mark">M</div><span>Money <b>Saathi</b></span></div>
-        <div className="sidebar-rule" />
-        <p className="eyebrow">Your money, simply</p>
-        <nav className="side-nav" aria-label="Primary navigation">
-          {navItems.map(item => { const Icon = item.icon; return <button key={item.label} onClick={() => setActive(item.label)} className={active === item.label ? 'nav-item active' : 'nav-item'}><Icon size={18} /><span>{item.label}</span>{item.label === 'Budget' && <span className="nav-dot" />}</button> })}
-        </nav>
-        <div className="sidebar-bottom"><div className="privacy-chip"><ShieldCheck size={17} /><span><b>Private by design</b><small>Your data stays on this device.</small></span></div><button className="help-link" onClick={logout}><LockKeyhole size={16} /> Lock / log out</button></div>
-      </aside>
-
-      <section className="content-area">
-        <header className="topbar"><div className="mobile-brand"><div className="brand-mark">M</div><span>Money <b>Saathi</b></span></div><div className="top-actions"><button className="round-button" aria-label="Notifications"><Bell size={18} /><i /></button><button className="profile" aria-label="Open account access" onClick={() => openAccess(registered ? 'unlock' : 'register')}>S</button></div></header>
-        <div className="page-content">
-          {active === 'Home' ? <>
-            <div className="welcome-row"><div><p className="eyebrow">Monday, 16 September 2026</p><h1>Good evening</h1><p className="subheading">Here is where your money stands.</p></div><button className="desktop-add" onClick={() => { setEntryType('expense'); setShowAdd(true) }}><Plus size={18} /> Add transaction</button></div>
-            <section className="balance-card"><div><p className="card-label">Current balance <span className="mini-info">i</span></p><div className="balance-value">{formatNu(84250)}</div><p className="balance-note"><span className="trend-up">↗ 12.4%</span> from last month</p></div><div className="balance-orbit"><WalletCards size={24} /><span>On track</span></div></section>
-            <div className="stats-grid"><StatCard label="Income this month" value={formatNu(totals.income)} note="↗ 8.2% from last month" positive icon={ArrowDownLeft} /><StatCard label="Expenses this month" value={formatNu(totals.expenses)} note="↘ 4.6% from last month" positive icon={ArrowUpRight} /><StatCard label="Saved this month" value={formatNu(totals.saved)} note="37.3% savings rate" positive icon={Sparkles} /></div>
-            <div className="dashboard-grid"><section className="panel cashflow-panel"><div className="panel-heading"><div><p className="eyebrow">Your rhythm</p><h2>Cash flow</h2></div><button className="select-button">Last 6 months <ChevronRight size={15} /></button></div><div className="chart-legend"><span><i className="legend-income" /> Income</span><span><i className="legend-expense" /> Expenses</span></div><div className="bar-chart" aria-label="Income and expenses over the last six months"><div className="axis-labels"><span>150k</span><span>100k</span><span>50k</span><span>0</span></div>{[['Apr',72,38],['May',64,44],['Jun',80,42],['Jul',68,48],['Aug',88,52],['Sep',96,55]].map(([month,income,expense]) => <div className="bar-group" key={month as string}><div className="bars"><i style={{height: `${income}%`}} /><i style={{height: `${expense}%`}} /></div><span>{month}</span></div>)}</div></section><section className="panel spending-panel"><div className="panel-heading"><div><p className="eyebrow">This month</p><h2>Where it went</h2></div><button className="round-button small"><MoreHorizontal size={17} /></button></div><div className="donut-wrap"><div className="donut"><div><strong>Nu. 78k</strong><span>spent</span></div></div><div className="category-list"><span><i className="dot food" />Food <b>32%</b></span><span><i className="dot housing" />Housing <b>27%</b></span><span><i className="dot transport" />Transport <b>18%</b></span><span><i className="dot other" />Other <b>23%</b></span></div></div></section></div>
-            <div className="lower-grid"><section className="panel transactions-panel"><div className="panel-heading"><div><p className="eyebrow">Latest activity</p><h2>Recent transactions</h2></div><button className="text-button" onClick={() => setActive('Transactions')}>View all <ChevronRight size={15} /></button></div><div className="transaction-list">{transactions.slice(0, 4).map(t => <TransactionRow key={t.id} transaction={t} />)}</div></section><section className="insight-card"><div className="insight-icon"><Sparkles size={19} /></div><p className="eyebrow">A little insight</p><h2>You&apos;re spending less on transport</h2><p>Your transport spending is down 18% compared with last month. That&apos;s a good habit worth keeping.</p><button className="insight-link">See your reports <ChevronRight size={15} /></button></section></div>
-          </> : active === 'Audit trail' ? <section className="audit-page"><div className="welcome-row"><div><p className="eyebrow">Security & accountability</p><h1>Audit trail</h1><p className="subheading">A complete, private record of activity in your Money Saathi account.</p></div><div className="audit-export-actions"><button className="secondary-access-button" onClick={() => exportAudit('csv')}><Download size={16} /> CSV</button><button className="secondary-access-button" onClick={() => exportAudit('json')}><Download size={16} /> JSON</button></div></div><div className="audit-notice"><ShieldCheck size={18} /><span><b>Append-only records</b><small>Audit records cannot be edited or deleted. PINs, passcodes, biometric data, and session tokens are never stored.</small></span></div><div className="audit-toolbar"><Filter size={16} /><select value={auditFilter} onChange={event => setAuditFilter(event.target.value)} aria-label="Filter audit events"><option>All events</option><option>SECURITY</option><option>TRANSACTION</option><option>SETTINGS</option></select><label className="audit-search"><Search size={15} /><span className="sr-only">Search audit trail</span><input value={auditSearch} onChange={event => setAuditSearch(event.target.value)} placeholder="Search activity" /></label><span>{visibleAuditEvents.length} records</span></div><div className="audit-list">{visibleAuditEvents.map(event => <article className="audit-event" key={event.id}><div className={`audit-event-dot ${event.type.toLowerCase()}`} /><div className="audit-event-main"><div className="audit-event-top"><span className="audit-badge">{event.type}</span><time>{event.time}</time></div><h3>{event.summary}</h3><p>{event.action} · {event.resource}</p>{expandedAudit === event.id && <div className="audit-detail"><span><b>Source</b>{event.source}</span><span><b>Details</b>{event.metadata}</span><span><b>Integrity</b>Hash-linked record</span></div>}<button className="audit-detail-button" onClick={() => setExpandedAudit(expandedAudit === event.id ? null : event.id)}>{expandedAudit === event.id ? 'Hide details' : 'View details'}</button></div></article>)}</div></section> : <section className="page-placeholder"><div className="placeholder-icon">{active === 'Transactions' ? <WalletCards /> : active === 'Reports' ? <BarChart3 /> : active === 'Budget' ? <Target /> : <Settings />}</div><p className="eyebrow">Money Saathi</p><h1>{active}</h1><p>Everything you need to feel more confident about your money will live here.</p><button className="primary-button" onClick={() => setActive('Home')}>Back to home</button></section>}
-        </div>
-      </section>
-
-      <nav className="bottom-nav" aria-label="Mobile navigation">{navItems.map(item => { const Icon = item.icon; return <button key={item.label} onClick={() => setActive(item.label)} className={active === item.label ? 'bottom-item active' : 'bottom-item'}><Icon size={20} /><span>{item.label}</span></button> })}</nav>
-      <button className="floating-add" aria-label="Add transaction" onClick={() => { setEntryType('expense'); setShowAdd(true) }}><Plus size={24} /></button>
-
-      {(!unlocked || accessOpen) && <div className="modal-backdrop access-backdrop"><form className="add-sheet access-sheet" onSubmit={savePasscode}><div className="sheet-handle" /><div className="sheet-header"><div><p className="eyebrow">Private by design</p><h2>{accessMode === 'register' ? 'Protect your Saathi' : 'Welcome back'}</h2></div>{unlocked && <button type="button" className="round-button small" onClick={() => setAccessOpen(false)} aria-label="Close access dialog"><X size={17} /></button>}</div><div className="access-icon"><LockKeyhole size={25} /></div><p className="access-copy">{accessMode === 'register' ? 'Create a PIN to keep your money details private. You can also unlock faster with your device fingerprint.' : 'Enter your PIN to view your money details.'}</p><label>PIN or passcode<input autoFocus inputMode="numeric" pattern="[0-9]*" maxLength={6} type="password" placeholder="4 to 6 digits" value={passcode} onChange={event => setPasscode(event.target.value)} required /></label>{accessMode === 'register' && <label>Confirm PIN<input inputMode="numeric" pattern="[0-9]*" maxLength={6} type="password" placeholder="Repeat your PIN" value={confirmPasscode} onChange={event => setConfirmPasscode(event.target.value)} required /></label>}{accessError && <p className="access-message" role="status">{accessError}</p>}<button className="primary-button submit-button" type="submit">{accessMode === 'register' ? 'Create PIN' : 'Unlock Money Saathi'}</button>{accessMode === 'register' && <button type="button" className="secondary-access-button" onClick={registerFingerprint}><Fingerprint size={17} /> {biometricReady ? 'Fingerprint ready' : 'Set up fingerprint'}</button>}{accessMode === 'unlock' && biometricReady && <button type="button" className="secondary-access-button" onClick={() => setUnlocked(true)}><Fingerprint size={17} /> Unlock with fingerprint</button>}{accessMode === 'unlock' && <button type="button" className="forgot-access" onClick={() => openAccess('register')}>Create a new PIN</button>}</form></div>}
-
-      {showAdd && <div className="modal-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setShowAdd(false) }}><form className="add-sheet" onSubmit={addTransaction}><div className="sheet-handle" /><div className="sheet-header"><div><p className="eyebrow">Quick entry</p><h2>Add a transaction</h2></div><button type="button" className="round-button small" onClick={() => setShowAdd(false)} aria-label="Close"><X size={17} /></button></div><div className="entry-toggle"><button type="button" className={entryType === 'expense' ? 'selected expense' : ''} onClick={() => setEntryType('expense')}><ArrowUpRight size={16} /> Expense</button><button type="button" className={entryType === 'income' ? 'selected income' : ''} onClick={() => setEntryType('income')}><ArrowDownLeft size={16} /> Income</button></div><label>Amount<input autoFocus inputMode="decimal" placeholder="0" value={amount} onChange={e => setAmount(e.target.value)} required /></label><label>What was this for?<input placeholder={entryType === 'income' ? 'e.g. Monthly salary' : 'e.g. Lunch with friends'} value={title} onChange={e => setTitle(e.target.value)} /></label><div className="form-row"><label>Category<select><option>{entryType === 'income' ? 'Salary' : 'Food & Groceries'}</option><option>Housing</option><option>Transport</option><option>Other</option></select></label><label>Date<div className="date-input"><CalendarDays size={15} /> Today</div></label></div><button className="primary-button submit-button" type="submit">Save transaction</button></form></div>}
-    </main>
-  )
+  if (!loaded) return <main className="app-shell"><section className="content-area"><div className="page-content"><p className="subheading">Loading your private money data…</p></div></section></main>
+  return <main className="app-shell">
+    <aside className="sidebar"><div className="brand"><div className="brand-mark">M</div><span>Money <b>Saathi</b></span></div><div className="sidebar-rule"/><p className="eyebrow">Your money, simply</p><nav className="side-nav" aria-label="Primary navigation">{navItems.map(item => { const Icon = item.icon; return <button key={item.label} onClick={() => setActive(item.label)} className={active === item.label ? 'nav-item active' : 'nav-item'}><Icon size={18}/><span>{item.label}</span></button> })}</nav><div className="sidebar-bottom"><div className="privacy-chip"><span><b>Private by design</b><small>Your data stays on this device.</small></span></div><button className="help-link" onClick={() => window.alert('Money Saathi stores finance records only in this browser. There is no account or cloud sync in V1.')}>Privacy details</button></div></aside>
+    <section className="content-area"><header className="topbar"><div className="mobile-brand"><div className="brand-mark">M</div><span>Money <b>Saathi</b></span></div><button className="profile" aria-label="Device-only app">S</button></header><div className="page-content">
+      <div className="welcome-row"><div><p className="eyebrow">{new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p><h1>{active}</h1><p className="subheading">Your financial data is stored locally on this device.</p></div><button className="desktop-add" onClick={() => setShowAdd(true)}><Plus size={18}/> Add transaction</button></div>
+      {active === 'Home' && <><section className="balance-card"><div><p className="card-label">Current balance</p><div className="balance-value">{formatCurrency(currentBalance(openingBalance, transactions))}</div><button className="balance-note" onClick={changeOpeningBalance}>Opening balance: {formatCurrency(openingBalance)} · Edit</button></div></section><div className="stats-grid"><Stat label="Income this month" value={formatCurrency(income)} icon={ArrowDownLeft}/><Stat label="Expenses this month" value={formatCurrency(expenses)} icon={ArrowUpRight}/><Stat label="Saved this month" value={formatCurrency(savings)} note={rate === null ? 'No income yet' : `${rate.toFixed(1)}% savings rate`} icon={Target}/></div><section className="panel transactions-panel"><div className="panel-heading"><div><p className="eyebrow">Latest activity</p><h2>Recent transactions</h2></div><button className="text-button" onClick={() => setActive('Transactions')}>View all</button></div><div className="transaction-list">{transactions.length === 0 ? <p className="subheading">No transactions yet. Add your first income or expense.</p> : transactions.slice(0, 6).map(item => <TransactionRow key={item.id} item={item} onDelete={removeTransaction}/>)}</div></section></>}
+      {active === 'Transactions' && <section className="panel transactions-panel"><div className="panel-heading"><div><p className="eyebrow">Persistent local records</p><h2>All transactions</h2></div><button className="desktop-add" onClick={() => setShowAdd(true)}><Plus size={16}/> Add</button></div><div className="transaction-list">{transactions.map(item => <TransactionRow key={item.id} item={item} onDelete={removeTransaction}/>)}</div></section>}
+      {active === 'Reports' && <section className="panel"><p className="eyebrow">Reconciled from transactions</p><h2>Monthly report</h2><div className="report-grid"><p>Income<strong>{formatCurrency(income)}</strong></p><p>Expenses<strong>{formatCurrency(expenses)}</strong></p><p>Savings<strong>{formatCurrency(savings)}</strong></p><p>Savings rate<strong>{rate === null ? '—' : `${rate.toFixed(1)}%`}</strong></p></div></section>}
+      {active === 'Budget' && <section className="panel"><p className="eyebrow">Coming with your data model</p><h2>Budget</h2><p className="subheading">Budget records are ready for local persistence. Add transactions first to make your spending plan meaningful.</p></section>}
+    </div></section><nav className="bottom-nav" aria-label="Mobile navigation">{navItems.map(item => { const Icon = item.icon; return <button key={item.label} onClick={() => setActive(item.label)} className={active === item.label ? 'bottom-item active' : 'bottom-item'}><Icon size={20}/><span>{item.label}</span></button> })}</nav><button className="floating-add" aria-label="Add transaction" onClick={() => setShowAdd(true)}><Plus size={24}/></button>
+    {showAdd && <div className="modal-backdrop" onMouseDown={event => { if (event.target === event.currentTarget) setShowAdd(false) }}><form className="add-sheet" onSubmit={addTransaction}><div className="sheet-header"><div><p className="eyebrow">Quick entry</p><h2>Add a transaction</h2></div><button type="button" className="round-button small" onClick={() => setShowAdd(false)} aria-label="Close"><X size={17}/></button></div><div className="entry-toggle"><button type="button" className={type === 'expense' ? 'selected expense' : ''} onClick={() => setType('expense')}>Expense</button><button type="button" className={type === 'income' ? 'selected income' : ''} onClick={() => setType('income')}>Income</button></div><label>Amount in Ngultrum<input inputMode="decimal" value={amount} onChange={event => setAmount(event.target.value)} placeholder="0.00" required/></label><label>Category<select value={categoryId} onChange={event => setCategoryId(event.target.value)}>{categories.map(category => <option key={category.id} value={category.id}>{category.label}</option>)}</select></label><label>Date<input type="date" value={date} onChange={event => setDate(event.target.value)} required/></label><label>Note<input value={note} onChange={event => setNote(event.target.value)} placeholder="Optional note"/></label><button className="primary-button submit-button" type="submit">Save transaction</button></form></div>}
+  </main>
 }
+
+function Stat({ label, value, note, icon: Icon }: { label: string; value: string; note?: string; icon: typeof ArrowDownLeft }) { return <div className="stat-card"><div className="stat-card__top"><span>{label}</span><span className="stat-icon"><Icon size={16}/></span></div><strong>{value}</strong><small>{note || 'This month'}</small></div> }
+function TransactionRow({ item, onDelete }: { item: Transaction; onDelete: (id: string) => void }) { const category = categories.find(entry => entry.id === item.categoryId)?.label || 'Other'; return <div className="transaction-row"><div className={`transaction-avatar ${item.type === 'income' ? 'sage' : 'peach'}`}>{item.type === 'income' ? '↗' : '⌁'}</div><div className="transaction-copy"><strong>{item.note || category}</strong><span>{category} · {item.date}</span></div><strong className={item.type === 'income' ? 'amount-income' : ''}>{item.type === 'income' ? '+' : '-'}{formatCurrency(item.amountChetrum)}</strong><button className="icon-button" aria-label={`Delete ${item.note || category}`} onClick={() => onDelete(item.id)}><Trash2 size={16}/></button></div> }
