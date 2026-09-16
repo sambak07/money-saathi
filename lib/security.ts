@@ -10,3 +10,6 @@ export function lockRecordFromUnknown(value: unknown): LockRecord | null { if (!
 export function publicLockStatus(record: LockRecord | null) { return record?.enabled === true }
 function equal(a: string, b: string) { return a.length === b.length && [...a].every((char, index) => char === b[index]) }
 export { equal }
+
+export function autoLockElapsed(lastActivityAt: number, now: number, timeoutMinutes: number) { return timeoutMinutes > 0 && now - lastActivityAt >= timeoutMinutes * 60_000 }
+export function backgroundLockDecision(hiddenAt: number, visibleAt: number, timeoutMinutes: number) { return autoLockElapsed(hiddenAt, visibleAt, timeoutMinutes) }
