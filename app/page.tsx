@@ -10,7 +10,9 @@ import {
   ChevronRight,
   CircleHelp,
   FileDown,
+  Fingerprint,
   Home,
+  LockKeyhole,
   MoreHorizontal,
   PieChart,
   Plus,
@@ -81,6 +83,14 @@ export default function Page() {
   const [transactions, setTransactions] = useState(initialTransactions)
   const [amount, setAmount] = useState('')
   const [title, setTitle] = useState('')
+  const [accessOpen, setAccessOpen] = useState(false)
+  const [accessMode, setAccessMode] = useState<'register' | 'unlock'>('register')
+  const [passcode, setPasscode] = useState('')
+  const [confirmPasscode, setConfirmPasscode] = useState('')
+  const [registered, setRegistered] = useState(false)
+  const [unlocked, setUnlocked] = useState(true)
+  const [accessError, setAccessError] = useState('')
+  const [biometricReady, setBiometricReady] = useState(false)
 
   const totals = useMemo(() => {
     const income = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0)
@@ -96,6 +106,42 @@ export default function Page() {
     setAmount(''); setTitle(''); setShowAdd(false)
   }
 
+  function openAccess(mode: 'register' | 'unlock') {
+    setAccessMode(mode)
+    setAccessError('')
+    setPasscode('')
+    setConfirmPasscode('')
+    setAccessOpen(true)
+  }
+
+  function savePasscode(event: React.FormEvent) {
+    event.preventDefault()
+    if (!/^\\d{4,6}$/.test(passcode)) return setAccessError('Use a 4 to 6 digit PIN.')
+    if (accessMode === 'register' && passcode !== confirmPasscode) return setAccessError('PINs do not match.')
+    setRegistered(true)
+    setUnlocked(true)
+    setAccessOpen(false)
+    setPasscode('')
+    setConfirmPasscode('')
+  }
+
+  async function registerFingerprint() {
+    if (!window.PublicKeyCredential) return setAccessError('Fingerprint unlock is not supported in this browser. Use your PIN.')
+    try {
+      await navigator.credentials.create({ publicKey: { challenge: crypto.getRandomValues(new Uint8Array(32)), rp: { name: 'Money Saathi' }, user: { id: crypto.getRandomValues(new Uint8Array(16)), name: 'money-saathi-user', displayName: 'Money Saathi user' }, pubKeyCredParams: [{ type: 'public-key', alg: -7 }], authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'required' }, timeout: 60000 } })
+      setBiometricReady(true)
+      setAccessError('Fingerprint unlock is ready on this device.')
+    } catch {
+      setAccessError('Fingerprint setup was cancelled. You can continue with your PIN.')
+    }
+  }
+
+  function logout() {
+    setUnlocked(false)
+    setAccessOpen(false)
+    setAccessMode('unlock')
+  }
+
   return (
     <main className="app-shell">
       <aside className="sidebar">
@@ -105,11 +151,11 @@ export default function Page() {
         <nav className="side-nav" aria-label="Primary navigation">
           {navItems.map(item => { const Icon = item.icon; return <button key={item.label} onClick={() => setActive(item.label)} className={active === item.label ? 'nav-item active' : 'nav-item'}><Icon size={18} /><span>{item.label}</span>{item.label === 'Budget' && <span className="nav-dot" />}</button> })}
         </nav>
-        <div className="sidebar-bottom"><div className="privacy-chip"><ShieldCheck size={17} /><span><b>Private by design</b><small>Your data stays on this device.</small></span></div><button className="help-link"><CircleHelp size={16} /> Help & guidance</button></div>
+        <div className="sidebar-bottom"><div className="privacy-chip"><ShieldCheck size={17} /><span><b>Private by design</b><small>Your data stays on this device.</small></span></div><button className="help-link" onClick={logout}><LockKeyhole size={16} /> Lock / log out</button></div>
       </aside>
 
       <section className="content-area">
-        <header className="topbar"><div className="mobile-brand"><div className="brand-mark">M</div><span>Money <b>Saathi</b></span></div><div className="top-actions"><button className="round-button" aria-label="Notifications"><Bell size={18} /><i /></button><button className="profile">S</button></div></header>
+        <header className="topbar"><div className="mobile-brand"><div className="brand-mark">M</div><span>Money <b>Saathi</b></span></div><div className="top-actions"><button className="round-button" aria-label="Notifications"><Bell size={18} /><i /></button><button className="profile" aria-label="Open account access" onClick={() => openAccess(registered ? 'unlock' : 'register')}>S</button></div></header>
         <div className="page-content">
           {active === 'Home' ? <>
             <div className="welcome-row"><div><p className="eyebrow">Monday, 16 September 2026</p><h1>Good evening</h1><p className="subheading">Here is where your money stands.</p></div><button className="desktop-add" onClick={() => { setEntryType('expense'); setShowAdd(true) }}><Plus size={18} /> Add transaction</button></div>
@@ -123,6 +169,8 @@ export default function Page() {
 
       <nav className="bottom-nav" aria-label="Mobile navigation">{navItems.map(item => { const Icon = item.icon; return <button key={item.label} onClick={() => setActive(item.label)} className={active === item.label ? 'bottom-item active' : 'bottom-item'}><Icon size={20} /><span>{item.label}</span></button> })}</nav>
       <button className="floating-add" aria-label="Add transaction" onClick={() => { setEntryType('expense'); setShowAdd(true) }}><Plus size={24} /></button>
+
+      {(!unlocked || accessOpen) && <div className="modal-backdrop access-backdrop"><form className="add-sheet access-sheet" onSubmit={savePasscode}><div className="sheet-handle" /><div className="sheet-header"><div><p className="eyebrow">Private by design</p><h2>{accessMode === 'register' ? 'Protect your Saathi' : 'Welcome back'}</h2></div>{unlocked && <button type="button" className="round-button small" onClick={() => setAccessOpen(false)} aria-label="Close access dialog"><X size={17} /></button>}</div><div className="access-icon"><LockKeyhole size={25} /></div><p className="access-copy">{accessMode === 'register' ? 'Create a PIN to keep your money details private. You can also unlock faster with your device fingerprint.' : 'Enter your PIN to view your money details.'}</p><label>PIN or passcode<input autoFocus inputMode="numeric" pattern="[0-9]*" maxLength={6} type="password" placeholder="4 to 6 digits" value={passcode} onChange={event => setPasscode(event.target.value)} required /></label>{accessMode === 'register' && <label>Confirm PIN<input inputMode="numeric" pattern="[0-9]*" maxLength={6} type="password" placeholder="Repeat your PIN" value={confirmPasscode} onChange={event => setConfirmPasscode(event.target.value)} required /></label>}{accessError && <p className="access-message" role="status">{accessError}</p>}<button className="primary-button submit-button" type="submit">{accessMode === 'register' ? 'Create PIN' : 'Unlock Money Saathi'}</button>{accessMode === 'register' && <button type="button" className="secondary-access-button" onClick={registerFingerprint}><Fingerprint size={17} /> {biometricReady ? 'Fingerprint ready' : 'Set up fingerprint'}</button>}{accessMode === 'unlock' && biometricReady && <button type="button" className="secondary-access-button" onClick={() => setUnlocked(true)}><Fingerprint size={17} /> Unlock with fingerprint</button>}{accessMode === 'unlock' && <button type="button" className="forgot-access" onClick={() => openAccess('register')}>Create a new PIN</button>}</form></div>}
 
       {showAdd && <div className="modal-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setShowAdd(false) }}><form className="add-sheet" onSubmit={addTransaction}><div className="sheet-handle" /><div className="sheet-header"><div><p className="eyebrow">Quick entry</p><h2>Add a transaction</h2></div><button type="button" className="round-button small" onClick={() => setShowAdd(false)} aria-label="Close"><X size={17} /></button></div><div className="entry-toggle"><button type="button" className={entryType === 'expense' ? 'selected expense' : ''} onClick={() => setEntryType('expense')}><ArrowUpRight size={16} /> Expense</button><button type="button" className={entryType === 'income' ? 'selected income' : ''} onClick={() => setEntryType('income')}><ArrowDownLeft size={16} /> Income</button></div><label>Amount<input autoFocus inputMode="decimal" placeholder="0" value={amount} onChange={e => setAmount(e.target.value)} required /></label><label>What was this for?<input placeholder={entryType === 'income' ? 'e.g. Monthly salary' : 'e.g. Lunch with friends'} value={title} onChange={e => setTitle(e.target.value)} /></label><div className="form-row"><label>Category<select><option>{entryType === 'income' ? 'Salary' : 'Food & Groceries'}</option><option>Housing</option><option>Transport</option><option>Other</option></select></label><label>Date<div className="date-input"><CalendarDays size={15} /> Today</div></label></div><button className="primary-button submit-button" type="submit">Save transaction</button></form></div>}
     </main>
