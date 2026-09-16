@@ -1,25 +1,10 @@
 import type { Budget, RecurringItem } from './planning'
-
-export type ReminderSettings = { key: 'reminders'; enabled: boolean; budgetThresholdPercent: number; recurringDaysAhead: number; browserNotifications: boolean }
-export type Reminder = { id: string; kind: 'budget' | 'recurring'; title: string; body: string; severity: 'info' | 'warning'; action: 'Budget' }
-
-export const defaultReminderSettings: ReminderSettings = { key: 'reminders', enabled: true, budgetThresholdPercent: 80, recurringDaysAhead: 3, browserNotifications: false }
-
+import { categoryLabel } from './finance'
+export type ReminderSettings = { key: 'reminders'; enabled: boolean; budgetAlerts: boolean; budgetThresholdPercent: number; recurringDaysAhead: 0 | 1 | 3 | 7; browserNotifications: boolean }
+export type Reminder = { id: string; kind: 'budget' | 'recurring'; title: string; body: string; severity: 'info' | 'warning'; action: 'Budget' | 'Transactions'; dueDate?: string; daysUntil?: number }
+export const defaultReminderSettings: ReminderSettings = { key: 'reminders', enabled: true, budgetAlerts: true, budgetThresholdPercent: 80, recurringDaysAhead: 3, browserNotifications: false }
 export function reminderKey(reminder: Reminder, month: string) { return `${month}:${reminder.kind}:${reminder.id}` }
-
-export function buildReminders(budgets: Budget[], recurring: RecurringItem[], spending: Record<string, number>, month: string, today = new Date()) {
-  const reminders: Reminder[] = []
-  for (const budget of budgets) {
-    if (budget.month !== month) continue
-    const percent = budget.limitChetrum ? (spending[budget.categoryId] || 0) / budget.limitChetrum * 100 : 0
-    if (percent >= 100) reminders.push({ id: budget.id, kind: 'budget', title: 'Budget exceeded', body: `${budget.categoryId} is over its monthly limit.`, severity: 'warning', action: 'Budget' })
-    else if (percent >= 80) reminders.push({ id: budget.id, kind: 'budget', title: 'Budget nearly reached', body: `${budget.categoryId} has used ${Math.round(percent)}% of its monthly limit.`, severity: 'warning', action: 'Budget' })
-  }
-  const current = new Date(today.getFullYear(), today.getMonth(), today.getDate())
-  for (const item of recurring.filter(entry => entry.active && entry.lastConfirmedMonth !== month)) {
-    const due = new Date(today.getFullYear(), today.getMonth(), Math.min(item.dayOfMonth, new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate()))
-    const days = Math.ceil((due.getTime() - current.getTime()) / 86400000)
-    if (days >= 0 && days <= 3) reminders.push({ id: item.id, kind: 'recurring', title: 'Recurring payment due', body: `${item.name} is due in ${days} day${days === 1 ? '' : 's'}.`, severity: 'info', action: 'Budget' })
-  }
-  return reminders
-}
+export function buildReminders(budgets: Budget[], recurring: RecurringItem[], spending: Record<string, number>, month: string, settingsOrToday: ReminderSettings | Date = defaultReminderSettings, maybeToday = new Date()) { const settings = settingsOrToday instanceof Date ? defaultReminderSettings : settingsOrToday; const today = settingsOrToday instanceof Date ? settingsOrToday : maybeToday; const reminders: Reminder[] = []; const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate(); const current = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+  if (settings.budgetAlerts) for (const budget of budgets) { if (budget.month !== month) continue; const percent = budget.limitChetrum ? (spending[budget.categoryId] || 0) / budget.limitChetrum * 100 : 0; if (percent >= settings.budgetThresholdPercent) reminders.push({ id: budget.id, kind: 'budget', title: percent >= 100 ? 'Budget exceeded' : 'Budget nearly reached', body: `${categoryLabel(budget.categoryId)} has used ${Math.round(percent)}% of its ${new Date(`${month}-01`).toLocaleString('en-US', { month: 'long' })} budget.`, severity: percent >= 100 ? 'warning' : 'info', action: 'Budget' }) }
+  for (const item of recurring.filter(entry => entry.active && entry.lastConfirmedMonth !== month)) { const day = Math.min(item.dayOfMonth, lastDay); const due = new Date(today.getFullYear(), today.getMonth(), day); const days = Math.round((due.getTime() - current.getTime()) / 86400000); if (days <= settings.recurringDaysAhead) { const overdue = days < 0; const label = Math.abs(days) === 0 ? 'today' : Math.abs(days) === 1 ? overdue ? '1 day ago' : 'tomorrow' : overdue ? `${Math.abs(days)} days ago` : `in ${days} days`; reminders.push({ id: item.id, kind: 'recurring', title: overdue ? 'Recurring item overdue' : 'Recurring item due', body: `${item.name} of Nu. ${(item.amountChetrum / 100).toLocaleString('en-IN', { minimumFractionDigits: 2 })} is ${overdue ? 'overdue by' : 'due'} ${label}.`, severity: overdue ? 'warning' : 'info', action: 'Transactions', dueDate: due.toISOString(), daysUntil: days }) } }
+  return reminders.sort((a, b) => Number(b.severity === 'warning') - Number(a.severity === 'warning')) }
