@@ -7,8 +7,9 @@ export function openDatabase(): Promise<IDBDatabase> {
   if (typeof indexedDB === 'undefined') return Promise.reject(new Error('Private storage is unavailable on this device.'))
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION)
-    request.onerror = () => reject(request.error || new Error('Could not open private storage.'))
-    request.onblocked = () => reject(new Error('Close another Money Saathi tab to update private storage.'))
+    const timeout = window.setTimeout(() => { request.onerror = null; reject(new Error('Private storage took too long to open. Close other Money Saathi tabs and retry.')) }, 8000)
+    request.onerror = () => { window.clearTimeout(timeout); reject(request.error || new Error('Could not open private storage.')) }
+    request.onblocked = () => { window.clearTimeout(timeout); reject(new Error('Close another Money Saathi tab to update private storage.')) }
     request.onupgradeneeded = () => {
       const db = request.result
       for (const store of ['transactions', 'categories', 'budgets', 'recurring', 'settings', 'audit', 'lock', 'reminders', 'reminderDismissals'] as StoreName[]) {
@@ -16,6 +17,7 @@ export function openDatabase(): Promise<IDBDatabase> {
       }
     }
     request.onsuccess = () => {
+      window.clearTimeout(timeout)
       const db = request.result
       db.onversionchange = () => db.close()
       resolve(db)
