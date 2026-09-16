@@ -52,20 +52,28 @@ export function transactionsToCsv(items: Transaction[]) {
 
 export type Backup = { schemaVersion: number; exportedAt: string; transactions: Transaction[]; settings: unknown[]; categories: unknown[]; budgets: unknown[]; recurring: unknown[] }
 export function serializeBackup(data: Omit<Backup, 'schemaVersion' | 'exportedAt'>): string { return JSON.stringify({ schemaVersion: SCHEMA_VERSION, exportedAt: new Date().toISOString(), ...data }, null, 2) }
-function validDate(value: unknown) { return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(Date.parse(`${value}T00:00:00Z`)) }
+function validDate(value: unknown) { if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false; const [year, month, day] = value.split('-').map(Number); const date = new Date(Date.UTC(year, month - 1, day)); return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day }
+function validIso(value: unknown) { return typeof value === 'string' && !Number.isNaN(Date.parse(value)) && new Date(value).toISOString() === value }
+function isRecord(value: unknown): value is Record<string, unknown> { return !!value && typeof value === 'object' && !Array.isArray(value) }
 export function validateBackup(input: unknown): Backup {
-  if (!input || typeof input !== 'object') throw new Error('Backup must be a JSON object.')
-  const value = input as Partial<Backup>
-  if (value.schemaVersion !== SCHEMA_VERSION) throw new Error('Unsupported backup version.')
-  if (!Array.isArray(value.transactions) || !Array.isArray(value.settings) || !Array.isArray(value.categories) || !Array.isArray(value.budgets) || !Array.isArray(value.recurring)) throw new Error('Backup is missing required data.')
+  if (!isRecord(input)) throw new Error('Backup must be a JSON object.')
+  if (input.schemaVersion !== SCHEMA_VERSION || typeof input.exportedAt !== 'string' || !validIso(input.exportedAt)) throw new Error('Unsupported or malformed backup version.')
+  const keys = Object.keys(input).sort().join(','); if (keys !== 'budgets,categories,exportedAt,recurring,schemaVersion,settings,transactions') throw new Error('Backup contains unknown fields.')
+  const arrays = ['transactions', 'settings', 'categories', 'budgets', 'recurring'] as const
+  for (const key of arrays) if (!Array.isArray(input[key])) throw new Error('Backup is missing required data.')
+  const transactions = input.transactions as unknown[]
+  const settingsList = input.settings as unknown[]
   const ids = new Set<string>()
-  for (const item of value.transactions) {
-    if (!item || typeof item !== 'object') throw new Error('Invalid transaction.')
-    const transaction = item as Transaction
-    if (!transaction.id || ids.has(transaction.id) || !['income', 'expense'].includes(transaction.type) || !Number.isInteger(transaction.amountChetrum) || transaction.amountChetrum <= 0 || !validDate(transaction.date) || typeof transaction.createdAt !== 'string' || typeof transaction.updatedAt !== 'string') throw new Error('Invalid transaction data.')
+  for (const item of transactions) {
+    if (!isRecord(item) || Object.keys(item).sort().join(',') !== 'amountChetrum,categoryId,createdAt,date,id,isRecurring,note,paymentMethod,type,updatedAt') throw new Error('Invalid transaction data.')
+    const transaction = item as unknown as Transaction
+    if (typeof transaction.id !== 'string' || !transaction.id || ids.has(transaction.id) || !['income', 'expense'].includes(transaction.type) || !Number.isSafeInteger(transaction.amountChetrum) || transaction.amountChetrum <= 0 || typeof transaction.categoryId !== 'string' || !allCategories.some(category => category.id === transaction.categoryId) || !validDate(transaction.date) || !PAYMENT_METHODS.includes(transaction.paymentMethod as PaymentMethod) || typeof transaction.note !== 'string' || typeof transaction.isRecurring !== 'boolean' || !validIso(transaction.createdAt) || !validIso(transaction.updatedAt)) throw new Error('Invalid transaction data.')
     ids.add(transaction.id)
   }
-  return value as Backup
+  if (settingsList.length !== 1 || !isRecord(settingsList[0]) || Object.keys(settingsList[0]).sort().join(',') !== 'currency,key,openingBalanceChetrum,sampleData') throw new Error('Invalid settings data.')
+  const settings = settingsList[0] as Record<string, unknown>; if (settings.key !== 'app' || settings.currency !== 'BTN' || !Number.isSafeInteger(settings.openingBalanceChetrum) || (settings.openingBalanceChetrum as number) < 0 || typeof settings.sampleData !== 'boolean') throw new Error('Invalid settings data.')
+  for (const key of ['categories', 'budgets', 'recurring'] as const) for (const item of input[key] as unknown[]) if (!isRecord(item)) throw new Error(`Invalid ${key} data.`)
+  return input as unknown as Backup
 }
 
 export function downloadFile(filename: string, content: string, type: string) { const blob = new Blob([content], { type }); const url = URL.createObjectURL(blob); const anchor = document.createElement('a'); anchor.href = url; anchor.download = filename; anchor.click(); URL.revokeObjectURL(url) }
