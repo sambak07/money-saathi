@@ -1,7 +1,7 @@
 export const DB_NAME = 'money-saathi'
-export const DB_VERSION = 2
+export const DB_VERSION = 3
 
-export type StoreName = 'transactions' | 'categories' | 'budgets' | 'recurring' | 'settings' | 'audit'
+export type StoreName = 'transactions' | 'categories' | 'budgets' | 'recurring' | 'settings' | 'audit' | 'lock' | 'reminders' | 'reminderDismissals'
 
 export function openDatabase(): Promise<IDBDatabase> {
   if (typeof indexedDB === 'undefined') return Promise.reject(new Error('Private storage is unavailable on this device.'))
@@ -11,8 +11,8 @@ export function openDatabase(): Promise<IDBDatabase> {
     request.onblocked = () => reject(new Error('Close another Money Saathi tab to update private storage.'))
     request.onupgradeneeded = () => {
       const db = request.result
-      for (const store of ['transactions', 'categories', 'budgets', 'recurring', 'settings', 'audit'] as StoreName[]) {
-        if (!db.objectStoreNames.contains(store)) db.createObjectStore(store, { keyPath: store === 'settings' ? 'key' : 'id' })
+      for (const store of ['transactions', 'categories', 'budgets', 'recurring', 'settings', 'audit', 'lock', 'reminders', 'reminderDismissals'] as StoreName[]) {
+        if (!db.objectStoreNames.contains(store)) db.createObjectStore(store, { keyPath: store === 'settings' || store === 'lock' || store === 'reminders' ? 'key' : store === 'reminderDismissals' ? 'id' : 'id' })
       }
     }
     request.onsuccess = () => {
