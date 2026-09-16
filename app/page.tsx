@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { ArrowDownLeft, ArrowUpRight, BarChart3, Home, Plus, Target, WalletCards, X, Trash2 } from 'lucide-react'
-import { currentBalance, monthlyExpenses, monthlyIncome, monthlySavings, savingsRate, totalExpenses, totalIncome } from '@/lib/analytics'
+import { currentBalance, monthlyExpenses, monthlyIncome, monthlySavings, savingsRate } from '@/lib/analytics'
 import { formatCurrency, toChetrum } from '@/lib/currency'
 import { getSettings, saveSettings } from '@/lib/settings'
 import { createTransaction, todayLocal, transactionRepository, type Transaction } from '@/lib/transactions'
@@ -21,8 +21,28 @@ export default function Page() {
   const [note, setNote] = useState('')
   const [date, setDate] = useState(todayLocal())
   const [loaded, setLoaded] = useState(false)
+  const [storageError, setStorageError] = useState(false)
 
-  useEffect(() => { Promise.all([transactionRepository.list(), getSettings()]).then(([items, settings]) => { setTransactions(items); setOpeningBalance(settings.openingBalanceChetrum); setLoaded(true) }) }, [])
+  async function loadPrivateData() {
+    setLoaded(false)
+    setStorageError(false)
+    try {
+      const [items, settings] = await Promise.all([transactionRepository.list(), getSettings()])
+      setTransactions(items)
+      setOpeningBalance(settings.openingBalanceChetrum)
+      setLoaded(true)
+    } catch {
+      setStorageError(true)
+    }
+  }
+
+  useEffect(() => {
+    Promise.all([transactionRepository.list(), getSettings()]).then(([items, settings]) => {
+      setTransactions(items)
+      setOpeningBalance(settings.openingBalanceChetrum)
+      setLoaded(true)
+    }).catch(() => setStorageError(true))
+  }, [])
   const income = useMemo(() => monthlyIncome(transactions), [transactions])
   const expenses = useMemo(() => monthlyExpenses(transactions), [transactions])
   const savings = useMemo(() => monthlySavings(transactions), [transactions])
@@ -32,12 +52,17 @@ export default function Page() {
     event.preventDefault()
     if (!amount || Number(amount) <= 0) return
     const transaction = createTransaction({ type, amountChetrum: toChetrum(amount), categoryId, date, paymentMethod: 'Cash', note: note.trim(), isRecurring: false })
-    await transactionRepository.save(transaction)
-    setTransactions(current => [transaction, ...current]); setAmount(''); setNote(''); setShowAdd(false)
+    try {
+      await transactionRepository.save(transaction)
+      setTransactions(current => [transaction, ...current]); setAmount(''); setNote(''); setShowAdd(false)
+    } catch {
+      setStorageError(true)
+    }
   }
-  async function removeTransaction(id: string) { if (window.confirm('Delete this transaction? This cannot be undone.')) { await transactionRepository.remove(id); setTransactions(current => current.filter(item => item.id !== id)) } }
-  async function changeOpeningBalance() { const value = window.prompt('Opening balance in Ngultrum', String(openingBalance / 100)); if (value !== null && Number(value) >= 0) { const next = toChetrum(value); setOpeningBalance(next); await saveSettings({ key: 'app', openingBalanceChetrum: next, currency: 'BTN', sampleData: false }) } }
+  async function removeTransaction(id: string) { if (window.confirm('Delete this transaction? This cannot be undone.')) { try { await transactionRepository.remove(id); setTransactions(current => current.filter(item => item.id !== id)) } catch { setStorageError(true) } } }
+  async function changeOpeningBalance() { const value = window.prompt('Opening balance in Ngultrum', String(openingBalance / 100)); if (value !== null && Number(value) >= 0) { const next = toChetrum(value); try { await saveSettings({ key: 'app', openingBalanceChetrum: next, currency: 'BTN', sampleData: false }); setOpeningBalance(next) } catch { setStorageError(true) } } }
 
+  if (storageError) return <main className="app-shell"><section className="content-area"><div className="page-content storage-error"><p className="eyebrow">Private storage unavailable</p><h1>Money Saathi could not access private storage on this device.</h1><p className="subheading">Your existing data has not been intentionally deleted.</p><button className="primary-button" onClick={() => void loadPrivateData()}>Retry</button></div></section></main>
   if (!loaded) return <main className="app-shell"><section className="content-area"><div className="page-content"><p className="subheading">Loading your private money data…</p></div></section></main>
   return <main className="app-shell">
     <aside className="sidebar"><div className="brand"><div className="brand-mark">M</div><span>Money <b>Saathi</b></span></div><div className="sidebar-rule"/><p className="eyebrow">Your money, simply</p><nav className="side-nav" aria-label="Primary navigation">{navItems.map(item => { const Icon = item.icon; return <button key={item.label} onClick={() => setActive(item.label)} className={active === item.label ? 'nav-item active' : 'nav-item'}><Icon size={18}/><span>{item.label}</span></button> })}</nav><div className="sidebar-bottom"><div className="privacy-chip"><span><b>Private by design</b><small>Your data stays on this device.</small></span></div><button className="help-link" onClick={() => window.alert('Money Saathi stores finance records only in this browser. There is no account or cloud sync in V1.')}>Privacy details</button></div></aside>

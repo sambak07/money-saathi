@@ -3,7 +3,10 @@ import type { Transaction } from './transactions'
 export function totalIncome(items: Transaction[]) { return items.filter(item => item.type === 'income').reduce((sum, item) => sum + item.amountChetrum, 0) }
 export function totalExpenses(items: Transaction[]) { return items.filter(item => item.type === 'expense').reduce((sum, item) => sum + item.amountChetrum, 0) }
 export function currentBalance(openingBalance: number, items: Transaction[]) { return openingBalance + totalIncome(items) - totalExpenses(items) }
-export function monthlyItems(items: Transaction[], month = new Date().toISOString().slice(0, 7)) { return items.filter(item => item.date.startsWith(month)) }
+export function localCalendarMonth(date: Date = new Date()): string {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
+}
+export function monthlyItems(items: Transaction[], month = localCalendarMonth()) { return items.filter(item => item.date.startsWith(month)) }
 export function monthlyIncome(items: Transaction[], month?: string) { return totalIncome(monthlyItems(items, month)) }
 export function monthlyExpenses(items: Transaction[], month?: string) { return totalExpenses(monthlyItems(items, month)) }
 export function monthlySavings(items: Transaction[], month?: string) { return monthlyIncome(items, month) - monthlyExpenses(items, month) }

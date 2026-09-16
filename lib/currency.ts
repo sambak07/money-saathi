@@ -7,5 +7,6 @@ export function toChetrum(value: string | number): number {
 export function fromChetrum(value: number): number { return value / 100 }
 
 export function formatCurrency(value: number): string {
-  return `Nu. ${fromChetrum(value).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+  const fractionDigits = value % 100 === 0 ? 0 : 2
+  return `Nu. ${fromChetrum(value).toLocaleString('en-IN', { minimumFractionDigits: fractionDigits, maximumFractionDigits: 2 })}`
 }
