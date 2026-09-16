@@ -69,10 +69,15 @@ export async function replaceStores(values: Partial<Record<StoreName, Array<Reco
     transaction.oncomplete = () => resolve()
     transaction.onerror = () => reject(transaction.error)
     transaction.onabort = () => reject(transaction.error || new Error('Restore transaction aborted.'))
-    for (const name of names) {
-      const objectStore = transaction.objectStore(name)
-      objectStore.clear()
-      for (const value of values[name] || []) objectStore.put(value)
+    try {
+      for (const name of names) {
+        const objectStore = transaction.objectStore(name)
+        objectStore.clear()
+        for (const value of values[name] || []) objectStore.put(value)
+      }
+    } catch (error) {
+      transaction.abort()
+      reject(error instanceof Error ? error : new Error('Restore transaction failed.'))
     }
   })
 }

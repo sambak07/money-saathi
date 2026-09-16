@@ -1,9 +1,12 @@
 const MAX_SAFE_CHETRUM = Number.MAX_SAFE_INTEGER
 
 export function toChetrum(value: string | number): number {
-  const text = typeof value === 'number' ? String(value) : value.replace(/,/g, '').trim()
-  if (!/^\d+(?:\.\d{1,2})?$/.test(text)) throw new Error('Enter a valid amount with up to two decimal places.')
-  const [whole, fraction = ''] = text.split('.')
+  const text = typeof value === 'number' ? String(value) : value.trim()
+  const validGrouping = /^(?:\d+|\d{1,3}(?:,\d{2})*,\d{3}|\d{1,3}(?:,\d{3})+)(?:\.\d{1,2})?$/.test(text)
+  if (!validGrouping) throw new Error('Enter a valid amount with up to two decimal places.')
+  const normalized = text.replaceAll(',', '')
+  if (!/^\d+(?:\.\d{1,2})?$/.test(normalized)) throw new Error('Enter a valid amount with up to two decimal places.')
+  const [whole, fraction = ''] = normalized.split('.')
   const chetrum = Number(whole) * 100 + Number(fraction.padEnd(2, '0'))
   if (!Number.isSafeInteger(chetrum) || chetrum < 0 || chetrum > MAX_SAFE_CHETRUM) throw new Error('Amount is too large.')
   return chetrum
