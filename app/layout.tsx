@@ -3,8 +3,8 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
+  title: 'Money Saathi — Your money, simply',
+  description: 'A calm, private personal finance tracker for everyday money decisions.',
   generator: 'v0.app',
   icons: {
     icon: [
