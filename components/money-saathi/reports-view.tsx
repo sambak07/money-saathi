@@ -1,7 +1,15 @@
 'use client'
+import { useMemo, useState } from 'react'
+import { monthKey } from '@/lib/planning'
+import { availableMonths, budgetPerformance, categoryShares, classificationShares, commitmentMetrics, monthTotals, previousMonthComparison, trendSeries } from '@/lib/reporting'
+import { generateInsights } from '@/lib/insights'
+import type { Transaction } from '@/lib/transactions'
+import type { Budget, RecurringItem } from '@/lib/planning'
+import { MonthlySummary } from './reports/monthly-summary'
+import { CategoryBreakdown } from './reports/category-breakdown'
+import { ClassificationBreakdown } from './reports/classification-breakdown'
+import { BudgetPerformance } from './reports/budget-performance'
+import { SavingsTrend } from './reports/savings-trend'
+import { InsightCards } from './reports/insight-cards'
 
-import type { ReactNode } from 'react'
-
-export function ReportsView({ children }: { children: ReactNode }) {
-  return <>{children}</>
-}
+export function ReportsView({ transactions, budgets, recurring }: { transactions: Transaction[]; budgets: Budget[]; recurring: RecurringItem[] }) { const months = availableMonths(transactions); const [selected, setSelected] = useState(monthKey()); const month = months.includes(selected) ? selected : selected; const totals = useMemo(() => monthTotals(transactions, month), [transactions, month]); const comparison = useMemo(() => previousMonthComparison(transactions, month), [transactions, month]); return <div className="planning-page"><div className="panel planning-heading"><div><p className="eyebrow">Reconciled locally</p><h2>Monthly insights</h2><p className="subheading">Deterministic analysis from your device only.</p></div><label className="month-field">Month<input type="month" value={month} onChange={event => setSelected(event.target.value)}/></label></div><MonthlySummary totals={totals} comparison={comparison}/><div className="report-two-column"><CategoryBreakdown rows={categoryShares(transactions, month)}/><ClassificationBreakdown data={classificationShares(transactions, month)}/></div><BudgetPerformance rows={budgetPerformance(transactions, budgets, month)}/><section className="panel report-section"><p className="eyebrow">Planning metrics</p><h2>Commitments</h2><div className="report-grid"><p>Expected recurring income<strong>{commitmentMetrics(recurring).income}</strong></p><p>Monthly commitments<strong>{commitmentMetrics(recurring).commitments}</strong></p><p>Commitment ratio<strong>{commitmentMetrics(recurring).ratio === null ? '—' : `${commitmentMetrics(recurring).ratio?.toFixed(1)}%`}</strong></p></div></section><SavingsTrend rows={trendSeries(transactions)}/><InsightCards insights={generateInsights(transactions, budgets, month)}/></div> }

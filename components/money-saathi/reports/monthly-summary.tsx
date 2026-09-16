@@ -1,0 +1,4 @@
+'use client'
+import { formatCurrency } from '@/lib/currency'
+import type { MonthTotals, Comparison } from '@/lib/reporting'
+export function MonthlySummary({ totals, comparison }: { totals: MonthTotals; comparison: Comparison }) { const delta = (value: number) => comparison.hasPrevious ? `${value >= 0 ? '+' : '-'}${formatCurrency(Math.abs(value))} vs previous month` : 'No previous-month comparison'; return <section className="panel"><div className="report-grid"><p>Income<strong>{formatCurrency(totals.income)}</strong><small>{delta(comparison.income)}</small></p><p>Expenses<strong>{formatCurrency(totals.expenses)}</strong><small>{delta(comparison.expenses)}</small></p><p>Savings<strong>{formatCurrency(totals.savings)}</strong></p><p>Savings rate<strong>{totals.savingsRate === null ? '—' : `${totals.savingsRate.toFixed(1)}%`}</strong></p></div></section> }

@@ -1,0 +1,3 @@
+import { formatCurrency } from '@/lib/currency'
+import type { CategoryShare } from '@/lib/reporting'
+export function CategoryBreakdown({ rows }: { rows: CategoryShare[] }) { return <section className="panel report-section"><div className="panel-heading"><div><p className="eyebrow">Where it went</p><h2>Spending by category</h2></div></div>{rows.length ? <div className="planning-list">{rows.map(row => <div className="planning-row" key={row.categoryId}><div><b>{row.label}</b><small>{formatCurrency(row.amount)} · {row.percent.toFixed(1)}%</small><span className="progress-track"><i style={{ width: `${Math.min(row.percent, 100)}%` }}/></span></div></div>)}</div> : <p className="subheading">No expenses recorded for this month.</p>}</section> }

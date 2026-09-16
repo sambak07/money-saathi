@@ -1,0 +1,2 @@
+import type { Insight } from '@/lib/insights'
+export function InsightCards({ insights }: { insights: Insight[] }) { return <section className="panel report-section"><p className="eyebrow">Deterministic observations</p><h2>Insights</h2>{insights.length ? <div className="insight-list">{insights.map(insight => <p key={`${insight.kind}-${insight.text}`}>{insight.text}</p>)}</div> : <p className="subheading">Add more activity to generate local insights.</p>}</section> }

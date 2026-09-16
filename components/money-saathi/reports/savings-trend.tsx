@@ -1,0 +1,3 @@
+import { formatCurrency } from '@/lib/currency'
+import type { MonthTotals } from '@/lib/reporting'
+export function SavingsTrend({ rows }: { rows: MonthTotals[] }) { return <section className="panel report-section"><p className="eyebrow">Recent history</p><h2>Savings trend</h2>{rows.length ? <div className="trend-list">{rows.map(row => <div className="trend-row" key={row.month}><b>{row.month}</b><span>Income {formatCurrency(row.income)}</span><span>Expenses {formatCurrency(row.expenses)}</span><strong>Savings {formatCurrency(row.savings)}</strong></div>)}</div> : <p className="subheading">Add transactions across months to see a trend.</p>}</section> }
