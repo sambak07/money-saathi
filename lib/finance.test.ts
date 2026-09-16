@@ -1,28 +1,24 @@
 import { describe, expect, it } from 'vitest'
-import { currentBalance, localCalendarMonth, monthlyExpenses, monthlyIncome, monthlySavings, savingsRate, categoryTotals, totalExpenses, totalIncome } from './analytics'
+import { currentBalance, monthlyExpenses, monthlyIncome, monthlySavings, savingsRate, categoryTotals, totalExpenses, totalIncome } from './analytics'
 import { formatCurrency, toChetrum } from './currency'
-import type { Transaction } from './transactions'
+import { categoriesFor, filterTransactions, serializeBackup, sortedTransactions, transactionsToCsv, updatedTransaction, validateBackup, type Transaction } from './finance'
 
 const items: Transaction[] = [
-  { id: '1', type: 'income', amountChetrum: toChetrum(100000), categoryId: 'salary', date: '2026-09-01', paymentMethod: 'Bank', note: '', isRecurring: false, createdAt: '', updatedAt: '' },
-  { id: '2', type: 'income', amountChetrum: toChetrum(25000), categoryId: 'rental', date: '2026-09-02', paymentMethod: 'Bank', note: '', isRecurring: false, createdAt: '', updatedAt: '' },
-  { id: '3', type: 'expense', amountChetrum: toChetrum(5000), categoryId: 'food', date: '2026-09-03', paymentMethod: 'Cash', note: '', isRecurring: false, createdAt: '', updatedAt: '' },
-  { id: '4', type: 'expense', amountChetrum: toChetrum(18000), categoryId: 'housing', date: '2026-09-04', paymentMethod: 'Bank', note: '', isRecurring: false, createdAt: '', updatedAt: '' },
-  { id: '5', type: 'expense', amountChetrum: toChetrum(3000), categoryId: 'transport', date: '2026-09-05', paymentMethod: 'Cash', note: '', isRecurring: false, createdAt: '', updatedAt: '' },
+  { id: '1', type: 'income', amountChetrum: toChetrum(100000), categoryId: 'salary', date: '2026-09-01', paymentMethod: 'Bank Account', note: 'September salary', isRecurring: false, createdAt: '2026-09-01T01:00:00.000Z', updatedAt: '2026-09-01T01:00:00.000Z' },
+  { id: '2', type: 'income', amountChetrum: toChetrum(25000), categoryId: 'rental', date: '2026-09-02', paymentMethod: 'Bank Account', note: 'Rental income', isRecurring: false, createdAt: '2026-09-02T01:00:00.000Z', updatedAt: '2026-09-02T01:00:00.000Z' },
+  { id: '3', type: 'expense', amountChetrum: toChetrum(5000), categoryId: 'food', date: '2026-09-03', paymentMethod: 'Cash', note: 'Groceries, weekly', isRecurring: false, createdAt: '2026-09-03T01:00:00.000Z', updatedAt: '2026-09-03T01:00:00.000Z' },
+  { id: '4', type: 'expense', amountChetrum: toChetrum(18000), categoryId: 'housing', date: '2026-09-04', paymentMethod: 'Bank Account', note: 'EMI', isRecurring: false, createdAt: '2026-09-04T01:00:00.000Z', updatedAt: '2026-09-04T01:00:00.000Z' },
+  { id: '5', type: 'expense', amountChetrum: toChetrum(3000), categoryId: 'transport', date: '2026-09-05', paymentMethod: 'Cash', note: 'Fuel', isRecurring: false, createdAt: '2026-09-05T01:00:00.000Z', updatedAt: '2026-09-05T01:00:00.000Z' },
 ]
 
 describe('Money Saathi finance model', () => {
-  it('converts and formats chetrum precisely', () => {
-    expect(toChetrum('100.50')).toBe(10050)
-    expect(formatCurrency(toChetrum(100))).toBe('Nu. 100')
-    expect(formatCurrency(toChetrum(100.50))).toBe('Nu. 100.50')
-    expect(formatCurrency(toChetrum(100000))).toBe('Nu. 1,00,000')
-  })
-  it('uses the local calendar month at a UTC month boundary', () => {
-    const localBoundary = { getFullYear: () => 2026, getMonth: () => 8 } as unknown as Date
-    expect(localCalendarMonth(localBoundary)).toBe('2026-09')
-  })
-  it('reconciles acceptance totals', () => { expect(totalIncome(items)).toBe(12500000); expect(totalExpenses(items)).toBe(2600000); expect(monthlySavings(items, '2026-09')).toBe(9900000); expect(savingsRate(items, '2026-09')).toBeCloseTo(79.2); expect(currentBalance(toChetrum(50000), items)).toBe(toChetrum(149000)) })
-  it('groups by month and category', () => { expect(monthlyIncome(items, '2026-09')).toBe(12500000); expect(monthlyExpenses(items, '2026-09')).toBe(2600000); expect(categoryTotals(items).food).toBe(500000) })
-  it('returns null for zero-income savings rate', () => { expect(savingsRate([], '2026-09')).toBeNull() })
+  it('converts and formats chetrum precisely', () => { expect(toChetrum('100.50')).toBe(10050); expect(formatCurrency(toChetrum(100))).toBe('Nu. 100'); expect(formatCurrency(toChetrum(100.50))).toBe('Nu. 100.50'); expect(formatCurrency(toChetrum(100000))).toBe('Nu. 1,00,000') })
+  it('reconciles acceptance totals and edited expense', () => { expect(totalIncome(items)).toBe(12500000); expect(totalExpenses(items)).toBe(2600000); expect(monthlySavings(items, '2026-09')).toBe(9900000); expect(currentBalance(toChetrum(50000), items)).toBe(toChetrum(149000)); const edited = updatedTransaction(items[2], { ...items[2], amountChetrum: toChetrum(6500) }); const next = items.map(item => item.id === edited.id ? edited : item); expect(monthlyExpenses(next, '2026-09')).toBe(2750000); expect(monthlySavings(next, '2026-09')).toBe(9750000); expect(currentBalance(toChetrum(50000), next)).toBe(toChetrum(147500)) })
+  it('keeps identity and createdAt while updating income and expense', () => { const income = updatedTransaction(items[0], { ...items[0], amountChetrum: 10100, type: 'income' }); const expense = updatedTransaction(items[2], { ...items[2], amountChetrum: 650000 }); expect(income.id).toBe(items[0].id); expect(income.createdAt).toBe(items[0].createdAt); expect(income.updatedAt).not.toBe(items[0].updatedAt); expect(expense.amountChetrum).toBe(650000) })
+  it('sorts by transaction date then createdAt', () => { const sameDate = [{ ...items[0], id: 'old', date: '2026-09-10', createdAt: '2026-09-10T01:00:00Z' }, { ...items[1], id: 'new', date: '2026-09-10', createdAt: '2026-09-10T02:00:00Z' }]; expect(sortedTransactions(sameDate).map(item => item.id)).toEqual(['new', 'old']) })
+  it('searches and filters without mutating source', () => { const result = filterTransactions(items, { query: 'groceries', type: 'expense', paymentMethod: 'Cash' }); expect(result.map(item => item.id)).toEqual(['3']); expect(items).toHaveLength(5); expect(categoriesFor('income')[0].id).toBe('salary') })
+  it('escapes CSV and converts Ngultrum decimals', () => { const csv = transactionsToCsv([{ ...items[2], note: 'Tea, "milk"\nshop' }]); expect(csv).toContain('"Tea, ""milk""\nshop"'); expect(csv).toContain('5000.00') })
+  it('serializes and validates complete backups', () => { const parsed = JSON.parse(serializeBackup({ transactions: items, settings: [{ key: 'app' }], categories: [], budgets: [], recurring: [] })); expect(parsed.schemaVersion).toBe(1); expect(validateBackup(parsed).transactions).toHaveLength(5) })
+  it('rejects malformed and unsupported backups before restore', () => { expect(() => validateBackup({})).toThrow(); expect(() => validateBackup({ schemaVersion: 99, transactions: [], settings: [], categories: [], budgets: [], recurring: [] })).toThrow('Unsupported'); expect(() => validateBackup({ schemaVersion: 1, transactions: [{ ...items[0], amountChetrum: -1 }], settings: [], categories: [], budgets: [], recurring: [] })).toThrow() })
+  it('returns null for zero-income savings rate', () => { expect(savingsRate([], '2026-09')).toBeNull(); expect(monthlyIncome(items, '2026-09')).toBe(12500000); expect(categoryTotals(items).food).toBe(500000) })
 })

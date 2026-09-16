@@ -4,6 +4,7 @@ export type Transaction = { id: string; type: 'income' | 'expense'; amountChetru
 export const transactionRepository = {
   list: () => readStore<Transaction>('transactions'),
   save: (transaction: Transaction) => writeStore('transactions', transaction),
+  update: (transaction: Transaction) => writeStore('transactions', { ...transaction, updatedAt: new Date().toISOString() }),
   remove: (id: string) => deleteFromStore('transactions', id),
 }
 export function todayLocal() { const date = new Date(); return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}` }

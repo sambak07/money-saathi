@@ -52,3 +52,19 @@ export async function clearStore(store: StoreName): Promise<void> {
     request.onerror = () => reject(request.error)
   })
 }
+
+export async function replaceStores(values: Partial<Record<StoreName, Array<Record<string, unknown>>>>): Promise<void> {
+  const db = await openDatabase()
+  return new Promise((resolve, reject) => {
+    const names = Object.keys(values) as StoreName[]
+    const transaction = db.transaction(names, 'readwrite')
+    transaction.oncomplete = () => resolve()
+    transaction.onerror = () => reject(transaction.error)
+    transaction.onabort = () => reject(transaction.error || new Error('Restore transaction aborted.'))
+    for (const name of names) {
+      const objectStore = transaction.objectStore(name)
+      objectStore.clear()
+      for (const value of values[name] || []) objectStore.put(value)
+    }
+  })
+}
