@@ -1,4 +1,4 @@
-const VERSION = 'money-saathi-v2'
+const VERSION = 'money-saathi-v3'
 const SHELL = ['/', '/manifest.webmanifest', '/icon.svg']
 
 self.addEventListener('install', event => {
