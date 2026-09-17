@@ -121,11 +121,11 @@ export function MyMoneyView({ assets, onCreate, onEdit, onDelete }: Props) {
   const close = () => { setMode('none'); setSelected(null) }
 
   return <section className="money-page">
-    <div className="panel-heading"><div><p className="eyebrow">My Money</p><h1>Your financial position</h1><p className="subheading">Keep a simple view of the money you hold across savings and deposits.</p></div><button className="primary-button" onClick={openCreate}><Plus size={16}/> Add</button></div>
+    <div className="panel-heading"><div><p className="eyebrow">My Money</p><h1>Money you have</h1><p className="subheading">Keep your savings and deposits in one simple place.</p></div><button className="primary-button" onClick={openCreate}><Plus size={16}/> Add</button></div>
 
     <div className="money-notice"><Wallet size={18}/><p>Balances are updated by you. Money Saathi is not connected to your bank.</p></div>
 
-    <section className="money-summary"><p className="card-label">Tracked financial assets</p><div className="money-summary-value">{formatCurrency(totals.total)}</div></section>
+    <section className="money-summary"><p className="card-label">Savings & deposits</p><div className="money-summary-value">{formatCurrency(totals.total)}</div></section>
 
     <div className="money-breakdown">
       <div className="money-breakdown-item"><span>Savings accounts</span><strong>{formatCurrency(totals.savings)}</strong></div>
@@ -135,7 +135,7 @@ export function MyMoneyView({ assets, onCreate, onEdit, onDelete }: Props) {
 
     <div className="panel-heading money-list-heading"><div><p className="eyebrow">Your money</p><h2>Savings and deposits</h2></div></div>
     {sorted.length === 0
-      ? <div className="empty-state"><Wallet size={20}/><h2>Your financial picture starts here.</h2><p>Add savings accounts and deposits to see your money in one place.</p><button className="primary-button" onClick={openCreate}>Add your first asset</button></div>
+      ? <div className="empty-state"><Wallet size={20}/><h2>Your money picture starts here.</h2><p>Add your savings account or deposit when you&apos;re ready.</p><button className="primary-button" onClick={openCreate}>Add savings or deposit</button></div>
       : <div className="asset-list">{sorted.map(asset => <AssetCard key={asset.id} asset={asset} onEdit={() => openEdit(asset)} onDelete={() => onDelete(asset)}/>)}</div>}
 
     {mode === 'choose' && <div className="modal-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) close() }}>
