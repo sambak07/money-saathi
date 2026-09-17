@@ -1,0 +1,8 @@
+'use client'
+import { useEffect, useState } from 'react'
+import { AppDialog, DialogActions } from './app-dialog'
+
+type Props = { open: boolean; title: string; description?: string; label: string; initialValue?: string; inputType?: string; confirmLabel: string; onCancel: () => void; onSubmit: (value: string) => void | Promise<void>; validate?: (value: string) => string | undefined; busy?: boolean }
+// The dialog opens with fresh caller-provided values, so reset temporary input when its lifecycle changes.
+// eslint-disable-next-line react-hooks/set-state-in-effect
+export function InputDialog({ open, title, description, label, initialValue = '', inputType = 'text', confirmLabel, onCancel, onSubmit, validate, busy = false }: Props) { const [value, setValue] = useState(initialValue); const [error, setError] = useState(''); useEffect(() => { if (open) { setValue(initialValue); setError('') } }, [open, initialValue]); return <AppDialog open={open} title={title} description={description} onClose={onCancel}><form onSubmit={async event => { event.preventDefault(); const message = validate?.(value); if (message) { setError(message); return } await onSubmit(value) }}><label>{label}<input autoFocus type={inputType} value={value} onChange={event => setValue(event.target.value)} disabled={busy} /></label>{error && <p className="form-error">{error}</p>}<DialogActions><button className="secondary-button" type="button" onClick={onCancel} disabled={busy}>Cancel</button><button className="primary-button" type="submit" disabled={busy}>{busy ? 'Saving…' : confirmLabel}</button></DialogActions></form></AppDialog> }
