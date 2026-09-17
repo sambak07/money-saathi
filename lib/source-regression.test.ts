@@ -9,6 +9,12 @@ describe('production source regressions', () => {
     expect(source).toContain('setPendingRecurring(item)')
     expect(source).toContain('async function confirmBudgetDelete()')
     expect(source).toContain('async function confirmRecurringDelete()')
+    const budgetIntent = source.match(/onClick=\{\(\) => setPendingBudget\(budget\)\}/)?.[0] || ''
+    const recurringIntent = source.match(/onClick=\{\(\) => setPendingRecurring\(item\)\}/)?.[0] || ''
+    expect(budgetIntent).toBe('onClick={() => setPendingBudget(budget)}')
+    expect(recurringIntent).toBe('onClick={() => setPendingRecurring(item)}')
+    expect(budgetIntent).not.toContain('removeBudget(')
+    expect(recurringIntent).not.toContain('removeRecurring(')
   })
 
   it('contains no native browser dialogs or dead false branches', () => {
