@@ -1,8 +1,8 @@
 export const DB_NAME = 'money-saathi'
-export const DB_VERSION = 3
+export const DB_VERSION = 4
 export const STORAGE_TIMEOUT_MS = 8000
 
-export type StoreName = 'transactions' | 'categories' | 'budgets' | 'recurring' | 'settings' | 'audit' | 'lock' | 'reminders' | 'reminderDismissals'
+export type StoreName = 'transactions' | 'categories' | 'budgets' | 'recurring' | 'settings' | 'audit' | 'lock' | 'reminders' | 'reminderDismissals' | 'goals'
 
 function storageTimeout(message = 'Private storage took too long to respond.') { return new Error(message) }
 
@@ -17,7 +17,7 @@ export function openDatabase(): Promise<IDBDatabase> {
     request.onblocked = () => fail(new Error('Close other Money Saathi tabs and try again.'))
     request.onupgradeneeded = () => {
       const db = request.result
-      for (const store of ['transactions', 'categories', 'budgets', 'recurring', 'settings', 'audit', 'lock', 'reminders', 'reminderDismissals'] as StoreName[]) {
+      for (const store of ['transactions', 'categories', 'budgets', 'recurring', 'settings', 'audit', 'lock', 'reminders', 'reminderDismissals', 'goals'] as StoreName[]) {
         if (!db.objectStoreNames.contains(store)) db.createObjectStore(store, { keyPath: store === 'settings' || store === 'lock' || store === 'reminders' ? 'key' : 'id' })
       }
     }
