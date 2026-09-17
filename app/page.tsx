@@ -1,7 +1,5 @@
-'use client'
-
-import { AppShell } from '@/components/money-saathi/app-shell'
+import { PublicHome } from '@/components/money-saathi/public-home'
 
 export default function Page() {
-  return <AppShell />
+  return <PublicHome />
 }

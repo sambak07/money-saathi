@@ -4,7 +4,12 @@ import './globals.css'
 export const metadata: Metadata = {
   manifest: '/manifest.webmanifest',
   title: 'Money Saathi — Your money, simply',
-  description: 'A calm, private personal finance tracker for everyday money decisions.',
+  description: 'A Bhutan-first personal money companion for tracking spending, planning monthly finances and saving towards your goals.',
+  openGraph: {
+    title: 'Money Saathi — Your money, simply',
+    description: 'A Bhutan-first personal money companion for tracking spending, planning monthly finances and saving towards your goals.',
+    type: 'website',
+  },
   generator: 'v0.app',
   icons: {
     icon: [

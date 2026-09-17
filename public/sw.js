@@ -1,5 +1,5 @@
-const VERSION = 'money-saathi-v3'
-const SHELL = ['/', '/manifest.webmanifest', '/icon.svg']
+const VERSION = 'money-saathi-v4'
+const SHELL = ['/app', '/manifest.webmanifest', '/icon.svg']
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(VERSION).then(cache => cache.addAll(SHELL)).then(() => self.skipWaiting()))
