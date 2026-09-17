@@ -18,8 +18,14 @@ export type FinancialAssetInput =
 export const FINANCIAL_ASSET_TYPES: FinancialAssetType[] = ['savings-account', 'fixed-deposit', 'recurring-deposit']
 export const financialAssetTypeLabels: Record<FinancialAssetType, string> = { 'savings-account': 'Savings account', 'fixed-deposit': 'Fixed deposit', 'recurring-deposit': 'Recurring deposit' }
 
+// Matches the RFC 4122 v4 format produced by crypto.randomUUID(): 8-4-4-4-12 hex
+// digits, version nibble 4, and an 8/9/a/b variant nibble.
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+export function validAssetId(value: unknown): value is string { return typeof value === 'string' && UUID_PATTERN.test(value) }
+
 export function validChetrum(value: unknown): value is number { return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0 }
-export function validInterestRateBps(value: unknown) { return value === undefined || (typeof value === 'number' && Number.isInteger(value) && value >= 0 && value <= 1_000_000) }
+// 0% to 100%, represented as 0 to 10,000 basis points.
+export function validInterestRateBps(value: unknown) { return value === undefined || (typeof value === 'number' && Number.isInteger(value) && value >= 0 && value <= 10_000) }
 export function validOptionalDate(value: unknown) { if (value === undefined) return true; if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false; const [year, month, day] = value.split('-').map(Number); const date = new Date(Date.UTC(year, month - 1, day)); return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day }
 export function validIsoTimestamp(value: unknown) { return typeof value === 'string' && !Number.isNaN(Date.parse(value)) && new Date(value).toISOString() === value }
 
@@ -28,7 +34,7 @@ function isRecord(value: unknown): value is Record<string, unknown> { return !!v
 export function validateFinancialAssetRecord(input: unknown): input is FinancialAsset {
   if (!isRecord(input)) return false
   const value = input as Record<string, unknown>
-  if (typeof value.id !== 'string' || !value.id.trim()) return false
+  if (!validAssetId(value.id)) return false
   if (typeof value.name !== 'string' || !value.name.trim()) return false
   if (value.institution !== undefined && typeof value.institution !== 'string') return false
   if (!validChetrum(value.currentValueChetrum)) return false
@@ -80,10 +86,16 @@ export function financialTotals(assets: FinancialAsset[]) {
   return { savings, fixedDeposits, recurringDeposits, total: savings + fixedDeposits + recurringDeposits }
 }
 
+// Domain guard: even if a future caller bypasses the UI, an invalid record
+// must never reach IndexedDB. This throws instead of writing.
+function assertValidFinancialAsset(asset: FinancialAsset) {
+  if (!validateFinancialAssetRecord(asset)) throw new Error('Invalid financial asset record; refusing to save.')
+}
+
 export const financialAssetsRepository = {
   list: () => readStore<FinancialAsset>('financialAssets'),
-  save: (asset: FinancialAsset) => writeStore('financialAssets', asset),
-  update: (asset: FinancialAsset) => writeStore('financialAssets', asset),
+  save: async (asset: FinancialAsset) => { assertValidFinancialAsset(asset); return writeStore('financialAssets', asset) },
+  update: async (asset: FinancialAsset) => { assertValidFinancialAsset(asset); return writeStore('financialAssets', asset) },
   remove: (id: string) => deleteFromStore('financialAssets', id),
 }
 

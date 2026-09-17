@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Banknote, CalendarClock, Landmark, Pencil, Plus, Trash2, Wallet } from 'lucide-react'
 import { safeToChetrum } from '@/lib/currency'
 import { formatCurrency } from '@/lib/currency'
-import { financialAssetTypeLabels, financialTotals, formatAssetDate, formatAssetUpdated, interestRatePercent, sortFinancialAssets, type FinancialAsset, type FinancialAssetInput, type FinancialAssetType } from '@/lib/financial-assets'
+import { financialAssetTypeLabels, financialTotals, formatAssetDate, formatAssetUpdated, interestRatePercent, sortFinancialAssets, validInterestRateBps, type FinancialAsset, type FinancialAssetInput, type FinancialAssetType } from '@/lib/financial-assets'
 
 type Props = {
   assets: FinancialAsset[]
@@ -68,7 +68,7 @@ function AssetForm({ type, initial, editing, onSubmit, onCancel }: { type: Finan
       const principal = safeToChetrum(fields.principal)
       if (principal.value === undefined || principal.value < 0) return setError('Enter a principal of zero or more.')
       let interestRateBps: number | undefined
-      if (fields.interestRate.trim()) { const parsed = safeToChetrum(fields.interestRate); if (parsed.value === undefined || parsed.value < 0) return setError('Enter a valid interest rate.'); interestRateBps = parsed.value }
+      if (fields.interestRate.trim()) { const parsed = safeToChetrum(fields.interestRate); if (!validInterestRateBps(parsed.value)) return setError('Enter an interest rate between 0% and 100%.'); interestRateBps = parsed.value }
       input = { type, name: fields.name.trim(), institution, currentValueChetrum: currentValue.value, principalChetrum: principal.value, interestRateBps, startDate: fields.startDate || undefined, maturityDate: fields.maturityDate || undefined }
     } else if (type === 'recurring-deposit') {
       const monthly = safeToChetrum(fields.monthlyContribution)
