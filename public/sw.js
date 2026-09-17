@@ -17,5 +17,5 @@ self.addEventListener('fetch', event => {
       void caches.open(VERSION).then(cache => cache.put(event.request, copy))
     }
     return response
-  }).catch(() => caches.match(event.request).then(cached => cached || (event.request.mode === 'navigate' ? caches.match('/') : Response.error()))))
+  }).catch(() => caches.match(event.request).then(cached => cached || (event.request.mode === 'navigate' ? caches.match('/app') : Response.error()))))
 })
