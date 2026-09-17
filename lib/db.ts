@@ -10,9 +10,9 @@ export function openDatabase(): Promise<IDBDatabase> {
   if (typeof indexedDB === 'undefined') return Promise.reject(new Error('Private storage is unavailable on this device.'))
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION)
-    let timedOut = false
-    const timeout = window.setTimeout(() => { timedOut = true; reject(storageTimeout('Private storage took too long to open.')) }, STORAGE_TIMEOUT_MS)
-    const fail = (error: Error) => { window.clearTimeout(timeout); reject(error) }
+    let settled = false
+    const timeout = window.setTimeout(() => { if (settled) return; settled = true; reject(storageTimeout('Private storage took too long to open.')) }, STORAGE_TIMEOUT_MS)
+    const fail = (error: Error) => { if (settled) return; settled = true; window.clearTimeout(timeout); reject(error) }
     request.onerror = () => fail(new Error('Private storage could not be opened.'))
     request.onblocked = () => fail(new Error('Close other Money Saathi tabs and try again.'))
     request.onupgradeneeded = () => {
@@ -25,8 +25,8 @@ export function openDatabase(): Promise<IDBDatabase> {
       window.clearTimeout(timeout)
       const db = request.result
       db.onversionchange = () => db.close()
-      if (timedOut) db.close()
-      else resolve(db)
+      if (settled) db.close()
+      else { settled = true; resolve(db) }
     }
   })
 }
