@@ -8,6 +8,21 @@ describe('production source regressions', () => {
     expect(source).toContain('onComplete={(balance, protect, displayName) => completeOnboarding(balance, protect, displayName)}')
   })
 
+  it('keeps My Money asset deletion behind an explicit confirmation dialog', () => {
+    expect(source).toContain("function removeAsset(asset: FinancialAsset) { setDialog({ kind: 'asset', id: asset.id }) }")
+    expect(source).toContain('async function confirmRemoveAsset()')
+    const deleteIntent = source.match(/onDelete=\{removeAsset\}/)?.[0] || ''
+    expect(deleteIntent).toBe('onDelete={removeAsset}')
+    expect(deleteIntent).not.toContain('financialAssetsRepository.remove(')
+  })
+
+  it('never turns My Money asset edits into transactions', () => {
+    expect(source).toContain('financialAssetsRepository.save(asset)')
+    const addAsset = source.match(/async function addAsset\([^)]*\) \{[^\n]*/)?.[0] || ''
+    expect(addAsset).not.toContain('transactionRepository.save(')
+    expect(addAsset).not.toContain('createTransaction(')
+  })
+
   it('keeps planning deletion behind confirmation handlers', () => {
     expect(source).toContain('setPendingBudget(budget)')
     expect(source).toContain('setPendingRecurring(item)')

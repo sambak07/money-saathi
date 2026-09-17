@@ -1,6 +1,6 @@
 import { deleteFromStore, readStore, writeStore, type StoreName } from './db'
 
-export type AuditEventType = 'transaction' | 'backup' | 'settings' | 'planning'
+export type AuditEventType = 'transaction' | 'backup' | 'settings' | 'planning' | 'financial'
 export type AuditAction = 'create' | 'update' | 'delete' | 'export' | 'restore' | 'change' | 'reset' | 'pause' | 'resume'
 export type AuditMetadata = Record<string, string | number | boolean | null>
 export type AuditEvent = { id: string; eventType: AuditEventType; action: AuditAction; resourceType: string; resourceId?: string; occurredAt: string; source: 'web' | 'offline'; summary: string; metadata: AuditMetadata }

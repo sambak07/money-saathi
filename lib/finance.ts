@@ -1,5 +1,6 @@
 import type { Transaction } from './transactions'
 import { validateGoalRecord, type Goal } from './goals'
+import { validateFinancialAssetRecord, type FinancialAsset } from './financial-assets'
 export type { Transaction } from './transactions'
 
 export const SCHEMA_VERSION = 1
@@ -51,15 +52,15 @@ export function transactionsToCsv(items: Transaction[]) {
   return `\ufeff${rows.map(row => row.map(cell => csvCell(String(cell))).join(',')).join('\n')}`
 }
 
-export type Backup = { schemaVersion: number; exportedAt: string; transactions: Transaction[]; settings: unknown[]; categories: unknown[]; budgets: unknown[]; recurring: unknown[]; goals?: Goal[] }
-export function serializeBackup(data: Omit<Backup, 'schemaVersion' | 'exportedAt'> & { goals?: Goal[] }): string { return JSON.stringify({ schemaVersion: SCHEMA_VERSION, exportedAt: new Date().toISOString(), ...data }, null, 2) }
+export type Backup = { schemaVersion: number; exportedAt: string; transactions: Transaction[]; settings: unknown[]; categories: unknown[]; budgets: unknown[]; recurring: unknown[]; goals?: Goal[]; financialAssets?: FinancialAsset[] }
+export function serializeBackup(data: Omit<Backup, 'schemaVersion' | 'exportedAt'> & { goals?: Goal[]; financialAssets?: FinancialAsset[] }): string { return JSON.stringify({ schemaVersion: SCHEMA_VERSION, exportedAt: new Date().toISOString(), ...data }, null, 2) }
 function validDate(value: unknown) { if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false; const [year, month, day] = value.split('-').map(Number); const date = new Date(Date.UTC(year, month - 1, day)); return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day }
 function validIso(value: unknown) { return typeof value === 'string' && !Number.isNaN(Date.parse(value)) && new Date(value).toISOString() === value }
 function isRecord(value: unknown): value is Record<string, unknown> { return !!value && typeof value === 'object' && !Array.isArray(value) }
 export function validateBackup(input: unknown): Backup {
   if (!isRecord(input)) throw new Error('Backup must be a JSON object.')
   if (input.schemaVersion !== SCHEMA_VERSION || typeof input.exportedAt !== 'string' || !validIso(input.exportedAt)) throw new Error('Unsupported or malformed backup version.')
-  const keys = Object.keys(input).sort().join(','); if (keys !== 'budgets,categories,exportedAt,goals,recurring,schemaVersion,settings,transactions' && keys !== 'budgets,categories,exportedAt,recurring,schemaVersion,settings,transactions') throw new Error('Backup contains unknown fields.')
+  const keySet = new Set(Object.keys(input)); for (const optional of ['goals', 'financialAssets']) keySet.delete(optional); const keys = [...keySet].sort().join(','); if (keys !== 'budgets,categories,exportedAt,recurring,schemaVersion,settings,transactions') throw new Error('Backup contains unknown fields.')
   const arrays = ['transactions', 'settings', 'categories', 'budgets', 'recurring'] as const
   for (const key of arrays) if (!Array.isArray(input[key])) throw new Error('Backup is missing required data.')
   const transactions = input.transactions as unknown[]
@@ -76,8 +77,9 @@ export function validateBackup(input: unknown): Backup {
   for (const item of input.categories as unknown[]) if (!isRecord(item)) throw new Error('Invalid categories data.')
   const budgetIds = new Set<string>(); const budgetKeys = new Set<string>(); for (const item of input.budgets as unknown[]) { const limit = isRecord(item) ? item.limitChetrum : undefined; const key = isRecord(item) && typeof item.month === 'string' && typeof item.categoryId === 'string' ? `${item.month}:${item.categoryId}` : ''; if (!isRecord(item) || typeof item.id !== 'string' || budgetIds.has(item.id) || typeof item.month !== 'string' || !/^\d{4}-(0[1-9]|1[0-2])$/.test(item.month) || typeof item.categoryId !== 'string' || !expenseCategories.some(category => category.id === item.categoryId) || typeof limit !== 'number' || !Number.isSafeInteger(limit) || limit <= 0 || budgetKeys.has(key) || !validIso(item.createdAt) || !validIso(item.updatedAt)) throw new Error('Invalid budgets data.'); budgetKeys.add(key); budgetIds.add(item.id) }
   const goalItems = Array.isArray(input.goals) ? input.goals as unknown[] : []; const goalIds = new Set<string>(); for (const item of goalItems) { if (!validateGoalRecord(item) || goalIds.has(item.id)) throw new Error('Invalid goals data.'); goalIds.add(item.id) }
+  const assetItems = Array.isArray(input.financialAssets) ? input.financialAssets as unknown[] : []; const assetIds = new Set<string>(); for (const item of assetItems) { if (!validateFinancialAssetRecord(item) || assetIds.has(item.id)) throw new Error('Invalid financial assets data.'); assetIds.add(item.id) }
   const recurringIds = new Set<string>(); for (const item of input.recurring as unknown[]) { const amount = isRecord(item) ? item.amountChetrum : undefined; const day = isRecord(item) ? item.dayOfMonth : undefined; const type = isRecord(item) ? item.type : undefined; const categories = type === 'income' ? incomeCategories : expenseCategories; if (!isRecord(item) || typeof item.id !== 'string' || recurringIds.has(item.id) || typeof item.name !== 'string' || !['income', 'expense'].includes(type as string) || typeof amount !== 'number' || !Number.isSafeInteger(amount) || amount <= 0 || typeof item.categoryId !== 'string' || !categories.some(category => category.id === item.categoryId) || !PAYMENT_METHODS.includes(item.paymentMethod as PaymentMethod) || item.frequency !== 'monthly' || typeof day !== 'number' || !Number.isInteger(day) || day < 1 || day > 31 || !['essential', 'flexible'].includes(item.classification as string) || typeof item.isCommitment !== 'boolean' || (type === 'income' && item.isCommitment) || typeof item.active !== 'boolean' || !validIso(item.createdAt) || !validIso(item.updatedAt) || (item.lastConfirmedMonth !== undefined && (typeof item.lastConfirmedMonth !== 'string' || !/^\d{4}-(0[1-9]|1[0-2])$/.test(item.lastConfirmedMonth)))) throw new Error('Invalid recurring data.'); recurringIds.add(item.id) }
-  return { ...input, goals: goalItems } as unknown as Backup
+  return { ...input, goals: goalItems, financialAssets: assetItems } as unknown as Backup
 }
 
 export function downloadFile(filename: string, content: string, type: string) { const blob = new Blob([content], { type }); const url = URL.createObjectURL(blob); const anchor = document.createElement('a'); anchor.href = url; anchor.download = filename; anchor.click(); URL.revokeObjectURL(url) }

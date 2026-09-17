@@ -1,11 +1,19 @@
 export const DB_NAME = 'money-saathi'
-export const DB_VERSION = 4
+export const DB_VERSION = 5
 export const STORAGE_TIMEOUT_MS = 8000
 
-export type StoreName = 'transactions' | 'categories' | 'budgets' | 'recurring' | 'settings' | 'audit' | 'lock' | 'reminders' | 'reminderDismissals' | 'goals'
-export const DB_STORE_NAMES: StoreName[] = ['transactions', 'categories', 'budgets', 'recurring', 'settings', 'audit', 'lock', 'reminders', 'reminderDismissals', 'goals']
+export type StoreName = 'transactions' | 'categories' | 'budgets' | 'recurring' | 'settings' | 'audit' | 'lock' | 'reminders' | 'reminderDismissals' | 'goals' | 'financialAssets'
+export const DB_STORE_NAMES: StoreName[] = ['transactions', 'categories', 'budgets', 'recurring', 'settings', 'audit', 'lock', 'reminders', 'reminderDismissals', 'goals', 'financialAssets']
 
 function storageTimeout(message = 'Private storage took too long to respond.') { return new Error(message) }
+
+// Additive, non-destructive upgrade: only missing stores are created, so existing
+// records survive every version bump (including the v4 -> v5 financialAssets migration).
+export function createStores(db: IDBDatabase) {
+  for (const store of DB_STORE_NAMES) {
+    if (!db.objectStoreNames.contains(store)) db.createObjectStore(store, { keyPath: store === 'settings' || store === 'lock' || store === 'reminders' ? 'key' : 'id' })
+  }
+}
 
 export function openDatabase(): Promise<IDBDatabase> {
   if (typeof indexedDB === 'undefined') return Promise.reject(new Error('Private storage is unavailable on this device.'))
@@ -16,12 +24,7 @@ export function openDatabase(): Promise<IDBDatabase> {
     const fail = (error: Error) => { if (settled) return; settled = true; window.clearTimeout(timeout); reject(error) }
     request.onerror = () => fail(new Error('Private storage could not be opened.'))
     request.onblocked = () => fail(new Error('Close other Money Saathi tabs and try again.'))
-    request.onupgradeneeded = () => {
-      const db = request.result
-      for (const store of DB_STORE_NAMES) {
-        if (!db.objectStoreNames.contains(store)) db.createObjectStore(store, { keyPath: store === 'settings' || store === 'lock' || store === 'reminders' ? 'key' : 'id' })
-      }
-    }
+    request.onupgradeneeded = () => createStores(request.result)
     request.onsuccess = () => {
       window.clearTimeout(timeout)
       const db = request.result
