@@ -12,6 +12,10 @@ export function toChetrum(value: string | number): number {
   return chetrum
 }
 
+export function safeToChetrum(value: string | number): { value?: number; error?: string } {
+  try { return { value: toChetrum(value) } } catch (error) { return { error: error instanceof Error ? error.message : 'Enter a valid amount.' } }
+}
+
 export function fromChetrum(value: number): number { return value / 100 }
 
 export function formatCurrency(value: number): string {
