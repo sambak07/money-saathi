@@ -4,6 +4,10 @@ import { describe, expect, it } from 'vitest'
 const source = readFileSync(new URL('../components/money-saathi/app-shell.tsx', import.meta.url), 'utf8') + readFileSync(new URL('../components/money-saathi/budget-view.tsx', import.meta.url), 'utf8')
 
 describe('production source regressions', () => {
+  it('passes the preferred name through onboarding completion', () => {
+    expect(source).toContain('onComplete={(balance, protect, displayName) => completeOnboarding(balance, protect, displayName)}')
+  })
+
   it('keeps planning deletion behind confirmation handlers', () => {
     expect(source).toContain('setPendingBudget(budget)')
     expect(source).toContain('setPendingRecurring(item)')
