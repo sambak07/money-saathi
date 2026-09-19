@@ -1,6 +1,7 @@
 import type { Transaction } from './transactions'
 import { validateGoalRecord, type Goal } from './goals'
 import { validateFinancialAssetRecord, type FinancialAsset } from './financial-assets'
+import { USER_TYPES, type UserType } from './settings'
 export type { Transaction } from './transactions'
 
 export const SCHEMA_VERSION = 1
@@ -9,6 +10,7 @@ export type PaymentMethod = typeof PAYMENT_METHODS[number]
 
 export const incomeCategories = [
   { id: 'salary', label: 'Salary' },
+  { id: 'pension', label: 'Pension' },
   { id: 'rental', label: 'Rental income' },
   { id: 'business', label: 'Business' },
   { id: 'other-income', label: 'Other income' },
@@ -19,6 +21,7 @@ export const expenseCategories = [
   { id: 'transport', label: 'Fuel & transport' },
   { id: 'utilities', label: 'Utilities' },
   { id: 'health', label: 'Health' },
+  { id: 'insurance', label: 'Insurance' },
   { id: 'other', label: 'Other expense' },
 ]
 export const allCategories = [...incomeCategories, ...expenseCategories]
@@ -92,7 +95,7 @@ export function validateBackup(input: unknown): Backup {
     ids.add(transaction.id)
   }
   if (settingsList.length !== 1 || !isRecord(settingsList[0])) throw new Error('Invalid settings data.')
-  const settings = settingsList[0] as Record<string, unknown>; const settingKeys = Object.keys(settings).sort().join(','); const allowedSettings = ['currency,key,openingBalanceChetrum,sampleData', 'currency,key,openingBalanceChetrum,sampleData,onboardingComplete', 'currency,key,openingBalanceChetrum,sampleData,displayName', 'currency,key,openingBalanceChetrum,sampleData,displayName,onboardingComplete']; if (!allowedSettings.includes(settingKeys) || settings.key !== 'app' || settings.currency !== 'BTN' || !Number.isSafeInteger(settings.openingBalanceChetrum) || (settings.openingBalanceChetrum as number) < 0 || typeof settings.sampleData !== 'boolean' || (settings.displayName !== undefined && (typeof settings.displayName !== 'string' || settings.displayName.length > 50)) || (settings.onboardingComplete !== undefined && typeof settings.onboardingComplete !== 'boolean')) throw new Error('Invalid settings data.')
+  const settings = settingsList[0] as Record<string, unknown>; const requiredSettingKeys = ['currency', 'key', 'openingBalanceChetrum', 'sampleData']; const allowedSettingKeys = new Set([...requiredSettingKeys, 'displayName', 'onboardingComplete', 'userType']); const presentSettingKeys = Object.keys(settings); if (!requiredSettingKeys.every(key => presentSettingKeys.includes(key)) || !presentSettingKeys.every(key => allowedSettingKeys.has(key)) || settings.key !== 'app' || settings.currency !== 'BTN' || !Number.isSafeInteger(settings.openingBalanceChetrum) || (settings.openingBalanceChetrum as number) < 0 || typeof settings.sampleData !== 'boolean' || (settings.displayName !== undefined && (typeof settings.displayName !== 'string' || settings.displayName.length > 50)) || (settings.onboardingComplete !== undefined && typeof settings.onboardingComplete !== 'boolean') || (settings.userType !== undefined && !USER_TYPES.includes(settings.userType as UserType))) throw new Error('Invalid settings data.')
   for (const item of input.categories as unknown[]) if (!isRecord(item)) throw new Error('Invalid categories data.')
   const budgetIds = new Set<string>(); const budgetKeys = new Set<string>(); for (const item of input.budgets as unknown[]) { const limit = isRecord(item) ? item.limitChetrum : undefined; const key = isRecord(item) && typeof item.month === 'string' && typeof item.categoryId === 'string' ? `${item.month}:${item.categoryId}` : ''; if (!isRecord(item) || typeof item.id !== 'string' || budgetIds.has(item.id) || typeof item.month !== 'string' || !/^\d{4}-(0[1-9]|1[0-2])$/.test(item.month) || typeof item.categoryId !== 'string' || !expenseCategories.some(category => category.id === item.categoryId) || typeof limit !== 'number' || !Number.isSafeInteger(limit) || limit <= 0 || budgetKeys.has(key) || !validIso(item.createdAt) || !validIso(item.updatedAt)) throw new Error('Invalid budgets data.'); budgetKeys.add(key); budgetIds.add(item.id) }
   const goalItems = Array.isArray(input.goals) ? input.goals as unknown[] : []; const goalIds = new Set<string>(); for (const item of goalItems) { if (!validateGoalRecord(item) || goalIds.has(item.id)) throw new Error('Invalid goals data.'); goalIds.add(item.id) }

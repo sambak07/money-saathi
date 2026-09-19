@@ -5,7 +5,7 @@ const source = readFileSync(new URL('../components/money-saathi/app-shell.tsx', 
 
 describe('production source regressions', () => {
   it('passes the preferred name through onboarding completion', () => {
-    expect(source).toContain('onComplete={(balance, protect, displayName) => completeOnboarding(balance, protect, displayName)}')
+    expect(source).toContain('onComplete={(balance, protect, displayName, selectedUserType) => completeOnboarding(balance, protect, displayName, selectedUserType)}')
   })
 
   it('keeps My Money asset deletion behind an explicit confirmation dialog', () => {
