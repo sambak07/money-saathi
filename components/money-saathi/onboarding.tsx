@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { safeToChetrum, toChetrum } from '@/lib/currency'
+import { safeToChetrum } from '@/lib/currency'
 import { normalizeDisplayName } from '@/lib/greeting'
 
 export function Onboarding({ onComplete }: { onComplete: (openingBalance: number, protect: boolean, displayName: string) => Promise<void> }) {
