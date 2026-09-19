@@ -36,6 +36,28 @@ describe('production source regressions', () => {
     expect(recurringIntent).not.toContain('removeRecurring(')
   })
 
+  it('gates the plain backup behind a privacy confirmation instead of an immediate download', () => {
+    // The toolbar action is clearly labelled and opens a dialog rather than downloading.
+    expect(source).toContain('Download unencrypted backup')
+    expect(source).toContain('onClick={requestUnencryptedBackup}')
+    const plainButton = source.match(/onClick=\{requestUnencryptedBackup\}><FileArchive[^>]*\/> Download unencrypted backup<\/button>/)?.[0] || ''
+    expect(plainButton).not.toContain('void backup()')
+    expect(source).toContain("function requestUnencryptedBackup() { setDialog({ kind: 'unencryptedBackup' }) }")
+    // The confirmation carries the required warning wording and recommends encryption.
+    expect(source).toContain('Download unencrypted backup?')
+    expect(source).toContain('This backup contains your Money Saathi financial records in readable JSON. Anyone who gets the file may be able to read it.')
+    expect(source).toContain('For better privacy, use Encrypted backup.')
+  })
+
+  it('keeps encrypted backup available, emphasized, and never mislabels the plain backup as encrypted', () => {
+    expect(source).toContain('backup-recommended')
+    expect(source).toContain('void encryptedBackup()')
+    expect(source).toContain('async function createEncryptedBackup()')
+    // The plain-backup confirmation must not claim the ordinary backup is encrypted.
+    const dialog = source.match(/Download unencrypted backup\?[\s\S]{0,400}For better privacy/)?.[0] || ''
+    expect(dialog).not.toMatch(/is encrypted|will be encrypted|password-protected/i)
+  })
+
   it('contains no native browser dialogs or dead false branches', () => {
     expect(source).not.toContain('window.prompt(')
     expect(source).not.toContain('window.confirm(')

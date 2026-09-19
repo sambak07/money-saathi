@@ -46,10 +46,29 @@ export function filterTransactions(items: Transaction[], filters: TransactionFil
   })
 }
 
-function csvCell(value: string) { return /[",\n\r]/.test(value) ? `"${value.replaceAll('"', '""')}"` : value }
+// Standard CSV field quoting: wrap in double quotes and double any embedded quote.
+function csvQuote(value: string) { return /[",\n\r]/.test(value) ? `"${value.replaceAll('"', '""')}"` : value }
+// Spreadsheet formula-injection guard. Excel/Sheets/LibreOffice execute a cell
+// whose text begins with =, +, -, or @ — including after leading whitespace or
+// control characters, or when the cell opens with a tab/carriage return. Exported
+// user text is untrusted, so such cells are prefixed with a single quote (the
+// OWASP-recommended neutralization) which importers treat as a literal-text marker.
+// The value stored in Money Saathi is never changed — this applies only to the
+// exported string, and only to text columns so numeric amount/date columns are untouched.
+export function neutralizeCsvFormula(value: string): string {
+  if (value !== '' && (/^[=+\-@\t\r]/.test(value) || /^[\s\u0000-\u001f]+[=+\-@]/.test(value))) return `'${value}`
+  return value
+}
+function csvText(value: string) { return csvQuote(neutralizeCsvFormula(value)) }
 export function transactionsToCsv(items: Transaction[]) {
-  const rows = [['Date', 'Type', 'Category', 'Amount', 'Payment Method', 'Note'], ...sortedTransactions(items).map(item => [item.date, item.type, allCategories.find(entry => entry.id === item.categoryId)?.label || item.categoryId, (item.amountChetrum / 100).toFixed(2), item.paymentMethod, item.note])]
-  return `\ufeff${rows.map(row => row.map(cell => csvCell(String(cell))).join(',')).join('\n')}`
+  const header = ['Date', 'Type', 'Category', 'Amount', 'Payment Method', 'Note'].map(csvQuote).join(',')
+  const lines = sortedTransactions(items).map(item => {
+    const category = allCategories.find(entry => entry.id === item.categoryId)?.label || item.categoryId
+    // Date and Amount are app-generated structured values (never formula-prefixed),
+    // so they are only quoted. Type/Category/Payment Method/Note are neutralized.
+    return [csvQuote(item.date), csvText(item.type), csvText(category), csvQuote((item.amountChetrum / 100).toFixed(2)), csvText(item.paymentMethod), csvText(item.note)].join(',')
+  })
+  return `\ufeff${[header, ...lines].join('\n')}`
 }
 
 export type Backup = { schemaVersion: number; exportedAt: string; transactions: Transaction[]; settings: unknown[]; categories: unknown[]; budgets: unknown[]; recurring: unknown[]; goals?: Goal[]; financialAssets?: FinancialAsset[] }
