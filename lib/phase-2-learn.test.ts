@@ -160,6 +160,49 @@ describe('topic groups and content', () => {
   })
 })
 
+describe('content accuracy patch', () => {
+  it('26. OTP guidance says do not disclose OTP to another person, without absolute theft claim', () => {
+    const otp = lessonText('otp-safety')
+    expect(otp.toLowerCase()).toContain('do not tell or forward an otp to another person')
+    expect(otp).toContain('Never disclose your OTP, PIN or password to another person.')
+    expect(otp).not.toContain('Anyone asking for it is trying to take your money')
+  })
+
+  it('27. QR lesson drops "only sends money" claims and tells user to inspect what they authorize', () => {
+    const qr = lessonText('qr-scams')
+    expect(qr).not.toContain('never for receiving it')
+    expect(qr).not.toContain('it never brings money in')
+    expect(qr.toLowerCase()).toContain('check what the screen says you are authorizing')
+    expect(qr).toContain('Read the payment screen before confirming. Never approve a payment you do not understand.')
+  })
+
+  it('28. working capital references current assets minus current liabilities', () => {
+    const wc = lessonText('working-capital').toLowerCase()
+    expect(wc).toContain('current assets minus current liabilities')
+    expect(wc).toContain('short-term')
+  })
+
+  it('29. business records lesson does not claim tracking alone establishes profit', () => {
+    const income = lessonText('business-income-expenses')
+    expect(income).not.toContain('the only way to know whether the business is making or losing money')
+    expect(income.toLowerCase()).toContain('formal profit calculation may also require proper accounting')
+    expect(income).toContain('do not replace proper accounting')
+  })
+
+  it('30. loan prepayment guidance includes checking loan terms', () => {
+    const loan = lessonText('loan-repayment')
+    expect(loan.toLowerCase()).toContain('check the lender')
+    expect(loan).toContain('Repay on time and check your loan terms before making extra payments.')
+    expect(loan).not.toContain('reduces the principal faster and lowers total interest')
+  })
+
+  it('31. pension wording refers to Money Saathi personal cash-flow treatment', () => {
+    const pension = lessonText('pension')
+    expect(pension).toContain('Money Saathi treats pension receipts as income')
+    expect(pension).not.toContain('It is treated as income.')
+  })
+})
+
 describe('no schema or calculation changes', () => {
   it('22. DB_VERSION remains unchanged', () => {
     expect(DB_VERSION).toBe(5)

@@ -127,7 +127,7 @@ export const topicGroups: TopicGroup[] = [
         id: 'pension',
         title: 'Pension',
         paragraphs: [
-          'A pension is money received after or through retirement, or through an eligible pension arrangement. It is treated as income.',
+          'A pension is money received after or through retirement, or through an eligible pension arrangement. For personal cash-flow tracking, Money Saathi treats pension receipts as income.',
           'Like a salary, a pension is usually regular, so it can anchor a monthly plan.',
         ],
         example: 'A retired person receiving Nu. 15,000 each month treats it as regular income.',
@@ -330,10 +330,10 @@ export const topicGroups: TopicGroup[] = [
         title: 'Loan repayment',
         paragraphs: [
           'Repaying on time keeps a loan from growing and protects your standing with lenders.',
-          'Paying a little extra when you can reduces the principal faster and lowers total interest.',
+          "Where your loan terms allow additional principal repayment, paying extra may reduce the outstanding principal faster and can reduce future interest. Check the lender's terms, including any charges or restrictions, before making an extra payment.",
         ],
         example: 'Clearing an EMI on time each month keeps the loan on track.',
-        keyPoint: 'Repay on time; extra payments cut future interest.',
+        keyPoint: 'Repay on time and check your loan terms before making extra payments.',
       },
     ],
   },
@@ -396,10 +396,10 @@ export const topicGroups: TopicGroup[] = [
         title: 'OTP safety',
         paragraphs: [
           'A one-time password (OTP) is a code sent to approve your own transactions. It is meant for you alone.',
-          'No genuine bank or officer will ever need your OTP. Anyone asking for it is trying to take your money.',
+          'An OTP is meant for you to enter yourself when you are authorizing an action. Do not tell or forward an OTP to another person, including someone claiming to be bank staff.',
         ],
-        example: 'A caller who says "read me the OTP to verify your account" is a scam.',
-        keyPoint: 'Never share your OTP, PIN or password with anyone.',
+        example: 'A caller who says "read me the OTP to verify your account" is trying to get a code that is meant for you to enter yourself.',
+        keyPoint: 'Never disclose your OTP, PIN or password to another person.',
       },
       {
         id: 'pin-safety',
@@ -445,11 +445,10 @@ export const topicGroups: TopicGroup[] = [
         id: 'qr-scams',
         title: 'QR-payment scams',
         paragraphs: [
-          'Scanning a QR code is for paying money out, never for receiving it.',
-          'If someone says "scan this QR to receive your money," they are trying to make you pay them.',
+          'Before scanning or confirming a QR payment, check what the screen says you are authorizing. A scammer may send a QR code or payment request while falsely claiming it is required to receive a refund or payment.',
         ],
-        example: 'A "scan to receive your refund" QR actually sends your money away.',
-        keyPoint: 'Scanning a QR pays money out — it never brings money in.',
+        example: 'If someone tells you to scan a QR and enter a PIN to receive a refund, stop and check the payment screen carefully. You may actually be authorizing money to leave your account.',
+        keyPoint: 'Read the payment screen before confirming. Never approve a payment you do not understand.',
       },
       {
         id: 'money-mule',
@@ -566,10 +565,10 @@ export const topicGroups: TopicGroup[] = [
         title: 'Business income and expenses',
         paragraphs: [
           'Business income is what the business earns; business expenses are what it spends to operate.',
-          'Recording both is the only way to know whether the business is making or losing money.',
+          'Recording income and expenses helps you understand how the business is performing and where its money is going. Formal profit calculation may also require proper accounting for items such as stock, amounts owed, assets and other adjustments.',
         ],
         example: 'Rent, stock, and wages are expenses to weigh against sales income.',
-        keyPoint: 'Track both what the business earns and what it spends.',
+        keyPoint: 'Good income and expense records are the foundation of understanding a business, but they do not replace proper accounting.',
         tryIt: { label: 'Open Transactions', destination: 'Transactions' },
       },
       {
@@ -586,11 +585,11 @@ export const topicGroups: TopicGroup[] = [
         id: 'working-capital',
         title: 'Working capital',
         paragraphs: [
-          'Working capital is the everyday money a business needs to keep running — to buy stock and cover short-term costs.',
-          'Without enough, a business may struggle even when sales are healthy.',
+          'Working capital is the short-term financial resources available to run a business. In basic accounting, it is commonly understood as current assets minus current liabilities.',
+          'It helps show whether a business has enough short-term resources to cover everyday obligations.',
         ],
-        example: 'Money set aside to restock and pay bills until customers pay is working capital.',
-        keyPoint: 'Working capital keeps day-to-day operations going.',
+        example: 'Cash, money customers owe the business and stock may form part of current assets, while bills and other short-term amounts due form part of current liabilities.',
+        keyPoint: "Working capital helps show the business's short-term financial position.",
       },
       {
         id: 'record-keeping',
