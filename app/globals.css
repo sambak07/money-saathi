@@ -170,3 +170,10 @@ button { cursor: pointer; }
   .filter-controls { grid-template-columns: 1fr; }
   .custom-dates { grid-template-columns: 1fr; }
 }
+/* Release Repair 5 — Settings grouping + isolated danger zone. */
+.settings-panel > .settings-subsection { border-top: 1px solid #ece7db; margin-top: 18px; padding-top: 18px; }
+.settings-panel > .settings-subsection:first-of-type { border-top: 0; margin-top: 14px; padding-top: 0; }
+.settings-panel .settings-subsection h3, .settings-danger h3 { margin: 2px 0 0; font-size: 16px; letter-spacing: -.02em; color: #24483f; }
+.settings-danger { margin-top: 16px; border: 1px solid #e7c8bd; background: #fdf6f3; }
+.settings-danger .danger-eyebrow { color: #b0472f; }
+.settings-danger .danger-button { border-color: #e0b3a6; color: #b0472f; }

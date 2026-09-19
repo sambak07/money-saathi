@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Banknote, CalendarClock, Landmark, Pencil, Plus, Trash2, Wallet } from 'lucide-react'
 import { safeToChetrum } from '@/lib/currency'
 import { formatCurrency } from '@/lib/currency'
+import { useModalDialog } from '@/components/money-saathi/dialogs/use-modal-dialog'
 import { financialAssetTypeLabels, financialTotals, formatAssetDate, formatAssetUpdated, interestRatePercent, sortFinancialAssets, validInterestRateBps, type FinancialAsset, type FinancialAssetInput, type FinancialAssetType } from '@/lib/financial-assets'
 
 type Props = {
@@ -16,7 +17,7 @@ type Props = {
 const typeIcons: Record<FinancialAssetType, typeof Wallet> = { 'savings-account': Landmark, 'fixed-deposit': Banknote, 'recurring-deposit': CalendarClock }
 
 function assetSubtitle(asset: FinancialAsset) {
-  if (asset.type === 'recurring-deposit') return `${formatCurrency(asset.monthlyContributionChetrum)} / month`
+  if (asset.type === 'recurring-deposit') return asset.institution ? `${formatCurrency(asset.monthlyContributionChetrum)} / month · ${asset.institution}` : `${formatCurrency(asset.monthlyContributionChetrum)} / month`
   return asset.institution || financialAssetTypeLabels[asset.type]
 }
 
@@ -119,6 +120,8 @@ export function MyMoneyView({ assets, onCreate, onEdit, onDelete }: Props) {
   const chooseType = (next: FinancialAssetType) => { setType(next); setMode('create') }
   const openEdit = (asset: FinancialAsset) => { setSelected(asset); setType(asset.type); setMode('edit') }
   const close = () => { setMode('none'); setSelected(null) }
+  const chooseRef = useModalDialog<HTMLDivElement>({ open: mode === 'choose', onClose: close })
+  const formRef = useModalDialog<HTMLDivElement>({ open: mode === 'create' || mode === 'edit', onClose: close })
 
   return <section className="money-page">
     <div className="panel-heading"><div><p className="eyebrow">My Money</p><h1>Money you have</h1><p className="subheading">Keep your savings and deposits in one simple place.</p></div><button className="primary-button" onClick={openCreate}><Plus size={16}/> Add</button></div>
@@ -139,14 +142,14 @@ export function MyMoneyView({ assets, onCreate, onEdit, onDelete }: Props) {
       : <div className="asset-list">{sorted.map(asset => <AssetCard key={asset.id} asset={asset} onEdit={() => openEdit(asset)} onDelete={() => onDelete(asset)}/>)}</div>}
 
     {mode === 'choose' && <div className="modal-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) close() }}>
-      <div className="add-sheet" role="dialog" aria-modal="true" aria-label="Choose asset type">
+      <div className="add-sheet" role="dialog" aria-modal="true" aria-label="Choose asset type" ref={chooseRef}>
         <div className="sheet-header"><div><p className="eyebrow">Add</p><h2>What would you like to add?</h2></div><button type="button" className="round-button small" onClick={close} aria-label="Close">×</button></div>
         <div className="more-list">{(['savings-account', 'fixed-deposit', 'recurring-deposit'] as FinancialAssetType[]).map(option => { const Icon = typeIcons[option]; return <button key={option} type="button" className="more-item" onClick={() => chooseType(option)}><Icon size={18}/><span>{financialAssetTypeLabels[option]}</span></button> })}</div>
       </div>
     </div>}
 
     {(mode === 'create' || mode === 'edit') && <div className="modal-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) close() }}>
-      <div className="add-sheet" role="dialog" aria-modal="true" aria-label={mode === 'edit' ? 'Edit record' : 'Add record'}>
+      <div className="add-sheet" role="dialog" aria-modal="true" aria-label={mode === 'edit' ? 'Edit record' : 'Add record'} ref={formRef}>
         <div className="sheet-header"><div><p className="eyebrow">{financialAssetTypeLabels[type]}</p><h2>{mode === 'edit' ? 'Edit record' : `Add ${financialAssetTypeLabels[type].toLowerCase()}`}</h2></div><button type="button" className="round-button small" onClick={close} aria-label="Close">×</button></div>
         <AssetForm type={type} initial={selected || undefined} editing={mode === 'edit'} onCancel={close} onSubmit={async input => { if (mode === 'edit' && selected) await onEdit(selected, input); else await onCreate(input); close() }}/>
       </div>
