@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { BarChart3, Home, MoreHorizontal, PiggyBank, RotateCcw, Target, Wallet, WalletCards, type LucideIcon } from 'lucide-react'
+import { BarChart3, BookOpen, Home, MoreHorizontal, PiggyBank, RotateCcw, Target, Wallet, WalletCards, type LucideIcon } from 'lucide-react'
 import { useModalDialog } from '@/components/money-saathi/dialogs/use-modal-dialog'
 
 type NavItem = { label: string; icon: LucideIcon }
@@ -12,12 +12,13 @@ export const navItems: NavItem[] = [
   { label: 'Reports', icon: BarChart3 },
   { label: 'Budget', icon: Target },
   { label: 'Goals', icon: PiggyBank },
+  { label: 'Learn', icon: BookOpen },
   { label: 'Settings', icon: RotateCcw },
 ]
 
 // Keep the mobile bottom bar to five targets. Everything else lives under "More".
 export const mobilePrimaryItems = ['Home', 'Transactions', 'My Money', 'Budget']
-export const mobileMoreItems = ['Reports', 'Goals', 'Settings']
+export const mobileMoreItems = ['Reports', 'Goals', 'Learn', 'Settings']
 
 type NavigationProps = {
   active: string

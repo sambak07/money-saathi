@@ -4,7 +4,7 @@ import { useCallback, useState } from 'react'
 import { todayLocal, type Transaction } from '@/lib/transactions'
 import type { TransactionFilters } from '@/lib/finance'
 
-export type MoneySaathiView = 'Home' | 'Transactions' | 'My Money' | 'Reports' | 'Budget' | 'Goals' | 'Settings'
+export type MoneySaathiView = 'Home' | 'Transactions' | 'My Money' | 'Reports' | 'Budget' | 'Goals' | 'Learn' | 'Settings'
 export type FormState = { type: Transaction['type']; amount: string; categoryId: string; date: string; paymentMethod: string; note: string }
 
 export const emptyFilters: TransactionFilters = { query: '', type: '', categoryId: '', paymentMethod: '', period: '' }
