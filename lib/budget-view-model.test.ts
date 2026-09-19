@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { activeBudgetRows, budgetFormValues, budgetMonthSummary, buildBudgetRecord, parseBudgetAmount, regularMoneySummary } from './budget-view-model'
+import { activeBudgetRows, budgetFormValues, budgetMonthSummary, buildBudgetRecord, parseBudgetAmount, regularMoneySummary, totalBudgetedSpent } from './budget-view-model'
 import type { Budget, RecurringItem } from './planning'
 
 function budget(categoryId: string, limitChetrum: number, month = '2026-09', overrides: Partial<Budget> = {}): Budget {
@@ -41,6 +41,45 @@ describe('activeBudgetRows', () => {
   })
 })
 
+describe('totalBudgetedSpent (Budget performance scope)', () => {
+  it('counts spending in budgeted categories', () => {
+    const rows = activeBudgetRows([budget('food', 1000000)], { food: 500000 })
+    expect(totalBudgetedSpent(rows)).toBe(500000)
+  })
+
+  it('ignores spending in categories that have no budget', () => {
+    // Food is budgeted and under limit; Health is spent heavily but unbudgeted.
+    const rows = activeBudgetRows([budget('food', 1000000)], { food: 500000, health: 2000000 })
+    expect(totalBudgetedSpent(rows)).toBe(500000)
+  })
+
+  it('the exact reported case: unbudgeted spending cannot cause a false over-budget', () => {
+    // Food budget 10,000 / spent 5,000; Health spent 20,000 with no budget.
+    const rows = activeBudgetRows([budget('food', 1000000)], { food: 500000, health: 2000000 })
+    const summary = budgetMonthSummary(1000000, totalBudgetedSpent(rows))
+    expect(summary.budgeted).toBe(1000000)
+    expect(summary.spent).toBe(500000)
+    expect(summary.moneyLeft).toBe(500000)
+    expect(summary.overBudget).toBe(false)
+    expect(summary.overAmount).toBe(0)
+  })
+
+  it('aggregates multiple budgeted categories correctly', () => {
+    const rows = activeBudgetRows([budget('food', 1000000), budget('transport', 500000)], { food: 400000, transport: 300000, health: 999999 })
+    expect(totalBudgetedSpent(rows)).toBe(700000)
+    const summary = budgetMonthSummary(1500000, totalBudgetedSpent(rows))
+    expect(summary.moneyLeft).toBe(800000)
+    expect(summary.overBudget).toBe(false)
+  })
+
+  it('still flags a real over-budget from budgeted-category overspending', () => {
+    const rows = activeBudgetRows([budget('food', 1000000)], { food: 1300000, health: 50000 })
+    const summary = budgetMonthSummary(1000000, totalBudgetedSpent(rows))
+    expect(summary.overBudget).toBe(true)
+    expect(summary.overAmount).toBe(300000)
+  })
+})
+
 describe('budgetMonthSummary', () => {
   it('shows positive money left when under budget', () => {
     const summary = budgetMonthSummary(1000000, 600000)
@@ -65,12 +104,34 @@ describe('budgetMonthSummary', () => {
 })
 
 describe('regularMoneySummary', () => {
-  it('uses existing recurring calculations for income, payments and ratio', () => {
+  it('counts ALL active recurring expenses as payments, not only commitments', () => {
     const items = [recurring({ type: 'income', amountChetrum: 5000000 }), recurring({ type: 'expense', isCommitment: true, amountChetrum: 1500000 }), recurring({ type: 'expense', isCommitment: false, amountChetrum: 900000 })]
     const summary = regularMoneySummary(items)
     expect(summary.income).toBe(5000000)
-    expect(summary.payments).toBe(1500000)
-    expect(summary.ratio).toBeCloseTo(30, 5)
+    // 1,500,000 (commitment) + 900,000 (non-commitment) = 2,400,000
+    expect(summary.payments).toBe(2400000)
+    // Ratio is payments as a share of income, consistent with the payments figure.
+    expect(summary.ratio).toBeCloseTo(48, 5)
+  })
+
+  it('includes non-commitment recurring expenses', () => {
+    const summary = regularMoneySummary([recurring({ type: 'expense', isCommitment: false, amountChetrum: 700000 })])
+    expect(summary.payments).toBe(700000)
+  })
+
+  it('excludes paused recurring expenses', () => {
+    const summary = regularMoneySummary([recurring({ type: 'expense', amountChetrum: 500000, active: false }), recurring({ type: 'expense', amountChetrum: 300000, active: true })])
+    expect(summary.payments).toBe(300000)
+  })
+
+  it('does not count recurring income as a payment', () => {
+    const summary = regularMoneySummary([recurring({ type: 'income', amountChetrum: 4000000 })])
+    expect(summary.payments).toBe(0)
+  })
+
+  it('totals active recurring income and excludes paused income', () => {
+    const summary = regularMoneySummary([recurring({ type: 'income', amountChetrum: 4000000, active: true }), recurring({ type: 'income', amountChetrum: 1000000, active: false })])
+    expect(summary.income).toBe(4000000)
   })
 
   it('returns a null ratio when there is no recurring income', () => {

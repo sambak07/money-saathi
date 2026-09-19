@@ -7,7 +7,7 @@ import { budgetId } from '@/lib/budgets'
 import { updatedRecurring } from '@/lib/recurring'
 import { usePlanning } from '@/hooks/use-planning'
 import { dueRecurringItems, monthKey, monthlyCategorySpending, type Budget, type RecurringItem } from '@/lib/planning'
-import { activeBudgetRows, budgetFormValues, budgetMonthSummary, buildBudgetRecord, parseBudgetAmount, regularMoneySummary } from '@/lib/budget-view-model'
+import { activeBudgetRows, budgetFormValues, budgetMonthSummary, buildBudgetRecord, parseBudgetAmount, regularMoneySummary, totalBudgetedSpent } from '@/lib/budget-view-model'
 import type { Transaction } from '@/lib/transactions'
 import { ConfirmDialog } from '@/components/money-saathi/dialogs/confirm-dialog'
 import { AppDialog, DialogActions } from '@/components/money-saathi/dialogs/app-dialog'
@@ -25,8 +25,7 @@ export function BudgetView({ transactions, onConfirmRecurring, onPlanningAudit, 
   const monthBudgets = useMemo(() => budgets.filter(item => item.month === month), [budgets, month])
   const rows = useMemo(() => activeBudgetRows(monthBudgets, spending), [monthBudgets, spending])
   const totalBudget = monthBudgets.reduce((sum, item) => sum + item.limitChetrum, 0)
-  const totalSpent = Object.values(spending).reduce((sum, value) => sum + value, 0)
-  const summary = budgetMonthSummary(totalBudget, totalSpent)
+  const summary = budgetMonthSummary(totalBudget, totalBudgetedSpent(rows))
   const regular = regularMoneySummary(recurring)
   const dueItems = dueRecurringItems(recurring).filter(item => !skipped.includes(item.id))
   const overlayOpen = showBudgetEditor || showRecurring

@@ -1,7 +1,7 @@
 import { safeToChetrum } from './currency'
 import { budgetId } from './budgets'
 import { expenseCategories, categoryLabel } from './finance'
-import { budgetRemaining, budgetUsedPercent, commitmentRatio, monthlyCommitments, monthlyRecurringIncome, type Budget, type RecurringItem } from './planning'
+import { budgetRemaining, budgetUsedPercent, monthlyRecurringExpense, monthlyRecurringIncome, type Budget, type RecurringItem } from './planning'
 
 // Presentation-only helpers for the Budget screen. These never change the
 // underlying finance arithmetic — they only reshape existing calculations for
@@ -22,6 +22,15 @@ export function activeBudgetRows(monthBudgets: Budget[], spending: Record<string
     .sort((a, b) => a.label.localeCompare(b.label))
 }
 
+// Budget performance measures spending ONLY in categories that currently have a
+// budget for the month. Spending in unbudgeted categories is real (and still
+// shown in Reports and Transactions) but must never inflate the Budget "Spent"
+// total or trigger a false "Over budget" — otherwise a category that is under
+// its limit could look overspent because of unrelated, unbudgeted spending.
+export function totalBudgetedSpent(rows: BudgetRow[]): number {
+  return rows.reduce((sum, row) => sum + row.spent, 0)
+}
+
 export type MonthSummary = { budgeted: number; spent: number; moneyLeft: number; overBudget: boolean; overAmount: number }
 
 // Money left never goes negative on screen: an overspent month is presented as
@@ -34,9 +43,14 @@ export function budgetMonthSummary(totalBudget: number, totalSpent: number): Mon
 
 export type RegularSummary = { income: number; payments: number; ratio: number | null }
 
-// Reuses the existing recurring calculations only; no new financial math.
+// "Regular payments" means ALL active recurring expenses, not only the ones
+// flagged as commitments — the label would otherwise understate what the user
+// pays each month. The ratio is payments as a share of regular income, so it
+// stays consistent with the payments figure shown above it.
 export function regularMoneySummary(items: RecurringItem[]): RegularSummary {
-  return { income: monthlyRecurringIncome(items), payments: monthlyCommitments(items), ratio: commitmentRatio(items) }
+  const income = monthlyRecurringIncome(items)
+  const payments = monthlyRecurringExpense(items)
+  return { income, payments, ratio: income === 0 ? null : (payments / income) * 100 }
 }
 
 // Prefill values for the on-demand budget editor. Editing an existing budget
