@@ -86,7 +86,7 @@ function AssetForm({ type, initial, editing, onSubmit, onCancel }: { type: Finan
 
   const nameLabel = type === 'savings-account' ? 'Account name' : 'Deposit name'
   return <form className="goal-form" onSubmit={submit}>
-    <label>{nameLabel}<input value={fields.name} onChange={event => set('name', event.target.value)} placeholder={type === 'savings-account' ? 'Druk PNB Savings' : '3-year Fixed Deposit'} required disabled={saving}/></label>
+    <label>{nameLabel}<input value={fields.name} onChange={event => set('name', event.target.value)} placeholder={type === 'savings-account' ? 'Druk PNB Savings' : type === 'recurring-deposit' ? 'Monthly recurring deposit' : '3-year Fixed Deposit'} required disabled={saving}/></label>
     <label>Institution<input value={fields.institution} onChange={event => set('institution', event.target.value)} placeholder="Bank of Bhutan" disabled={saving}/></label>
     {type === 'savings-account' && <label>Current balance<input value={fields.currentValue} onChange={event => set('currentValue', event.target.value)} placeholder="Nu. 125,400" inputMode="decimal" required disabled={saving}/></label>}
     {type === 'fixed-deposit' && <>
@@ -103,7 +103,7 @@ function AssetForm({ type, initial, editing, onSubmit, onCancel }: { type: Finan
       <label>Start date <span className="muted">(optional)</span><input type="date" value={fields.startDate} onChange={event => set('startDate', event.target.value)} disabled={saving}/></label>
       <label>Maturity date <span className="muted">(optional)</span><input type="date" value={fields.maturityDate} onChange={event => set('maturityDate', event.target.value)} disabled={saving}/></label>
     </>}
-    <p className="form-hint">Update balances to match your actual financial position. This does not create a transaction or change your balance.</p>
+    <p className="form-hint">Update balances to match your actual financial position. This will not change your transaction balance.</p>
     {error && <p className="form-error">{error}</p>}
     <div className="form-actions"><button className="secondary-button" type="button" onClick={onCancel} disabled={saving}>Cancel</button><button className="primary-button" type="submit" disabled={saving}>{saving ? 'Saving…' : editing ? 'Save changes' : 'Add record'}</button></div>
   </form>
@@ -124,7 +124,7 @@ export function MyMoneyView({ assets, onCreate, onEdit, onDelete }: Props) {
   const formRef = useModalDialog<HTMLDivElement>({ open: mode === 'create' || mode === 'edit', onClose: close })
 
   return <section className="money-page">
-    <div className="panel-heading"><div><p className="eyebrow">My Money</p><h1>Money you have</h1><p className="subheading">Keep your savings and deposits in one simple place.</p></div><button className="primary-button" onClick={openCreate}><Plus size={16}/> Add</button></div>
+    <div className="panel-heading"><div><p className="eyebrow">My Money</p><h1>My Money</h1><p className="subheading">Keep your savings and deposits in one simple place.</p></div><button className="primary-button" onClick={openCreate}><Plus size={16}/> Add</button></div>
 
     <div className="money-notice"><Wallet size={18}/><p>Balances are updated by you. Money Saathi is not connected to your bank.</p></div>
 
