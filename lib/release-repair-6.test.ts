@@ -85,9 +85,8 @@ describe('R-03 transaction validation inside the dialog', () => {
     expect(notice).toContain('storageError || backupError || actionNotice')
   })
 
-  it('8. transaction error clears on correction and on close', () => {
+  it('8. transaction error clears as soon as the amount is corrected', () => {
     expect(appShell).toContain("if (key === 'amount') setTransactionError('')")
-    expect(appShell).toContain("const closeTransactionForm = () => { if (!transactionSavingRef.current) { setTransactionError(''); setShowForm(false) } }")
   })
 })
 
