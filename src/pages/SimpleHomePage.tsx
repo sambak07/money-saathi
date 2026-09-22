@@ -320,6 +320,9 @@ function SimpleHomePage() {
           <Link to="/app/irregular-income">
             Income rhythm
           </Link>
+          <Link to="/app/explain">
+            Explain my money
+          </Link>
 
           <Link to="/app/goals">
             My goals
@@ -447,5 +450,6 @@ function SimpleHomePage() {
 }
 
 export default SimpleHomePage
+
 
 

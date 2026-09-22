@@ -53,6 +53,7 @@ const SchemesPage = lazy(() => import('./pages/SchemesPage'))
 const TransactionFormPage = lazy(() => import('./pages/TransactionFormPage'))
 const TransactionsPage = lazy(() => import('./pages/TransactionsPage'))
 
+const ExplainMoneyPage = lazy(() => import('./pages/ExplainMoneyPage'))
 function App() {
   return (
     <BrowserRouter>
@@ -110,6 +111,7 @@ function App() {
         <Route path="/app/start" element={<GettingStartedPage />} />
         <Route path="/app/financial-safety" element={<FinancialSafetyPage />} />
         <Route path="/app/irregular-income" element={<IrregularIncomePage />} />
+        <Route path="/app/explain" element={<ExplainMoneyPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>
@@ -119,6 +121,7 @@ function App() {
 }
 
 export default App
+
 
 
 
