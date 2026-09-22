@@ -22,6 +22,7 @@ import {
   parsePercentToBasisPoints,
 } from '../utils/assets'
 import {
+  formatChetrumForInput,
   formatNu,
   getLocalToday,
   parseNuToChetrum,
@@ -201,17 +202,17 @@ function LoansPage() {
     setName(loan.name)
     setLender(loan.lender)
     setOriginalPrincipal(
-      (loan.originalPrincipalChetrum / 100).toFixed(2),
+      formatChetrumForInput(loan.originalPrincipalChetrum),
     )
     setOutstandingPrincipal(
-      (loan.outstandingPrincipalChetrum / 100).toFixed(2),
+      formatChetrumForInput(loan.outstandingPrincipalChetrum),
     )
     setAnnualRate(
       (loan.annualRateBps / 100).toFixed(2),
     )
     setEmi(
       loan.emiChetrum > 0
-        ? (loan.emiChetrum / 100).toFixed(2)
+        ? formatChetrumForInput(loan.emiChetrum)
         : '',
     )
     setTenure(
@@ -846,3 +847,5 @@ function LoansPage() {
 }
 
 export default LoansPage
+
+

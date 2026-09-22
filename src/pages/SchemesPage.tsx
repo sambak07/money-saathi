@@ -26,6 +26,7 @@ import {
   getSchemeStatusLabel,
 } from '../utils/schemes'
 import {
+  formatChetrumForInput,
   formatNu,
   getLocalToday,
   parseNuToChetrumAllowZero,
@@ -179,17 +180,17 @@ function SchemesPage() {
     setCategory(scheme.category)
     setStatus(scheme.status)
     setContribution(
-      (scheme.contributionChetrum / 100).toFixed(2),
+      formatChetrumForInput(scheme.contributionChetrum),
     )
     setFrequency(scheme.contributionFrequency)
     setCurrentValue(
-      (scheme.currentValueChetrum / 100).toFixed(2),
+      formatChetrumForInput(scheme.currentValueChetrum),
     )
     setProtectionCover(
-      (scheme.protectionCoverChetrum / 100).toFixed(2),
+      formatChetrumForInput(scheme.protectionCoverChetrum),
     )
     setFutureBenefit(
-      (scheme.futureBenefitChetrum / 100).toFixed(2),
+      formatChetrumForInput(scheme.futureBenefitChetrum),
     )
     setStartDate(scheme.startDate)
     setNextContributionDate(scheme.nextContributionDate)
@@ -983,3 +984,5 @@ function SchemesPage() {
 }
 
 export default SchemesPage
+
+

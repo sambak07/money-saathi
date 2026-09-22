@@ -61,6 +61,22 @@ export function formatNu(
   )}.${decimals}`
 }
 
+export function formatChetrumForInput(
+  amountChetrum: number,
+): string {
+  if (!Number.isSafeInteger(amountChetrum)) {
+    return ''
+  }
+
+  const negative = amountChetrum < 0
+  const absolute = Math.abs(amountChetrum)
+
+  const whole = Math.floor(absolute / 100)
+  const decimals = String(absolute % 100).padStart(2, '0')
+
+  return `${negative ? '-' : ''}${whole}.${decimals}`
+}
+
 export function getLocalToday(): string {
   const now = new Date()
 
@@ -76,3 +92,4 @@ export function isCurrentMonth(
 ): boolean {
   return date.slice(0, 7) === getLocalToday().slice(0, 7)
 }
+

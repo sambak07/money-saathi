@@ -32,6 +32,7 @@ import {
   parsePercentToBasisPoints,
 } from '../utils/assets'
 import {
+  formatChetrumForInput,
   formatNu,
   getLocalToday,
   parseNuToChetrum,
@@ -204,7 +205,7 @@ function MyMoneyPage() {
       setEditingId(record.id)
       setSavingsName(record.name)
       setSavingsBalance(
-        (record.balanceChetrum / 100).toFixed(2),
+        formatChetrumForInput(record.balanceChetrum),
       )
       setSavingsNote(record.note)
     }
@@ -218,7 +219,7 @@ function MyMoneyPage() {
       setEditingId(record.id)
       setFdName(record.name)
       setFdPrincipal(
-        (record.principalChetrum / 100).toFixed(2),
+        formatChetrumForInput(record.principalChetrum),
       )
       setFdRate(
         (record.annualRateBps / 100).toFixed(2),
@@ -237,7 +238,7 @@ function MyMoneyPage() {
       setEditingId(record.id)
       setRdName(record.name)
       setRdInstallment(
-        (record.installmentChetrum / 100).toFixed(2),
+        formatChetrumForInput(record.installmentChetrum),
       )
       setRdRate(
         (record.annualRateBps / 100).toFixed(2),
@@ -1272,5 +1273,7 @@ function MyMoneyPage() {
 }
 
 export default MyMoneyPage
+
+
 
 

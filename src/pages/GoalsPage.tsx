@@ -16,6 +16,7 @@ import {
 } from '../storage/db'
 import type { Goal, GoalContribution } from '../types/goal'
 import {
+  formatChetrumForInput,
   formatNu,
   getLocalToday,
   parseNuToChetrum,
@@ -140,7 +141,7 @@ function GoalsPage() {
   function startEdit(goal: Goal) {
     setEditingGoal(goal)
     setName(goal.name)
-    setTarget((goal.targetChetrum / 100).toFixed(2))
+    setTarget(formatChetrumForInput(goal.targetChetrum))
     setTargetDate(goal.targetDate)
     setNote(goal.note)
     setError('')
@@ -837,3 +838,5 @@ function GoalsPage() {
 }
 
 export default GoalsPage
+
+

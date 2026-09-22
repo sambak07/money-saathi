@@ -21,6 +21,7 @@ import type {
   TransactionKind,
 } from '../types/transaction'
 import {
+  formatChetrumForInput,
   formatNu,
   getLocalToday,
   parseNuToChetrum,
@@ -105,7 +106,7 @@ function TransactionFormPage() {
 
         setKind(record.kind)
         setAmount(
-          (record.amountChetrum / 100).toFixed(2),
+          formatChetrumForInput(record.amountChetrum),
         )
         setCategory(record.category)
         setDate(record.date)
@@ -394,3 +395,6 @@ function TransactionFormPage() {
 }
 
 export default TransactionFormPage
+
+
+

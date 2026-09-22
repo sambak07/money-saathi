@@ -22,6 +22,7 @@ import type {
   TransactionKind,
 } from '../types/transaction'
 import {
+  formatChetrumForInput,
   formatNu,
   getLocalToday,
   parseNuToChetrum,
@@ -244,7 +245,7 @@ function RegularMoneyPage() {
     setEditingItem(item)
     setName(item.name)
     setKind(item.kind)
-    setAmount((item.amountChetrum / 100).toFixed(2))
+    setAmount(formatChetrumForInput(item.amountChetrum))
     setCategory(item.category)
     setFrequency(item.frequency)
     setStartDate(item.startDate)
@@ -342,7 +343,7 @@ function RegularMoneyPage() {
 
     try {
       const transaction: MoneyTransaction = {
-        id: crypto.randomUUID(),
+        id: `regular::`,
         kind: item.kind,
         amountChetrum: item.amountChetrum,
         category: item.category,
@@ -791,4 +792,6 @@ function RegularMoneyPage() {
 }
 
 export default RegularMoneyPage
+
+
 

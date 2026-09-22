@@ -15,6 +15,7 @@ import {
 import type { Budget } from '../types/budget'
 import type { MoneyTransaction } from '../types/transaction'
 import {
+  formatChetrumForInput,
   formatNu,
   getLocalToday,
   parseNuToChetrum,
@@ -214,7 +215,7 @@ function BudgetPage() {
     setCategory(budget.category)
 
     setAmount(
-      (budget.limitChetrum / 100).toFixed(2),
+      formatChetrumForInput(budget.limitChetrum),
     )
 
     setError('')
@@ -781,3 +782,4 @@ function BudgetPage() {
 }
 
 export default BudgetPage
+
