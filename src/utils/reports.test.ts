@@ -8,6 +8,7 @@ import type { MoneyTransaction } from '../types/transaction'
 import {
   buildExpenseCategoryBreakdown,
   buildMonthlyTrend,
+  calculateAverageChetrum,
   calculateCashFlowRateBps,
   calculateShareBps,
   formatPercentBps,
@@ -75,6 +76,17 @@ describe('report utilities', () => {
     ])
   })
 
+  it('calculates average chetrum without floating-point money arithmetic', () => {
+    expect(calculateAverageChetrum(100, 3)).toBe(33)
+    expect(calculateAverageChetrum(1, 3)).toBe(0)
+    expect(calculateAverageChetrum(100, 0)).toBe(0)
+    expect(
+      calculateAverageChetrum(
+        Number.MAX_SAFE_INTEGER,
+        1,
+      ),
+    ).toBe(Number.MAX_SAFE_INTEGER)
+  })
   it('calculates category share using integer basis points', () => {
     expect(calculateShareBps(25000, 100000)).toBe(2500)
     expect(formatPercentBps(2500)).toBe('25.00%')
@@ -128,3 +140,4 @@ describe('report utilities', () => {
     })
   })
 })
+

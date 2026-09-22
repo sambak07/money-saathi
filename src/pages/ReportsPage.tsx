@@ -15,6 +15,7 @@ import {
 import {
   buildExpenseCategoryBreakdown,
   buildMonthlyTrend,
+  calculateAverageChetrum,
   calculateCashFlowRateBps,
   formatPercentBps,
   getMonthKeyOffset,
@@ -116,19 +117,16 @@ function ReportsPage() {
     const topCategory =
       categories[0] ?? null
 
+    const expenseTransactionCount =
+      monthTransactions.filter(
+        (item) => item.kind === 'expense',
+      ).length
+
     const averageExpenseChetrum =
-      current.transactionCount > 0
-        ? Math.trunc(
-            current.expenseChetrum /
-              Math.max(
-                1,
-                monthTransactions.filter(
-                  (item) =>
-                    item.kind === 'expense',
-                ).length,
-              ),
-          )
-        : 0
+      calculateAverageChetrum(
+        current.expenseChetrum,
+        expenseTransactionCount,
+      )
 
     return {
       current,
@@ -574,5 +572,6 @@ function ReportsPage() {
 }
 
 export default ReportsPage
+
 
 

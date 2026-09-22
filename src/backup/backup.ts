@@ -112,6 +112,147 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   )
 }
 
+const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/
+const MAX_TEXT_LENGTH = 20_000
+const MAX_ID_LENGTH = 500
+
+function isValidDateText(value: string): boolean {
+  if (value === '') return true
+  if (!DATE_PATTERN.test(value)) return false
+
+  const [year, month, day] = value.split('-').map(Number)
+  const date = new Date(year, month - 1, day)
+
+  return (
+    date.getFullYear() === year &&
+    date.getMonth() === month - 1 &&
+    date.getDate() === day
+  )
+}
+
+function isValidBackupRecord(
+  value: unknown,
+): value is Record<string, unknown> & { id: string } {
+  if (!isRecord(value)) return false
+
+  if (
+    typeof value.id !== 'string' ||
+    value.id.length === 0 ||
+    value.id.length > MAX_ID_LENGTH
+  ) {
+    return false
+  }
+
+  for (const [key, field] of Object.entries(value)) {
+    if (
+      typeof field === 'string' &&
+      field.length > MAX_TEXT_LENGTH
+    ) {
+      return false
+    }
+
+    if (
+      (
+        key.endsWith('Chetrum') ||
+        key.endsWith('Bps') ||
+        key.endsWith('Months') ||
+        key === 'installmentsPaid' ||
+        key === 'createdAt' ||
+        key === 'updatedAt'
+      ) &&
+      (
+        typeof field !== 'number' ||
+        !Number.isSafeInteger(field) ||
+        field < 0
+      )
+    ) {
+      return false
+    }
+
+    if (
+      (
+        key === 'date' ||
+        key.endsWith('Date') ||
+        key === 'scheduledFor'
+      ) &&
+      field !== undefined &&
+      (
+        typeof field !== 'string' ||
+        !isValidDateText(field)
+      )
+    ) {
+      return false
+    }
+  }
+
+  if (
+    'kind' in value &&
+    value.kind !== 'income' &&
+    value.kind !== 'expense'
+  ) {
+    return false
+  }
+
+  if (
+    'frequency' in value &&
+    value.frequency !== 'weekly' &&
+    value.frequency !== 'monthly' &&
+    value.frequency !== 'yearly'
+  ) {
+    return false
+  }
+
+  if (
+    'contributionFrequency' in value &&
+    ![
+      'monthly',
+      'quarterly',
+      'half-yearly',
+      'yearly',
+      'irregular',
+      'none',
+    ].includes(String(value.contributionFrequency))
+  ) {
+    return false
+  }
+
+  if (
+    'status' in value &&
+    ![
+      'active',
+      'paused',
+      'matured',
+      'closed',
+    ].includes(String(value.status))
+  ) {
+    return false
+  }
+
+  return true
+}
+
+function isValidCollection(
+  value: unknown,
+): value is Record<string, unknown>[] {
+  if (!Array.isArray(value)) return false
+
+  const ids = new Set<string>()
+
+  for (const item of value) {
+    if (!isValidBackupRecord(item)) {
+      return false
+    }
+
+    if (ids.has(item.id)) {
+      return false
+    }
+
+    ids.add(item.id)
+  }
+
+  return true
+}
+
 function hasSnapshotArrays(
   value: unknown,
 ): value is MoneySaathiDatabaseSnapshot {
@@ -130,7 +271,9 @@ function hasSnapshotArrays(
     'financialSchemes',
   ]
 
-  return keys.every((key) => Array.isArray(value[key]))
+  return keys.every(
+    (key) => isValidCollection(value[key]),
+  )
 }
 
 export function isValidBackupPayload(
@@ -302,3 +445,5 @@ export function parseEncryptedBackupText(
 
   return parsed
 }
+
+

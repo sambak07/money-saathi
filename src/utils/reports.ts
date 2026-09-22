@@ -89,6 +89,24 @@ export function buildMonthlyTrend(
   )
 }
 
+export function calculateAverageChetrum(
+  totalChetrum: number,
+  count: number,
+): number {
+  if (
+    !Number.isSafeInteger(totalChetrum) ||
+    totalChetrum < 0 ||
+    !Number.isSafeInteger(count) ||
+    count <= 0
+  ) {
+    return 0
+  }
+
+  return Number(
+    BigInt(totalChetrum) / BigInt(count),
+  )
+}
+
 export function calculateShareBps(
   partChetrum: number,
   totalChetrum: number,
@@ -205,3 +223,4 @@ export function getMonthTransactions(
       return b.createdAt - a.createdAt
     })
 }
+
