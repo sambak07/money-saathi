@@ -130,6 +130,14 @@ function AppShell({ children }: AppShellProps) {
           >
             Settings
           </NavLink>
+          <NavLink
+            to="/app/install"
+            className={({ isActive }) =>
+              isActive ? 'sidebar-item active' : 'sidebar-item'
+            }
+          >
+            Install
+          </NavLink>
 {futureItems.map((item) => (
             <button
               key={item}
@@ -213,6 +221,7 @@ function AppShell({ children }: AppShellProps) {
 }
 
 export default AppShell
+
 
 
 

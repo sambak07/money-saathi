@@ -1,4 +1,5 @@
-﻿import SettingsPage from './pages/SettingsPage'
+﻿import InstallPage from './pages/InstallPage'
+import SettingsPage from './pages/SettingsPage'
 import BackupPage from './pages/BackupPage'
 import SecurityPage from './pages/SecurityPage'
 import AppLockGate from './security/AppLockGate'
@@ -58,6 +59,7 @@ function App() {
         <Route path="/app/security" element={<SecurityPage />} />
         <Route path="/app/backup" element={<BackupPage />} />
         <Route path="/app/settings" element={<SettingsPage />} />
+        <Route path="/app/install" element={<InstallPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </AppLockGate>
@@ -66,6 +68,7 @@ function App() {
 }
 
 export default App
+
 
 
 
