@@ -1,4 +1,5 @@
-﻿import type { ReactNode } from 'react'
+﻿import '../styles/accessibility.css'
+import type { ReactNode } from 'react'
 import { NavLink } from 'react-router-dom'
 
 import '../styles/dashboard.css'
@@ -12,6 +13,9 @@ const futureItems: string[] = []
 function AppShell({ children }: AppShellProps) {
   return (
     <div className="app-layout">
+      <a className="skip-link" href="#main-content">
+        Skip to main content
+      </a>
       <aside className="app-sidebar">
         <NavLink to="/" className="app-brand">
           <span className="app-brand-mark">M</span>
@@ -155,7 +159,7 @@ function AppShell({ children }: AppShellProps) {
         </div>
       </aside>
 
-      <main className="app-main">{children}</main>
+      <main id="main-content" tabIndex={-1} className="app-main">{children}</main>
 
       <nav
         className="mobile-nav"
@@ -221,6 +225,8 @@ function AppShell({ children }: AppShellProps) {
 }
 
 export default AppShell
+
+
 
 
 
