@@ -7,9 +7,7 @@ interface AppShellProps {
   children: ReactNode
 }
 
-const futureItems = [
-  'Settings',
-]
+const futureItems: string[] = []
 
 function AppShell({ children }: AppShellProps) {
   return (
@@ -124,6 +122,14 @@ function AppShell({ children }: AppShellProps) {
           >
             Backup
           </NavLink>
+          <NavLink
+            to="/app/settings"
+            className={({ isActive }) =>
+              isActive ? 'sidebar-item active' : 'sidebar-item'
+            }
+          >
+            Settings
+          </NavLink>
 {futureItems.map((item) => (
             <button
               key={item}
@@ -207,6 +213,8 @@ function AppShell({ children }: AppShellProps) {
 }
 
 export default AppShell
+
+
 
 
 

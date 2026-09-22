@@ -6,6 +6,7 @@
 
 import AppShell from '../components/AppShell'
 import { getTransactions } from '../storage/db'
+import { getPreferences } from '../settings/preferences'
 import type { MoneyTransaction } from '../types/transaction'
 import {
   formatNu,
@@ -29,6 +30,10 @@ function ReportsPage() {
     useState<MoneyTransaction[]>([])
   const [selectedMonth, setSelectedMonth] =
     useState(() => getLocalToday().slice(0, 7))
+
+  const [trendMonths] = useState(
+    () => getPreferences().reportTrendMonths,
+  )
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -79,7 +84,7 @@ function ReportsPage() {
     const trend = buildMonthlyTrend(
       transactions,
       selectedMonth,
-      6,
+      trendMonths,
     )
 
     const categories =
@@ -136,7 +141,7 @@ function ReportsPage() {
       topCategory,
       averageExpenseChetrum,
     }
-  }, [selectedMonth, transactions])
+  }, [selectedMonth, transactions, trendMonths])
 
   if (loading) {
     return (
@@ -269,7 +274,7 @@ function ReportsPage() {
           <div className="reports-panel-heading">
             <div>
               <p className="dashboard-eyebrow">
-                Six-month view
+                {trendMonths}-month view
               </p>
               <h2>Income and expense trend</h2>
             </div>
@@ -569,3 +574,5 @@ function ReportsPage() {
 }
 
 export default ReportsPage
+
+

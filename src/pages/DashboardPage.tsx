@@ -18,6 +18,7 @@ import {
   getSavingsAccounts,
   getTransactions,
 } from '../storage/db'
+import { getPreferences } from '../settings/preferences'
 import type { Budget } from '../types/budget'
 import type { FinancialScheme } from '../types/scheme'
 import type { RegularMoney } from '../types/regularMoney'
@@ -65,6 +66,10 @@ interface DashboardData {
 
 function DashboardPage() {
   const [today] = useState(() => getLocalToday())
+
+  const [preferences] = useState(
+    () => getPreferences(),
+  )
   const currentMonth = today.slice(0, 7)
 
   const [data, setData] =
@@ -475,7 +480,10 @@ function DashboardPage() {
       ).length
 
     const recentTransactions =
-      data.transactions.slice(0, 5)
+      data.transactions.slice(
+        0,
+        preferences.dashboardRecentCount,
+      )
 
     return {
       monthlyIncome,
@@ -523,6 +531,7 @@ function DashboardPage() {
     currentMonth,
     data,
     today,
+    preferences.dashboardRecentCount,
   ])
 
   if (loading) {
@@ -574,6 +583,9 @@ function DashboardPage() {
             <h1>Home</h1>
 
             <p className="dashboard2-intro">
+              {preferences.displayName
+                ? `Welcome, ${preferences.displayName}. `
+                : ''}
               Understand what came in, what went out,
               what you own, what you owe and what you
               are building toward.
@@ -643,6 +655,11 @@ function DashboardPage() {
             to="/app/backup"
           >
             Backup
+          </Link>
+          <Link
+            to="/app/settings"
+          >
+            Settings
           </Link>
         </div>
 
@@ -1168,6 +1185,8 @@ function DashboardPage() {
 }
 
 export default DashboardPage
+
+
 
 
 

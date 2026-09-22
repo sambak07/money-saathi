@@ -937,3 +937,34 @@ export async function replaceDatabaseSnapshot(
     database.close()
   }
 }
+export async function clearAllFinancialData(): Promise<void> {
+  const database = await openDatabase()
+
+  const stores = [
+    TRANSACTION_STORE,
+    BUDGET_STORE,
+    REGULAR_MONEY_STORE,
+    GOAL_STORE,
+    GOAL_CONTRIBUTION_STORE,
+    SAVINGS_STORE,
+    FIXED_DEPOSIT_STORE,
+    RECURRING_DEPOSIT_STORE,
+    LOAN_STORE,
+    SCHEME_STORE,
+  ]
+
+  try {
+    const transaction = database.transaction(
+      stores,
+      'readwrite',
+    )
+
+    for (const storeName of stores) {
+      transaction.objectStore(storeName).clear()
+    }
+
+    await waitForTransaction(transaction)
+  } finally {
+    database.close()
+  }
+}
