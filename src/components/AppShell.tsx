@@ -8,7 +8,6 @@ interface AppShellProps {
 }
 
 const futureItems = [
-  'Reports',
   'Settings',
 ]
 
@@ -100,6 +99,15 @@ function AppShell({ children }: AppShellProps) {
             Schemes
           </NavLink>
 
+          <NavLink
+            to="/app/reports"
+            className={({ isActive }) =>
+              isActive ? 'sidebar-item active' : 'sidebar-item'
+            }
+          >
+            Reports
+          </NavLink>
+
           {futureItems.map((item) => (
             <button
               key={item}
@@ -183,6 +191,7 @@ function AppShell({ children }: AppShellProps) {
 }
 
 export default AppShell
+
 
 
 

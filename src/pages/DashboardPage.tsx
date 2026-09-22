@@ -628,6 +628,12 @@ function DashboardPage() {
           >
             My Money
           </Link>
+
+          <Link
+            to="/app/reports"
+          >
+            Reports
+          </Link>
         </div>
 
         <section className="dashboard2-month-grid">
@@ -1152,3 +1158,4 @@ function DashboardPage() {
 }
 
 export default DashboardPage
+

@@ -13,6 +13,7 @@ import LoansPage from './pages/LoansPage'
 import MyMoneyPage from './pages/MyMoneyPage'
 import OnboardingPage from './pages/OnboardingPage'
 import RegularMoneyPage from './pages/RegularMoneyPage'
+import ReportsPage from './pages/ReportsPage'
 import SchemesPage from './pages/SchemesPage'
 import TransactionFormPage from './pages/TransactionFormPage'
 import TransactionsPage from './pages/TransactionsPage'
@@ -48,6 +49,7 @@ function App() {
           path="/app/my-money/schemes"
           element={<SchemesPage />}
         />
+        <Route path="/app/reports" element={<ReportsPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
@@ -55,6 +57,7 @@ function App() {
 }
 
 export default App
+
 
 
 
