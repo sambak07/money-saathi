@@ -1,145 +1,229 @@
-﻿import '../styles/dashboard.css'
+﻿import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 
-const futureNavigation = [
-  'Transactions',
-  'Budget',
-  'Regular money',
-  'Goals',
-  'My Money',
-  'Reports',
-  'Settings',
-]
+import AppShell from '../components/AppShell'
+import { getTransactions } from '../storage/db'
+import type { MoneyTransaction } from '../types/transaction'
+import {
+  formatNu,
+  isCurrentMonth,
+} from '../utils/money'
+
+interface DashboardTotals {
+  balance: number
+  monthlyIncome: number
+  monthlyExpense: number
+}
+
+const emptyTotals: DashboardTotals = {
+  balance: 0,
+  monthlyIncome: 0,
+  monthlyExpense: 0,
+}
 
 function DashboardPage() {
+  const [transactions, setTransactions] =
+    useState<MoneyTransaction[]>([])
+
+  const [totals, setTotals] =
+    useState<DashboardTotals>(emptyTotals)
+
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    let active = true
+
+    async function loadDashboard() {
+      try {
+        const records = await getTransactions()
+
+        if (!active) {
+          return
+        }
+
+        const nextTotals = records.reduce<DashboardTotals>(
+          (result, record) => {
+            if (record.kind === 'income') {
+              result.balance += record.amountChetrum
+
+              if (isCurrentMonth(record.date)) {
+                result.monthlyIncome += record.amountChetrum
+              }
+            } else {
+              result.balance -= record.amountChetrum
+
+              if (isCurrentMonth(record.date)) {
+                result.monthlyExpense += record.amountChetrum
+              }
+            }
+
+            return result
+          },
+          {
+            ...emptyTotals,
+          },
+        )
+
+        setTransactions(records)
+        setTotals(nextTotals)
+      } finally {
+        if (active) {
+          setLoading(false)
+        }
+      }
+    }
+
+    void loadDashboard()
+
+    return () => {
+      active = false
+    }
+  }, [])
+
   return (
-    <div className="app-layout">
-      <aside className="app-sidebar">
-        <div className="app-brand">
-          <span className="app-brand-mark">M</span>
-          <span>Money Saathi</span>
-        </div>
+    <AppShell>
+      <div className="dashboard-container">
+        <header className="dashboard-header">
+          <div>
+            <p className="dashboard-eyebrow">
+              Your money today
+            </p>
 
-        <p className="sidebar-label">Overview</p>
+            <h1>Home</h1>
+          </div>
 
-        <nav className="sidebar-nav" aria-label="Money Saathi navigation">
-          <button type="button" className="sidebar-item active">
-            Home
-          </button>
-
-          {futureNavigation.map((item) => (
-            <button
-              key={item}
-              type="button"
-              className="sidebar-item"
-              disabled
-              title="Coming in the next build stages"
-            >
-              {item}
-            </button>
-          ))}
-        </nav>
-
-        <div className="sidebar-footer">
-          Local-first personal finance
-          <br />
-          Built around Nu.
-        </div>
-      </aside>
-
-      <main className="app-main">
-        <div className="dashboard-container">
-          <header className="dashboard-header">
-            <div>
-              <p className="dashboard-eyebrow">
-                Your money today
-              </p>
-
-              <h1>Home</h1>
-            </div>
-
-            <button type="button" className="add-money-button" disabled>
-              + Add
-            </button>
-          </header>
-
-          <section
-            className="dashboard-grid"
-            aria-label="Money overview"
+          <Link
+            to="/app/transactions/new"
+            className="add-money-button"
           >
-            <article className="dashboard-card">
-              <p className="dashboard-card-label">
-                Current balance
-              </p>
+            + Add
+          </Link>
+        </header>
 
-              <h2 className="dashboard-balance">
-                Nu. 0.00
-              </h2>
-            </article>
+        <section
+          className="dashboard-grid"
+          aria-label="Money overview"
+        >
+          <article className="dashboard-card">
+            <p className="dashboard-card-label">
+              Current balance
+            </p>
 
-            <article className="dashboard-card">
-              <p className="dashboard-card-label">
-                Money in
-              </p>
+            <h2 className="dashboard-balance">
+              {formatNu(totals.balance)}
+            </h2>
+          </article>
 
-              <h2 className="dashboard-card-value">
-                Nu. 0.00
-              </h2>
-            </article>
+          <article className="dashboard-card">
+            <p className="dashboard-card-label">
+              Money in this month
+            </p>
 
-            <article className="dashboard-card">
-              <p className="dashboard-card-label">
-                Money out
-              </p>
+            <h2 className="dashboard-card-value positive">
+              {formatNu(totals.monthlyIncome)}
+            </h2>
+          </article>
 
-              <h2 className="dashboard-card-value">
-                Nu. 0.00
-              </h2>
-            </article>
-          </section>
+          <article className="dashboard-card">
+            <p className="dashboard-card-label">
+              Money out this month
+            </p>
 
+            <h2 className="dashboard-card-value">
+              {formatNu(totals.monthlyExpense)}
+            </h2>
+          </article>
+        </section>
+
+        {loading ? (
           <section className="empty-panel">
             <div className="empty-content">
-              <div className="empty-icon" aria-hidden="true">
+              <p>Loading your money...</p>
+            </div>
+          </section>
+        ) : transactions.length === 0 ? (
+          <section className="empty-panel">
+            <div className="empty-content">
+              <div className="empty-icon">
                 +
               </div>
 
               <h2>Your money story starts here</h2>
 
               <p>
-                You do not have any transactions yet. We will build
-                transaction entry and local storage in the next stage.
+                Add your first income or expense. Money Saathi
+                will calculate your balance automatically.
               </p>
 
-              <button
-                type="button"
+              <Link
+                to="/app/transactions/new"
                 className="empty-action"
-                disabled
               >
                 Add first transaction
-              </button>
+              </Link>
             </div>
           </section>
-        </div>
-      </main>
+        ) : (
+          <section className="recent-section">
+            <div className="section-heading">
+              <div>
+                <p className="dashboard-card-label">
+                  Activity
+                </p>
 
-      <nav className="mobile-nav" aria-label="Mobile navigation">
-        <button type="button" className="mobile-nav-item active">
-          Home
-        </button>
+                <h2>Recent transactions</h2>
+              </div>
 
-        <button type="button" className="mobile-nav-item" disabled>
-          Money
-        </button>
+              <Link
+                to="/app/transactions"
+                className="text-link"
+              >
+                View all
+              </Link>
+            </div>
 
-        <button type="button" className="mobile-nav-item" disabled>
-          Goals
-        </button>
+            <div className="transaction-list">
+              {transactions.slice(0, 5).map((record) => (
+                <div
+                  className="transaction-row"
+                  key={record.id}
+                >
+                  <div
+                    className={
+                      record.kind === 'income'
+                        ? 'transaction-symbol income'
+                        : 'transaction-symbol expense'
+                    }
+                    aria-hidden="true"
+                  >
+                    {record.kind === 'income' ? '+' : '−'}
+                  </div>
 
-        <button type="button" className="mobile-nav-item" disabled>
-          More
-        </button>
-      </nav>
-    </div>
+                  <div className="transaction-main">
+                    <strong>{record.category}</strong>
+
+                    <span>
+                      {record.note || record.date}
+                    </span>
+                  </div>
+
+                  <div
+                    className={
+                      record.kind === 'income'
+                        ? 'transaction-amount income-text'
+                        : 'transaction-amount'
+                    }
+                  >
+                    {record.kind === 'income' ? '+' : '−'}
+                    {formatNu(record.amountChetrum)}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
+    </AppShell>
   )
 }
 
