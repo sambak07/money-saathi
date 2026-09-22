@@ -6,8 +6,13 @@
   | 'savings-goals'
   | 'retirement'
 
+export type HomeExperience =
+  | 'simple'
+  | 'full'
+
 export interface MoneySaathiProfile {
   needs: MoneyNeed[]
+  homeExperience: HomeExperience
 }
 
 const PROFILE_KEY = 'money-saathi:profile:v1'
@@ -72,18 +77,29 @@ function isRecord(
 export function sanitizeProfile(
   value: unknown,
 ): MoneySaathiProfile {
-  if (!isRecord(value) || !Array.isArray(value.needs)) {
-    return { needs: [] }
+  if (!isRecord(value)) {
+    return {
+      needs: [],
+      homeExperience: 'full',
+    }
   }
 
-  const needs = value.needs.filter(
-    (need): need is MoneyNeed =>
-      typeof need === 'string' &&
-      validNeedIds.has(need as MoneyNeed),
-  )
+  const needs = Array.isArray(value.needs)
+    ? value.needs.filter(
+        (need): need is MoneyNeed =>
+          typeof need === 'string' &&
+          validNeedIds.has(need as MoneyNeed),
+      )
+    : []
+
+  const homeExperience: HomeExperience =
+    value.homeExperience === 'simple'
+      ? 'simple'
+      : 'full'
 
   return {
     needs: [...new Set(needs)],
+    homeExperience,
   }
 }
 
@@ -91,13 +107,19 @@ export function getProfile(): MoneySaathiProfile {
   const raw = localStorage.getItem(PROFILE_KEY)
 
   if (!raw) {
-    return { needs: [] }
+    return {
+      needs: [],
+      homeExperience: 'full',
+    }
   }
 
   try {
     return sanitizeProfile(JSON.parse(raw))
   } catch {
-    return { needs: [] }
+    return {
+      needs: [],
+      homeExperience: 'full',
+    }
   }
 }
 
@@ -123,6 +145,7 @@ export function toggleNeed(
   const exists = profile.needs.includes(need)
 
   return {
+    ...profile,
     needs: exists
       ? profile.needs.filter((item) => item !== need)
       : [...profile.needs, need],

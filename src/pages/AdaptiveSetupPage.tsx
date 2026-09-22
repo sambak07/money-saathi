@@ -107,6 +107,73 @@ function AdaptiveSetupPage() {
           })}
         </section>
 
+        <section className="adaptive-home-choice">
+          <div>
+            <p className="dashboard-eyebrow">
+              Choose your Home
+            </p>
+
+            <h2>
+              How much detail do you want?
+            </h2>
+
+            <p>
+              Both views use exactly the same financial records.
+              You can switch at any time.
+            </p>
+          </div>
+
+          <div className="adaptive-home-choice-buttons">
+            <button
+              type="button"
+              className={
+                profile.homeExperience === 'simple'
+                  ? 'selected'
+                  : ''
+              }
+              aria-pressed={
+                profile.homeExperience === 'simple'
+              }
+              onClick={() =>
+                setProfile((current) => ({
+                  ...current,
+                  homeExperience: 'simple',
+                }))
+              }
+            >
+              <strong>Simple Home</strong>
+              <span>
+                Safe to Spend, money in, money out, goals and
+                recent activity.
+              </span>
+            </button>
+
+            <button
+              type="button"
+              className={
+                profile.homeExperience === 'full'
+                  ? 'selected'
+                  : ''
+              }
+              aria-pressed={
+                profile.homeExperience === 'full'
+              }
+              onClick={() =>
+                setProfile((current) => ({
+                  ...current,
+                  homeExperience: 'full',
+                }))
+              }
+            >
+              <strong>Full Home</strong>
+              <span>
+                Budgets, assets, debt, schemes, reports and the
+                complete financial dashboard.
+              </span>
+            </button>
+          </div>
+        </section>
+
         <section className="adaptive-setup-summary">
           <div>
             <p className="dashboard-eyebrow">
@@ -193,3 +260,4 @@ function AdaptiveSetupPage() {
 }
 
 export default AdaptiveSetupPage
+

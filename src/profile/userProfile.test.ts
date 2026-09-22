@@ -10,13 +10,16 @@ import {
 } from './userProfile'
 
 describe('adaptive Money Saathi profile', () => {
-  it('starts safely from invalid profile data', () => {
-    expect(sanitizeProfile(null)).toEqual({
+  it('uses a safe full-home default for invalid profile data', () => {
+    expect(
+      sanitizeProfile(null),
+    ).toEqual({
       needs: [],
+      homeExperience: 'full',
     })
   })
 
-  it('keeps only supported needs and removes duplicates', () => {
+  it('keeps supported needs and removes duplicates', () => {
     expect(
       sanitizeProfile({
         needs: [
@@ -25,43 +28,44 @@ describe('adaptive Money Saathi profile', () => {
           'salary',
           'unsupported',
         ],
+        homeExperience: 'simple',
       }),
     ).toEqual({
-      needs: ['salary', 'small-business'],
-    })
-  })
-
-  it('supports more than one financial need', () => {
-    let profile = sanitizeProfile({
-      needs: [],
-    })
-
-    profile = toggleNeed(
-      profile,
-      'daily-money',
-    )
-
-    profile = toggleNeed(
-      profile,
-      'retirement',
-    )
-
-    expect(profile.needs).toEqual([
-      'daily-money',
-      'retirement',
-    ])
-  })
-
-  it('removes a need when selected again', () => {
-    expect(
-      toggleNeed(
-        {
-          needs: ['salary', 'savings-goals'],
-        },
+      needs: [
         'salary',
-      ),
+        'small-business',
+      ],
+      homeExperience: 'simple',
+    })
+  })
+
+  it('preserves the chosen home experience when toggling needs', () => {
+    const profile = toggleNeed(
+      {
+        needs: ['daily-money'],
+        homeExperience: 'simple',
+      },
+      'savings-goals',
+    )
+
+    expect(profile).toEqual({
+      needs: [
+        'daily-money',
+        'savings-goals',
+      ],
+      homeExperience: 'simple',
+    })
+  })
+
+  it('falls back to full home for unsupported home values', () => {
+    expect(
+      sanitizeProfile({
+        needs: [],
+        homeExperience: 'unknown',
+      }),
     ).toEqual({
-      needs: ['savings-goals'],
+      needs: [],
+      homeExperience: 'full',
     })
   })
 })

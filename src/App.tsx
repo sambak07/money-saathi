@@ -1,4 +1,5 @@
-﻿import MoneyHealthPage from './pages/MoneyHealthPage'
+﻿import AdaptiveHomeRoute from './components/AdaptiveHomeRoute'
+import MoneyHealthPage from './pages/MoneyHealthPage'
 import MoneyTimelinePage from './pages/MoneyTimelinePage'
 import BusinessPage from './pages/BusinessPage'
 import SafetyBufferPage from './pages/SafetyBufferPage'
@@ -16,7 +17,6 @@ import {
 } from 'react-router-dom'
 
 import BudgetPage from './pages/BudgetPage'
-import DashboardPage from './pages/DashboardPage'
 import GoalsPage from './pages/GoalsPage'
 import LandingPage from './pages/LandingPage'
 import LoansPage from './pages/LoansPage'
@@ -35,7 +35,7 @@ function App() {
         <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/onboarding" element={<OnboardingPage />} />
-        <Route path="/app" element={<DashboardPage />} />
+        <Route path="/app" element={<AdaptiveHomeRoute />} />
         <Route path="/app/transactions" element={<TransactionsPage />} />
         <Route
           path="/app/transactions/new"
@@ -78,6 +78,7 @@ function App() {
 }
 
 export default App
+
 
 
 

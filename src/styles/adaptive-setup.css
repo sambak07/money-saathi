@@ -209,3 +209,67 @@
     margin-top: 4px;
   }
 }
+
+.adaptive-home-choice {
+  margin-top: 18px;
+  padding: 20px;
+  display: grid;
+  grid-template-columns: minmax(220px, 0.75fr) minmax(0, 1.25fr);
+  gap: 20px;
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  background: var(--color-surface);
+}
+
+.adaptive-home-choice h2 {
+  margin: 4px 0 0;
+  font-size: 20px;
+}
+
+.adaptive-home-choice p:last-child {
+  margin: 8px 0 0;
+  color: var(--color-text-secondary);
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+.adaptive-home-choice-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.adaptive-home-choice-buttons button {
+  min-height: 118px;
+  padding: 15px;
+  display: grid;
+  align-content: center;
+  gap: 6px;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background: white;
+  color: var(--color-text);
+  text-align: left;
+}
+
+.adaptive-home-choice-buttons button.selected {
+  border-color: var(--color-brand);
+  background: var(--color-brand-soft);
+}
+
+.adaptive-home-choice-buttons strong {
+  font-size: 12px;
+}
+
+.adaptive-home-choice-buttons span {
+  color: var(--color-text-secondary);
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+@media (max-width: 760px) {
+  .adaptive-home-choice,
+  .adaptive-home-choice-buttons {
+    grid-template-columns: 1fr;
+  }
+}
