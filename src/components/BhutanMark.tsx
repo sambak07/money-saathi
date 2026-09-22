@@ -38,6 +38,9 @@ function BhutanMark() {
         <Link to="/app/start">
           Start here
         </Link>
+        <Link to="/app/alerts">
+          Alerts
+        </Link>
 
         <Link to="/app/about">
           About
@@ -48,5 +51,6 @@ function BhutanMark() {
 }
 
 export default BhutanMark
+
 
 

@@ -1,4 +1,5 @@
-﻿import BhutanMark from './BhutanMark'
+﻿import AlertNotifier from './AlertNotifier'
+import BhutanMark from './BhutanMark'
 import '../styles/accessibility.css'
 import type { ReactNode } from 'react'
 import { NavLink } from 'react-router-dom'
@@ -161,6 +162,7 @@ function AppShell({ children }: AppShellProps) {
       </aside>
 
       <main id="main-content" tabIndex={-1} className="app-main">
+        <AlertNotifier />
         <BhutanMark />
         {children}
       </main>
@@ -229,6 +231,7 @@ function AppShell({ children }: AppShellProps) {
 }
 
 export default AppShell
+
 
 
 
