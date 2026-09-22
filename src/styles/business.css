@@ -1,0 +1,324 @@
+﻿.business-page {
+  padding-bottom: 38px;
+}
+
+.business-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.business-header h1 {
+  margin: 0;
+  font-size: clamp(34px, 5vw, 50px);
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+
+.business-header p:last-child {
+  max-width: 760px;
+  margin: 14px 0 0;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.business-header > a {
+  flex: 0 0 auto;
+  color: var(--color-brand);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.business-message,
+.business-error {
+  margin-top: 16px;
+  padding: 13px 15px;
+  border-radius: 12px;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.business-message {
+  border: 1px solid var(--color-border);
+  background: var(--color-brand-soft);
+  color: var(--color-brand);
+}
+
+.business-error {
+  border: 1px solid rgba(196, 54, 46, 0.22);
+  background: rgba(196, 54, 46, 0.06);
+  color: var(--color-danger);
+}
+
+.business-separation-note {
+  margin-top: 18px;
+  padding: 15px 17px;
+  display: grid;
+  gap: 4px;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background: var(--color-brand-soft);
+}
+
+.business-separation-note strong {
+  font-size: 11px;
+}
+
+.business-separation-note span {
+  color: var(--color-text-secondary);
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+.business-workspace-row {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 0.45fr);
+  gap: 14px;
+}
+
+.business-create-form,
+.business-selector {
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  background: var(--color-surface);
+}
+
+.business-create-form label,
+.business-selector label,
+.business-transaction-form label {
+  display: grid;
+  gap: 7px;
+  color: var(--color-text);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.business-create-form > div {
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.business-create-form input,
+.business-selector select,
+.business-transaction-form input,
+.business-transaction-form select {
+  min-height: 46px;
+  padding: 0 12px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 11px;
+  background: white;
+  color: var(--color-text);
+}
+
+.business-create-form button,
+.business-transaction-form > button {
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1px solid var(--color-brand);
+  border-radius: 11px;
+  background: var(--color-brand);
+  color: white;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.business-selector select {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.business-summary-grid {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.business-summary-grid article {
+  min-height: 120px;
+  padding: 17px;
+  display: grid;
+  align-content: center;
+  gap: 6px;
+  border: 1px solid var(--color-border);
+  border-radius: 17px;
+  background: var(--color-surface);
+}
+
+.business-summary-grid span {
+  color: var(--color-text-muted);
+  font-size: 9px;
+}
+
+.business-summary-grid strong {
+  font-size: 19px;
+}
+
+.business-summary-grid small {
+  color: var(--color-text-secondary);
+  font-size: 8px;
+  line-height: 1.45;
+}
+
+.business-two-column {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: minmax(280px, 0.72fr) minmax(0, 1.28fr);
+  gap: 14px;
+}
+
+.business-panel {
+  padding: 19px;
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.business-panel h2 {
+  margin: 4px 0 0;
+  font-size: 18px;
+}
+
+.business-transaction-form {
+  margin-top: 16px;
+  display: grid;
+  gap: 12px;
+}
+
+.business-kind-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.business-kind-toggle button {
+  min-height: 44px;
+  border: 1px solid var(--color-border);
+  border-radius: 11px;
+  background: white;
+  color: var(--color-text-secondary);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.business-kind-toggle button.selected {
+  border-color: var(--color-brand);
+  background: var(--color-brand-soft);
+  color: var(--color-brand);
+}
+
+.business-panel-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.business-danger-link,
+.business-transaction-row button {
+  min-height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 9px;
+  background: transparent;
+  color: var(--color-danger);
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.business-transaction-list {
+  margin-top: 14px;
+  display: grid;
+  gap: 8px;
+}
+
+.business-transaction-row {
+  min-height: 64px;
+  padding: 11px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+}
+
+.business-transaction-row > div:first-child {
+  display: grid;
+  gap: 4px;
+}
+
+.business-transaction-row span {
+  color: var(--color-text-secondary);
+  font-size: 9px;
+}
+
+.business-transaction-amount {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  text-align: right;
+}
+
+.business-empty {
+  margin-top: 16px;
+  padding: 28px;
+  border: 1px dashed var(--color-border-strong);
+  border-radius: 17px;
+  background: var(--color-surface);
+  text-align: center;
+}
+
+.business-empty.compact {
+  margin-top: 14px;
+  padding: 20px;
+}
+
+.business-empty strong {
+  font-size: 13px;
+}
+
+.business-empty p {
+  margin: 7px 0 0;
+  color: var(--color-text-secondary);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+  .business-workspace-row,
+  .business-two-column {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 680px) {
+  .business-header {
+    flex-direction: column;
+  }
+
+  .business-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .business-create-form > div {
+    grid-template-columns: 1fr;
+  }
+
+  .business-transaction-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .business-transaction-amount {
+    width: 100%;
+    justify-content: space-between;
+  }
+}

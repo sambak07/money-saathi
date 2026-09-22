@@ -877,12 +877,14 @@ function DashboardPage() {
             {profile.needs.includes('small-business') && (
               <article>
                 <span>Small business</span>
-                <strong>Keep separate</strong>
+                <strong>Separate workspace</strong>
                 <p>
-                  Current totals are not a dedicated business
-                  ledger. Personal and business money should not
-                  be mixed.
+                  Business money stays outside your personal
+                  balance and Safe to Spend.
                 </p>
+                <Link to="/app/business">
+                  Open business
+                </Link>
               </article>
             )}
           </section>
@@ -1410,6 +1412,7 @@ function DashboardPage() {
 }
 
 export default DashboardPage
+
 
 
 

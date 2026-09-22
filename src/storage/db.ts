@@ -3,6 +3,10 @@
   RecurringDeposit,
   SavingsAccount,
 } from '../types/asset'
+import type {
+  BusinessProfile,
+  BusinessTransaction,
+} from '../types/business'
 import type { Budget } from '../types/budget'
 import type { Loan } from '../types/loan'
 import type { FinancialScheme } from '../types/scheme'
@@ -11,7 +15,7 @@ import type { RegularMoney } from '../types/regularMoney'
 import type { MoneyTransaction } from '../types/transaction'
 
 const DATABASE_NAME = 'money-saathi'
-const DATABASE_VERSION = 7
+const DATABASE_VERSION = 8
 
 const TRANSACTION_STORE = 'transactions'
 const BUDGET_STORE = 'budgets'
@@ -23,6 +27,8 @@ const FIXED_DEPOSIT_STORE = 'fixed-deposits'
 const RECURRING_DEPOSIT_STORE = 'recurring-deposits'
 const LOAN_STORE = 'loans'
 const SCHEME_STORE = 'financial-schemes'
+const BUSINESS_PROFILE_STORE = 'business-profiles'
+const BUSINESS_TRANSACTION_STORE = 'business-transactions'
 
 function openDatabase(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -108,6 +114,31 @@ function openDatabase(): Promise<IDBDatabase> {
         database.createObjectStore(SCHEME_STORE, {
           keyPath: 'id',
         })
+      }
+      if (!database.objectStoreNames.contains(BUSINESS_PROFILE_STORE)) {
+        database.createObjectStore(
+          BUSINESS_PROFILE_STORE,
+          { keyPath: 'id' },
+        )
+      }
+
+      if (!database.objectStoreNames.contains(BUSINESS_TRANSACTION_STORE)) {
+        const store = database.createObjectStore(
+          BUSINESS_TRANSACTION_STORE,
+          { keyPath: 'id' },
+        )
+
+        store.createIndex(
+          'businessId',
+          'businessId',
+          { unique: false },
+        )
+
+        store.createIndex(
+          'date',
+          'date',
+          { unique: false },
+        )
       }
     }
   })
@@ -788,6 +819,199 @@ export async function deleteFinancialScheme(
     database.close()
   }
 }
+export async function getBusinessProfiles(): Promise<
+  BusinessProfile[]
+> {
+  const database = await openDatabase()
+
+  try {
+    const records =
+      await getAllFromStore<BusinessProfile>(
+        database,
+        BUSINESS_PROFILE_STORE,
+      )
+
+    return records.sort((a, b) =>
+      a.createdAt - b.createdAt,
+    )
+  } finally {
+    database.close()
+  }
+}
+
+export async function upsertBusinessProfile(
+  record: BusinessProfile,
+): Promise<void> {
+  const database = await openDatabase()
+
+  try {
+    const transaction = database.transaction(
+      BUSINESS_PROFILE_STORE,
+      'readwrite',
+    )
+
+    transaction
+      .objectStore(BUSINESS_PROFILE_STORE)
+      .put(record)
+
+    await waitForTransaction(transaction)
+  } finally {
+    database.close()
+  }
+}
+
+export async function getBusinessTransactions(
+  businessId: string,
+): Promise<BusinessTransaction[]> {
+  const database = await openDatabase()
+
+  try {
+    const transaction = database.transaction(
+      BUSINESS_TRANSACTION_STORE,
+      'readonly',
+    )
+
+    const request = transaction
+      .objectStore(BUSINESS_TRANSACTION_STORE)
+      .index('businessId')
+      .getAll(businessId)
+
+    const records =
+      await new Promise<BusinessTransaction[]>(
+        (resolve, reject) => {
+          request.onsuccess = () =>
+            resolve(
+              request.result as BusinessTransaction[],
+            )
+
+          request.onerror = () =>
+            reject(
+              request.error ??
+                new Error(
+                  'Could not read business transactions',
+                ),
+            )
+        },
+      )
+
+    await waitForTransaction(transaction)
+
+    return records.sort((a, b) => {
+      const dateComparison =
+        b.date.localeCompare(a.date)
+
+      if (dateComparison !== 0) {
+        return dateComparison
+      }
+
+      return b.createdAt - a.createdAt
+    })
+  } finally {
+    database.close()
+  }
+}
+
+export async function addBusinessTransaction(
+  record: BusinessTransaction,
+): Promise<void> {
+  const database = await openDatabase()
+
+  try {
+    const transaction = database.transaction(
+      BUSINESS_TRANSACTION_STORE,
+      'readwrite',
+    )
+
+    transaction
+      .objectStore(BUSINESS_TRANSACTION_STORE)
+      .add(record)
+
+    await waitForTransaction(transaction)
+  } finally {
+    database.close()
+  }
+}
+
+export async function deleteBusinessTransaction(
+  id: string,
+): Promise<void> {
+  const database = await openDatabase()
+
+  try {
+    const transaction = database.transaction(
+      BUSINESS_TRANSACTION_STORE,
+      'readwrite',
+    )
+
+    transaction
+      .objectStore(BUSINESS_TRANSACTION_STORE)
+      .delete(id)
+
+    await waitForTransaction(transaction)
+  } finally {
+    database.close()
+  }
+}
+
+export async function deleteBusinessProfileWithTransactions(
+  businessId: string,
+): Promise<void> {
+  const database = await openDatabase()
+
+  try {
+    const readTransaction = database.transaction(
+      BUSINESS_TRANSACTION_STORE,
+      'readonly',
+    )
+
+    const keysRequest = readTransaction
+      .objectStore(BUSINESS_TRANSACTION_STORE)
+      .index('businessId')
+      .getAllKeys(businessId)
+
+    const keys = await new Promise<IDBValidKey[]>(
+      (resolve, reject) => {
+        keysRequest.onsuccess = () =>
+          resolve(keysRequest.result)
+
+        keysRequest.onerror = () =>
+          reject(
+            keysRequest.error ??
+              new Error(
+                'Could not find business transactions',
+              ),
+          )
+      },
+    )
+
+    await waitForTransaction(readTransaction)
+
+    const writeTransaction = database.transaction(
+      [
+        BUSINESS_PROFILE_STORE,
+        BUSINESS_TRANSACTION_STORE,
+      ],
+      'readwrite',
+    )
+
+    writeTransaction
+      .objectStore(BUSINESS_PROFILE_STORE)
+      .delete(businessId)
+
+    const transactionStore =
+      writeTransaction.objectStore(
+        BUSINESS_TRANSACTION_STORE,
+      )
+
+    for (const key of keys) {
+      transactionStore.delete(key)
+    }
+
+    await waitForTransaction(writeTransaction)
+  } finally {
+    database.close()
+  }
+}
 export interface MoneySaathiDatabaseSnapshot {
   transactions: MoneyTransaction[]
   budgets: Budget[]
@@ -799,6 +1023,8 @@ export interface MoneySaathiDatabaseSnapshot {
   recurringDeposits: RecurringDeposit[]
   loans: Loan[]
   financialSchemes: FinancialScheme[]
+  businessProfiles: BusinessProfile[]
+  businessTransactions: BusinessTransaction[]
 }
 
 export async function exportDatabaseSnapshot(): Promise<
@@ -818,7 +1044,10 @@ export async function exportDatabaseSnapshot(): Promise<
       recurringDeposits,
       loans,
       financialSchemes,
+      businessProfiles,
+      businessTransactions,
     ] = await Promise.all([
+
       getAllFromStore<MoneyTransaction>(
         database,
         TRANSACTION_STORE,
@@ -859,6 +1088,14 @@ export async function exportDatabaseSnapshot(): Promise<
         database,
         SCHEME_STORE,
       ),
+      getAllFromStore<BusinessProfile>(
+        database,
+        BUSINESS_PROFILE_STORE,
+      ),
+      getAllFromStore<BusinessTransaction>(
+        database,
+        BUSINESS_TRANSACTION_STORE,
+      ),
     ])
 
     return {
@@ -872,6 +1109,8 @@ export async function exportDatabaseSnapshot(): Promise<
       recurringDeposits,
       loans,
       financialSchemes,
+      businessProfiles,
+      businessTransactions,
     }
   } finally {
     database.close()
@@ -894,6 +1133,8 @@ export async function replaceDatabaseSnapshot(
     RECURRING_DEPOSIT_STORE,
     LOAN_STORE,
     SCHEME_STORE,
+    BUSINESS_PROFILE_STORE,
+    BUSINESS_TRANSACTION_STORE,
   ]
 
   try {
@@ -921,6 +1162,11 @@ export async function replaceDatabaseSnapshot(
       ],
       [LOAN_STORE, snapshot.loans],
       [SCHEME_STORE, snapshot.financialSchemes],
+      [BUSINESS_PROFILE_STORE, snapshot.businessProfiles],
+      [
+        BUSINESS_TRANSACTION_STORE,
+        snapshot.businessTransactions,
+      ],
     ]
 
     for (const [storeName, records] of mappings) {
@@ -951,6 +1197,8 @@ export async function clearAllFinancialData(): Promise<void> {
     RECURRING_DEPOSIT_STORE,
     LOAN_STORE,
     SCHEME_STORE,
+    BUSINESS_PROFILE_STORE,
+    BUSINESS_TRANSACTION_STORE,
   ]
 
   try {
@@ -968,3 +1216,4 @@ export async function clearAllFinancialData(): Promise<void> {
     database.close()
   }
 }
+

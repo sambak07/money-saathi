@@ -269,6 +269,8 @@ function hasSnapshotArrays(
     'recurringDeposits',
     'loans',
     'financialSchemes',
+    'businessProfiles',
+    'businessTransactions',
   ]
 
   return keys.every(
@@ -445,5 +447,6 @@ export function parseEncryptedBackupText(
 
   return parsed
 }
+
 
 

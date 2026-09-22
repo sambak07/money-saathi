@@ -25,6 +25,8 @@ const emptySnapshot: MoneySaathiDatabaseSnapshot = {
   recurringDeposits: [],
   loans: [],
   financialSchemes: [],
+  businessProfiles: [],
+  businessTransactions: [],
 }
 
 describe('backup validation', () => {
@@ -182,4 +184,5 @@ describe('backup validation', () => {
     ).toBe(false)
   })
 })
+
 
