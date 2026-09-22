@@ -1,4 +1,5 @@
-﻿import '../styles/accessibility.css'
+﻿import BhutanMark from './BhutanMark'
+import '../styles/accessibility.css'
 import type { ReactNode } from 'react'
 import { NavLink } from 'react-router-dom'
 
@@ -159,7 +160,10 @@ function AppShell({ children }: AppShellProps) {
         </div>
       </aside>
 
-      <main id="main-content" tabIndex={-1} className="app-main">{children}</main>
+      <main id="main-content" tabIndex={-1} className="app-main">
+        <BhutanMark />
+        {children}
+      </main>
 
       <nav
         className="mobile-nav"
@@ -225,6 +229,7 @@ function AppShell({ children }: AppShellProps) {
 }
 
 export default AppShell
+
 
 
 

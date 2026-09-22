@@ -10,6 +10,7 @@ export default defineConfig({
       registerType: 'prompt',
       includeAssets: ['money-saathi-icon.svg'],
       manifest: {
+        lang: 'en-BT',
         name: 'Money Saathi',
         short_name: 'Money Saathi',
         description:
@@ -35,4 +36,5 @@ export default defineConfig({
     }),
   ],
 })
+
 

@@ -1,0 +1,212 @@
+﻿.bhutan-mark {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 13px;
+  background: var(--color-surface);
+}
+
+.bhutan-mark-copy {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.bhutan-mark-symbol {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: var(--color-brand-soft);
+  color: var(--color-brand);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+}
+
+.bhutan-mark-copy > span:last-child {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.bhutan-mark strong {
+  font-size: 9px;
+}
+
+.bhutan-mark small {
+  color: var(--color-text-secondary);
+  font-size: 8px;
+}
+
+.bhutan-mark > a {
+  flex: 0 0 auto;
+  color: var(--color-brand);
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.bhutan-about {
+  padding-bottom: 38px;
+}
+
+.bhutan-about-hero {
+  padding: clamp(24px, 5vw, 44px);
+  border: 1px solid var(--color-border);
+  border-radius: 24px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.bhutan-about-hero h1 {
+  margin: 0;
+  max-width: 760px;
+  font-size: clamp(38px, 7vw, 64px);
+  line-height: 0.98;
+  letter-spacing: -0.055em;
+}
+
+.bhutan-about-hero > p:last-child {
+  max-width: 720px;
+  margin: 16px 0 0;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.bhutan-about-promise {
+  margin-top: 14px;
+  padding: 15px 17px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  border-radius: 14px;
+  background: var(--color-brand-soft);
+}
+
+.bhutan-about-promise span {
+  color: var(--color-text-secondary);
+  font-size: 9px;
+}
+
+.bhutan-about-promise strong {
+  font-size: 11px;
+}
+
+.bhutan-principle-grid {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.bhutan-principle-grid article {
+  min-height: 165px;
+  padding: 20px;
+  display: grid;
+  align-content: center;
+  gap: 7px;
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  background: var(--color-surface);
+}
+
+.bhutan-principle-grid span {
+  color: var(--color-text-muted);
+  font-size: 8px;
+}
+
+.bhutan-principle-grid strong {
+  font-size: 15px;
+}
+
+.bhutan-principle-grid p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+.bhutan-audience-section,
+.bhutan-language-section {
+  margin-top: 14px;
+  padding: 20px;
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  background: var(--color-surface);
+}
+
+.bhutan-audience-section h2,
+.bhutan-language-section h2 {
+  margin: 4px 0 0;
+  font-size: 18px;
+}
+
+.bhutan-audience-section > p,
+.bhutan-language-section > p {
+  max-width: 760px;
+  margin: 8px 0 0;
+  color: var(--color-text-secondary);
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+.bhutan-audience-chips {
+  margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.bhutan-audience-chips span {
+  min-height: 34px;
+  padding: 0 11px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-brand-soft);
+  color: var(--color-text);
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.bhutan-language-section {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+}
+
+.bhutan-language-section a {
+  color: var(--color-brand);
+  font-size: 9px;
+  font-weight: 800;
+}
+
+@media (max-width: 680px) {
+  .bhutan-mark {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .bhutan-principle-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bhutan-about-promise,
+  .bhutan-language-section {
+    align-items: flex-start;
+    grid-template-columns: 1fr;
+    flex-direction: column;
+  }
+}

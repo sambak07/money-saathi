@@ -44,6 +44,14 @@ function AdaptiveSetupPage() {
   return (
     <AppShell>
       <div className="dashboard-container adaptive-setup-page">
+        <div className="adaptive-bhutan-note">
+          <strong>Bhutan-first by design</strong>
+          <span>
+            Ngultrum, local money habits and different Bhutanese
+            life stages stay at the center of Money Saathi.
+          </span>
+        </div>
+
         <header className="adaptive-setup-header">
           <p className="dashboard-eyebrow">
             Make Money Saathi yours
@@ -260,4 +268,5 @@ function AdaptiveSetupPage() {
 }
 
 export default AdaptiveSetupPage
+
 

@@ -273,3 +273,32 @@
     grid-template-columns: 1fr;
   }
 }
+
+.adaptive-bhutan-note {
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 9px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 13px;
+  background: var(--color-brand-soft);
+}
+
+.adaptive-bhutan-note strong {
+  flex: 0 0 auto;
+  font-size: 9px;
+}
+
+.adaptive-bhutan-note span {
+  color: var(--color-text-secondary);
+  font-size: 9px;
+  line-height: 1.45;
+}
+
+@media (max-width: 620px) {
+  .adaptive-bhutan-note {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
