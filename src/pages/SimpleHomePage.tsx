@@ -314,6 +314,9 @@ function SimpleHomePage() {
           <Link to="/app/upcoming">
             What is coming?
           </Link>
+          <Link to="/app/calendar">
+            Money calendar
+          </Link>
           <Link to="/app/financial-safety">
             My safety
           </Link>
@@ -453,6 +456,7 @@ function SimpleHomePage() {
 }
 
 export default SimpleHomePage
+
 
 
 

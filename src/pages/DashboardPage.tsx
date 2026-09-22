@@ -655,6 +655,11 @@ function DashboardPage() {
           >
             Upcoming
           </Link>
+          <Link
+            to="/app/calendar"
+          >
+            Money calendar
+          </Link>
 
           <Link
             to="/app/goals"
@@ -1442,6 +1447,7 @@ function DashboardPage() {
 }
 
 export default DashboardPage
+
 
 
 
