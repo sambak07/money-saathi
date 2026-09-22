@@ -1,4 +1,6 @@
-﻿import {
+﻿import SecurityPage from './pages/SecurityPage'
+import AppLockGate from './security/AppLockGate'
+import {
   BrowserRouter,
   Navigate,
   Route,
@@ -21,6 +23,7 @@ import TransactionsPage from './pages/TransactionsPage'
 function App() {
   return (
     <BrowserRouter>
+      <AppLockGate>
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/onboarding" element={<OnboardingPage />} />
@@ -50,13 +53,16 @@ function App() {
           element={<SchemesPage />}
         />
         <Route path="/app/reports" element={<ReportsPage />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
+                <Route path="/app/security" element={<SecurityPage />} />
+<Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+    </AppLockGate>
     </BrowserRouter>
   )
 }
 
 export default App
+
 
 
 
