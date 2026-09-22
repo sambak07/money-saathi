@@ -1,17 +1,15 @@
-﻿import IrregularIncomePage from './pages/IrregularIncomePage'
-import FinancialSafetyPage from './pages/FinancialSafetyPage'
-import GettingStartedPage from './pages/GettingStartedPage'
-import BhutanAboutPage from './pages/BhutanAboutPage'
+﻿import { lazy, Suspense } from 'react'
+import './styles/route-loading.css'
 import AdaptiveHomeRoute from './components/AdaptiveHomeRoute'
-import MoneyHealthPage from './pages/MoneyHealthPage'
-import MoneyTimelinePage from './pages/MoneyTimelinePage'
-import BusinessPage from './pages/BusinessPage'
-import SafetyBufferPage from './pages/SafetyBufferPage'
-import AdaptiveSetupPage from './pages/AdaptiveSetupPage'
-import InstallPage from './pages/InstallPage'
-import SettingsPage from './pages/SettingsPage'
-import BackupPage from './pages/BackupPage'
-import SecurityPage from './pages/SecurityPage'
+
+
+
+
+
+
+
+
+
 import AppLockGate from './security/AppLockGate'
 import {
   BrowserRouter,
@@ -20,22 +18,56 @@ import {
   Routes,
 } from 'react-router-dom'
 
-import BudgetPage from './pages/BudgetPage'
-import GoalsPage from './pages/GoalsPage'
-import LandingPage from './pages/LandingPage'
-import LoansPage from './pages/LoansPage'
-import MyMoneyPage from './pages/MyMoneyPage'
-import OnboardingPage from './pages/OnboardingPage'
-import RegularMoneyPage from './pages/RegularMoneyPage'
-import ReportsPage from './pages/ReportsPage'
-import SchemesPage from './pages/SchemesPage'
-import TransactionFormPage from './pages/TransactionFormPage'
-import TransactionsPage from './pages/TransactionsPage'
+
+
+
+
+
+
+
+
+
+
+const IrregularIncomePage = lazy(() => import('./pages/IrregularIncomePage'))
+const FinancialSafetyPage = lazy(() => import('./pages/FinancialSafetyPage'))
+const GettingStartedPage = lazy(() => import('./pages/GettingStartedPage'))
+const BhutanAboutPage = lazy(() => import('./pages/BhutanAboutPage'))
+const MoneyHealthPage = lazy(() => import('./pages/MoneyHealthPage'))
+const MoneyTimelinePage = lazy(() => import('./pages/MoneyTimelinePage'))
+const BusinessPage = lazy(() => import('./pages/BusinessPage'))
+const SafetyBufferPage = lazy(() => import('./pages/SafetyBufferPage'))
+const AdaptiveSetupPage = lazy(() => import('./pages/AdaptiveSetupPage'))
+const InstallPage = lazy(() => import('./pages/InstallPage'))
+const SettingsPage = lazy(() => import('./pages/SettingsPage'))
+const BackupPage = lazy(() => import('./pages/BackupPage'))
+const SecurityPage = lazy(() => import('./pages/SecurityPage'))
+const BudgetPage = lazy(() => import('./pages/BudgetPage'))
+const GoalsPage = lazy(() => import('./pages/GoalsPage'))
+const LandingPage = lazy(() => import('./pages/LandingPage'))
+const LoansPage = lazy(() => import('./pages/LoansPage'))
+const MyMoneyPage = lazy(() => import('./pages/MyMoneyPage'))
+const OnboardingPage = lazy(() => import('./pages/OnboardingPage'))
+const RegularMoneyPage = lazy(() => import('./pages/RegularMoneyPage'))
+const ReportsPage = lazy(() => import('./pages/ReportsPage'))
+const SchemesPage = lazy(() => import('./pages/SchemesPage'))
+const TransactionFormPage = lazy(() => import('./pages/TransactionFormPage'))
+const TransactionsPage = lazy(() => import('./pages/TransactionsPage'))
 
 function App() {
   return (
     <BrowserRouter>
       <AppLockGate>
+        <Suspense
+        fallback={
+          <div
+            className="route-loading-shell"
+            role="status"
+            aria-live="polite"
+          >
+            Loading Money Saathi…
+          </div>
+        }
+      >
         <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/onboarding" element={<OnboardingPage />} />
@@ -80,12 +112,14 @@ function App() {
         <Route path="/app/irregular-income" element={<IrregularIncomePage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+      </Suspense>
       </AppLockGate>
     </BrowserRouter>
   )
 }
 
 export default App
+
 
 
 
