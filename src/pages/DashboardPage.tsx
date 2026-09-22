@@ -661,6 +661,11 @@ function DashboardPage() {
           >
             Settings
           </Link>
+          <Link
+            to="/app/setup"
+          >
+            My setup
+          </Link>
         </div>
 
         <section className="dashboard2-month-grid">
@@ -1185,6 +1190,7 @@ function DashboardPage() {
 }
 
 export default DashboardPage
+
 
 
 

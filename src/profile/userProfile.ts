@@ -1,0 +1,130 @@
+﻿export type MoneyNeed =
+  | 'daily-money'
+  | 'salary'
+  | 'small-business'
+  | 'irregular-income'
+  | 'savings-goals'
+  | 'retirement'
+
+export interface MoneySaathiProfile {
+  needs: MoneyNeed[]
+}
+
+const PROFILE_KEY = 'money-saathi:profile:v1'
+
+export const MONEY_NEEDS: Array<{
+  id: MoneyNeed
+  title: string
+  description: string
+}> = [
+  {
+    id: 'daily-money',
+    title: 'Track daily money',
+    description:
+      'Understand what comes in, what goes out and what remains.',
+  },
+  {
+    id: 'salary',
+    title: 'Manage salary',
+    description:
+      'Plan salary, regular expenses, EMIs and monthly commitments.',
+  },
+  {
+    id: 'small-business',
+    title: 'Run a small business',
+    description:
+      'Prepare Money Saathi for business cash flow without mixing it with personal money.',
+  },
+  {
+    id: 'irregular-income',
+    title: 'Manage irregular income',
+    description:
+      'Useful when income changes by day, week, season or assignment.',
+  },
+  {
+    id: 'savings-goals',
+    title: 'Plan savings & goals',
+    description:
+      'Build toward emergencies, education, a home or other life goals.',
+  },
+  {
+    id: 'retirement',
+    title: 'Manage retirement income',
+    description:
+      'Focus on pension, deposits, commitments and available cash.',
+  },
+]
+
+const validNeedIds = new Set<MoneyNeed>(
+  MONEY_NEEDS.map((need) => need.id),
+)
+
+function isRecord(
+  value: unknown,
+): value is Record<string, unknown> {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    !Array.isArray(value)
+  )
+}
+
+export function sanitizeProfile(
+  value: unknown,
+): MoneySaathiProfile {
+  if (!isRecord(value) || !Array.isArray(value.needs)) {
+    return { needs: [] }
+  }
+
+  const needs = value.needs.filter(
+    (need): need is MoneyNeed =>
+      typeof need === 'string' &&
+      validNeedIds.has(need as MoneyNeed),
+  )
+
+  return {
+    needs: [...new Set(needs)],
+  }
+}
+
+export function getProfile(): MoneySaathiProfile {
+  const raw = localStorage.getItem(PROFILE_KEY)
+
+  if (!raw) {
+    return { needs: [] }
+  }
+
+  try {
+    return sanitizeProfile(JSON.parse(raw))
+  } catch {
+    return { needs: [] }
+  }
+}
+
+export function saveProfile(
+  profile: MoneySaathiProfile,
+): void {
+  const sanitized = sanitizeProfile(profile)
+
+  localStorage.setItem(
+    PROFILE_KEY,
+    JSON.stringify(sanitized),
+  )
+
+  window.dispatchEvent(
+    new Event('money-saathi-profile-change'),
+  )
+}
+
+export function toggleNeed(
+  profile: MoneySaathiProfile,
+  need: MoneyNeed,
+): MoneySaathiProfile {
+  const exists = profile.needs.includes(need)
+
+  return {
+    needs: exists
+      ? profile.needs.filter((item) => item !== need)
+      : [...profile.needs, need],
+  }
+}

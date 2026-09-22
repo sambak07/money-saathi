@@ -262,7 +262,24 @@ function SettingsPage() {
           </article>
         </section>
 
-        <section className="settings-two-column">
+                <section className="settings-two-column">
+          <article className="settings-link-card">
+            <p className="dashboard-eyebrow">
+              Experience
+            </p>
+
+            <h2>What Money Saathi should help with</h2>
+
+            <p>
+              Select one or more financial needs so future Home
+              screens can adapt without labeling you permanently.
+            </p>
+
+            <Link to="/app/setup">
+              Personalize Money Saathi
+            </Link>
+          </article>
+
           <article className="settings-link-card">
             <p className="dashboard-eyebrow">
               Privacy
@@ -351,3 +368,4 @@ function SettingsPage() {
 }
 
 export default SettingsPage
+
