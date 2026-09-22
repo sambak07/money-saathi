@@ -116,6 +116,14 @@ function AppShell({ children }: AppShellProps) {
           >
             App Lock
           </NavLink>
+          <NavLink
+            to="/app/backup"
+            className={({ isActive }) =>
+              isActive ? 'sidebar-item active' : 'sidebar-item'
+            }
+          >
+            Backup
+          </NavLink>
 {futureItems.map((item) => (
             <button
               key={item}
@@ -199,6 +207,7 @@ function AppShell({ children }: AppShellProps) {
 }
 
 export default AppShell
+
 
 
 

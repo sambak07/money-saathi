@@ -1,4 +1,5 @@
-﻿import SecurityPage from './pages/SecurityPage'
+﻿import BackupPage from './pages/BackupPage'
+import SecurityPage from './pages/SecurityPage'
 import AppLockGate from './security/AppLockGate'
 import {
   BrowserRouter,
@@ -24,7 +25,7 @@ function App() {
   return (
     <BrowserRouter>
       <AppLockGate>
-      <Routes>
+        <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/onboarding" element={<OnboardingPage />} />
         <Route path="/app" element={<DashboardPage />} />
@@ -53,15 +54,17 @@ function App() {
           element={<SchemesPage />}
         />
         <Route path="/app/reports" element={<ReportsPage />} />
-                <Route path="/app/security" element={<SecurityPage />} />
-<Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </AppLockGate>
+        <Route path="/app/security" element={<SecurityPage />} />
+        <Route path="/app/backup" element={<BackupPage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </AppLockGate>
     </BrowserRouter>
   )
 }
 
 export default App
+
 
 
 

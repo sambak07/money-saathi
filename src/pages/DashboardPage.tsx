@@ -639,6 +639,11 @@ function DashboardPage() {
           >
             App Lock
           </Link>
+          <Link
+            to="/app/backup"
+          >
+            Backup
+          </Link>
         </div>
 
         <section className="dashboard2-month-grid">
@@ -1163,5 +1168,6 @@ function DashboardPage() {
 }
 
 export default DashboardPage
+
 
 

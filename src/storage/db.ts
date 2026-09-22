@@ -788,3 +788,152 @@ export async function deleteFinancialScheme(
     database.close()
   }
 }
+export interface MoneySaathiDatabaseSnapshot {
+  transactions: MoneyTransaction[]
+  budgets: Budget[]
+  regularMoney: RegularMoney[]
+  goals: Goal[]
+  goalContributions: GoalContribution[]
+  savingsAccounts: SavingsAccount[]
+  fixedDeposits: FixedDeposit[]
+  recurringDeposits: RecurringDeposit[]
+  loans: Loan[]
+  financialSchemes: FinancialScheme[]
+}
+
+export async function exportDatabaseSnapshot(): Promise<
+  MoneySaathiDatabaseSnapshot
+> {
+  const database = await openDatabase()
+
+  try {
+    const [
+      transactions,
+      budgets,
+      regularMoney,
+      goals,
+      goalContributions,
+      savingsAccounts,
+      fixedDeposits,
+      recurringDeposits,
+      loans,
+      financialSchemes,
+    ] = await Promise.all([
+      getAllFromStore<MoneyTransaction>(
+        database,
+        TRANSACTION_STORE,
+      ),
+      getAllFromStore<Budget>(
+        database,
+        BUDGET_STORE,
+      ),
+      getAllFromStore<RegularMoney>(
+        database,
+        REGULAR_MONEY_STORE,
+      ),
+      getAllFromStore<Goal>(
+        database,
+        GOAL_STORE,
+      ),
+      getAllFromStore<GoalContribution>(
+        database,
+        GOAL_CONTRIBUTION_STORE,
+      ),
+      getAllFromStore<SavingsAccount>(
+        database,
+        SAVINGS_STORE,
+      ),
+      getAllFromStore<FixedDeposit>(
+        database,
+        FIXED_DEPOSIT_STORE,
+      ),
+      getAllFromStore<RecurringDeposit>(
+        database,
+        RECURRING_DEPOSIT_STORE,
+      ),
+      getAllFromStore<Loan>(
+        database,
+        LOAN_STORE,
+      ),
+      getAllFromStore<FinancialScheme>(
+        database,
+        SCHEME_STORE,
+      ),
+    ])
+
+    return {
+      transactions,
+      budgets,
+      regularMoney,
+      goals,
+      goalContributions,
+      savingsAccounts,
+      fixedDeposits,
+      recurringDeposits,
+      loans,
+      financialSchemes,
+    }
+  } finally {
+    database.close()
+  }
+}
+
+export async function replaceDatabaseSnapshot(
+  snapshot: MoneySaathiDatabaseSnapshot,
+): Promise<void> {
+  const database = await openDatabase()
+
+  const stores = [
+    TRANSACTION_STORE,
+    BUDGET_STORE,
+    REGULAR_MONEY_STORE,
+    GOAL_STORE,
+    GOAL_CONTRIBUTION_STORE,
+    SAVINGS_STORE,
+    FIXED_DEPOSIT_STORE,
+    RECURRING_DEPOSIT_STORE,
+    LOAN_STORE,
+    SCHEME_STORE,
+  ]
+
+  try {
+    const transaction = database.transaction(
+      stores,
+      'readwrite',
+    )
+
+    const mappings: Array<
+      [string, unknown[]]
+    > = [
+      [TRANSACTION_STORE, snapshot.transactions],
+      [BUDGET_STORE, snapshot.budgets],
+      [REGULAR_MONEY_STORE, snapshot.regularMoney],
+      [GOAL_STORE, snapshot.goals],
+      [
+        GOAL_CONTRIBUTION_STORE,
+        snapshot.goalContributions,
+      ],
+      [SAVINGS_STORE, snapshot.savingsAccounts],
+      [FIXED_DEPOSIT_STORE, snapshot.fixedDeposits],
+      [
+        RECURRING_DEPOSIT_STORE,
+        snapshot.recurringDeposits,
+      ],
+      [LOAN_STORE, snapshot.loans],
+      [SCHEME_STORE, snapshot.financialSchemes],
+    ]
+
+    for (const [storeName, records] of mappings) {
+      const store = transaction.objectStore(storeName)
+      store.clear()
+
+      for (const record of records) {
+        store.put(record)
+      }
+    }
+
+    await waitForTransaction(transaction)
+  } finally {
+    database.close()
+  }
+}
