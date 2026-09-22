@@ -1,6 +1,10 @@
 ﻿import type {
   MoneySaathiDatabaseSnapshot,
 } from '../storage/db'
+import {
+  isValidDurableSettingsBackup,
+  type DurableSettingsBackup,
+} from './durableSettings'
 
 export const BACKUP_FORMAT = 'MoneySaathiBackup'
 export const BACKUP_VERSION = 1
@@ -16,6 +20,7 @@ export interface MoneySaathiBackupPayload {
   version: typeof BACKUP_VERSION
   exportedAt: string
   data: MoneySaathiDatabaseSnapshot
+  settings?: DurableSettingsBackup
 }
 
 export interface EncryptedBackupEnvelope {
@@ -287,7 +292,13 @@ export function isValidBackupPayload(
     value.format === BACKUP_FORMAT &&
     value.version === BACKUP_VERSION &&
     typeof value.exportedAt === 'string' &&
-    hasSnapshotArrays(value.data)
+    hasSnapshotArrays(value.data) &&
+    (
+      value.settings === undefined ||
+      isValidDurableSettingsBackup(
+        value.settings,
+      )
+    )
   )
 }
 
@@ -447,6 +458,7 @@ export function parseEncryptedBackupText(
 
   return parsed
 }
+
 
 
 

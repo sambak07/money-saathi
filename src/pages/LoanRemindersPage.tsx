@@ -603,14 +603,15 @@ function LoanRemindersPage() {
 
           <div>
             <strong>
-              Reminder settings are currently device-local
+              Reminder settings are included in encrypted backup
             </strong>
 
             <p>
-              These verified reminder dates stay on this browser.
-              They are not yet part of the encrypted backup file;
-              Money Saathi shows this explicitly rather than
-              pretending otherwise.
+              These verified dates remain local during normal use
+              and are now included in Money Saathi encrypted backup
+              files. Browser notification permission itself stays
+              device-specific and must be enabled again after a
+              restore when needed.
             </p>
           </div>
         </section>
@@ -620,3 +621,4 @@ function LoanRemindersPage() {
 }
 
 export default LoanRemindersPage
+

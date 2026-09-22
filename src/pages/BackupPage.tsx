@@ -5,6 +5,10 @@
   useState,
 } from 'react'
 
+import {
+  captureDurableSettingsBackup,
+  restoreDurableSettingsBackup,
+} from '../backup/durableSettings'
 import AppShell from '../components/AppShell'
 import {
   exportDatabaseSnapshot,
@@ -91,6 +95,8 @@ function BackupPage() {
         version: BACKUP_VERSION,
         exportedAt: new Date().toISOString(),
         data: snapshot,
+        settings:
+          captureDurableSettingsBackup(),
       }
 
       const envelope = await encryptBackupPayload(
@@ -105,7 +111,9 @@ function BackupPage() {
 
       if (
         buildBackupSummary(verification).totalRecords !==
-        buildBackupSummary(payload).totalRecords
+          buildBackupSummary(payload).totalRecords ||
+        JSON.stringify(verification.settings) !==
+          JSON.stringify(payload.settings)
       ) {
         throw new Error(
           'Backup self-verification failed.',
@@ -228,8 +236,16 @@ function BackupPage() {
         verifiedPayload.data,
       )
 
+      if (verifiedPayload.settings) {
+        restoreDurableSettingsBackup(
+          verifiedPayload.settings,
+        )
+      }
+
       setMessage(
-        'Restore completed. Money Saathi will reload with the restored data.',
+        verifiedPayload.settings
+          ? 'Restore completed. Financial data and durable preferences were restored. Browser notification permission must be enabled again on this device.'
+          : 'Financial data restored from a legacy backup. This older backup did not contain durable preferences, so current device preferences were left unchanged.',
       )
 
       window.setTimeout(() => {
@@ -256,16 +272,18 @@ function BackupPage() {
 
           <p>
             Create an encrypted copy of your Money Saathi
-            financial records or restore a previously verified
-            backup.
+            financial records and durable preferences, or restore
+            a previously verified backup.
           </p>
         </header>
 
         <div className="backup-security-note">
           Backups use AES-GCM-256 encryption with a key derived
           from your password using PBKDF2-SHA-256 and 600,000
-          iterations. Your App Lock PIN is deliberately not
-          included in backup files.
+          iterations. App Lock PIN/verifier/session data, alerts
+          hidden for today, notification history and browser
+          notification permission are deliberately not restored
+          from backup files.
         </div>
 
         {message && (
@@ -509,8 +527,11 @@ function BackupPage() {
 
               <p>
                 Restoring replaces all current financial records
-                listed above. App Lock remains configured on this
-                device.
+                listed above.
+                {verifiedPayload?.settings
+                  ? ' Durable preferences, planning settings and verified loan reminders will also be restored. Browser notification permission must be enabled again on this device.'
+                  : ' This is a legacy backup without durable settings, so current device preferences will remain unchanged.'}
+                {' '}App Lock remains configured on this device.
               </p>
 
               <label htmlFor="restore-confirmation">
@@ -548,3 +569,5 @@ function BackupPage() {
 }
 
 export default BackupPage
+
+
