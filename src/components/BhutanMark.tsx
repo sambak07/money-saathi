@@ -7,6 +7,7 @@ import {
 } from '../bhutan/bhutanIdentity'
 
 import '../styles/bhutan-identity.css'
+import '../styles/getting-started.css'
 
 function BhutanMark() {
   return (
@@ -33,11 +34,19 @@ function BhutanMark() {
         </span>
       </div>
 
-      <Link to="/app/about">
-        About Money Saathi
-      </Link>
+      <div className="bhutan-mark-links">
+        <Link to="/app/start">
+          Start here
+        </Link>
+
+        <Link to="/app/about">
+          About
+        </Link>
+      </div>
     </div>
   )
 }
 
 export default BhutanMark
+
+

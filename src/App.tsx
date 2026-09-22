@@ -1,4 +1,5 @@
-﻿import BhutanAboutPage from './pages/BhutanAboutPage'
+﻿import GettingStartedPage from './pages/GettingStartedPage'
+import BhutanAboutPage from './pages/BhutanAboutPage'
 import AdaptiveHomeRoute from './components/AdaptiveHomeRoute'
 import MoneyHealthPage from './pages/MoneyHealthPage'
 import MoneyTimelinePage from './pages/MoneyTimelinePage'
@@ -72,6 +73,7 @@ function App() {
         <Route path="/app/upcoming" element={<MoneyTimelinePage />} />
         <Route path="/app/money-health" element={<MoneyHealthPage />} />
         <Route path="/app/about" element={<BhutanAboutPage />} />
+        <Route path="/app/start" element={<GettingStartedPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </AppLockGate>
@@ -80,6 +82,7 @@ function App() {
 }
 
 export default App
+
 
 
 
