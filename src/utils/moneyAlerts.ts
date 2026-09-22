@@ -1,4 +1,7 @@
 ﻿import type {
+  LoanReminderReference,
+} from '../alerts/loanDueReminders'
+import type {
   FinancialScheme,
 } from '../types/scheme'
 import type {
@@ -26,6 +29,7 @@ export type MoneyAlertSource =
   | 'regular-money'
   | 'scheme'
   | 'safe-to-spend'
+  | 'loan'
 
 export interface MoneyAlert {
   id: string
@@ -50,6 +54,7 @@ export interface BuildMoneyAlertsInput {
   recordedBalanceChetrum: number
   safeToSpendChetrum: number
   upcomingCommitmentsChetrum: number
+  loanReminders?: LoanReminderReference[]
 }
 
 const DAY_MS =
@@ -251,6 +256,52 @@ function schemeAlert(
   }
 }
 
+function loanAlert(
+  reminder: LoanReminderReference,
+  today: string,
+): MoneyAlert {
+  const days =
+    daysFromToday(
+      today,
+      reminder.nextDueDate,
+    )
+
+  const status: MoneyAlertStatus =
+    days < 0
+      ? 'overdue'
+      : days === 0
+        ? 'today'
+        : 'soon'
+
+  return {
+    id:
+      `loan:${reminder.loanId}:${reminder.nextDueDate}`,
+    level:
+      days <= 0
+        ? 'urgent'
+        : 'attention',
+    status,
+    source: 'loan',
+    title:
+      days < 0
+        ? `${reminder.loanName} payment date has passed`
+        : days === 0
+          ? `${reminder.loanName} payment is due today`
+          : `${reminder.loanName} payment is coming up`,
+    detail:
+      `${describeDue(days)}. This date and amount were entered by you in Loan reminders; Money Saathi did not infer them from EMI calculations.`,
+    dueDate:
+      reminder.nextDueDate,
+    amountChetrum:
+      reminder.amountChetrum,
+    href:
+      '/app/loan-reminders',
+    actionLabel:
+      'Review loan reminder',
+    notificationEligible: true,
+  }
+}
+
 function alertRank(
   alert: MoneyAlert,
 ): number {
@@ -359,6 +410,27 @@ export function buildMoneyAlerts(
     alerts.push(
       schemeAlert(
         scheme,
+        input.today,
+      ),
+    )
+  }
+
+  for (
+    const reminder of
+      input.loanReminders ?? []
+  ) {
+    if (
+      reminder.nextDueDate <
+        rangeStart ||
+      reminder.nextDueDate >
+        rangeEnd
+    ) {
+      continue
+    }
+
+    alerts.push(
+      loanAlert(
+        reminder,
         input.today,
       ),
     )

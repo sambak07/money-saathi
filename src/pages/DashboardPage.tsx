@@ -665,6 +665,11 @@ function DashboardPage() {
           >
             Alerts
           </Link>
+          <Link
+            to="/app/loan-reminders"
+          >
+            Loan reminders
+          </Link>
 
           <Link
             to="/app/goals"
@@ -1452,6 +1457,7 @@ function DashboardPage() {
 }
 
 export default DashboardPage
+
 
 
 

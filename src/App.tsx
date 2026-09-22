@@ -57,6 +57,7 @@ const ExplainMoneyPage = lazy(() => import('./pages/ExplainMoneyPage'))
 const DataExportPage = lazy(() => import('./pages/DataExportPage'))
 const MoneyCalendarPage = lazy(() => import('./pages/MoneyCalendarPage'))
 const AlertCentrePage = lazy(() => import('./pages/AlertCentrePage'))
+const LoanRemindersPage = lazy(() => import('./pages/LoanRemindersPage'))
 function App() {
   return (
     <BrowserRouter>
@@ -118,6 +119,7 @@ function App() {
         <Route path="/app/data-export" element={<DataExportPage />} />
         <Route path="/app/calendar" element={<MoneyCalendarPage />} />
         <Route path="/app/alerts" element={<AlertCentrePage />} />
+        <Route path="/app/loan-reminders" element={<LoanRemindersPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>
@@ -127,6 +129,7 @@ function App() {
 }
 
 export default App
+
 
 
 

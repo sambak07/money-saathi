@@ -15,24 +15,20 @@ import {
   type AlertDueSoonDays,
   type AlertPreferences,
 } from '../alerts/alertPreferences'
+import {
+  buildLoanReminderReferences,
+  getLoanDueReminders,
+} from '../alerts/loanDueReminders'
 import AppShell from '../components/AppShell'
 import {
   getFinancialSchemes,
+  getLoans,
   getRegularMoney,
   getTransactions,
 } from '../storage/db'
 import {
   getPreferences,
 } from '../settings/preferences'
-import type {
-  FinancialScheme,
-} from '../types/scheme'
-import type {
-  RegularMoney,
-} from '../types/regularMoney'
-import type {
-  MoneyTransaction,
-} from '../types/transaction'
 import {
   buildMoneyAlerts,
   countAlertLevels,
@@ -54,9 +50,18 @@ import {
 import '../styles/alert-centre.css'
 
 interface AlertData {
-  regularMoney: RegularMoney[]
-  transactions: MoneyTransaction[]
-  schemes: FinancialScheme[]
+  regularMoney: Awaited<
+    ReturnType<typeof getRegularMoney>
+  >
+  transactions: Awaited<
+    ReturnType<typeof getTransactions>
+  >
+  schemes: Awaited<
+    ReturnType<typeof getFinancialSchemes>
+  >
+  loans: Awaited<
+    ReturnType<typeof getLoans>
+  >
 }
 
 const DUE_SOON_OPTIONS:
@@ -106,10 +111,12 @@ function AlertCentrePage() {
           regularMoney,
           transactions,
           schemes,
+          loans,
         ] = await Promise.all([
           getRegularMoney(),
           getTransactions(),
           getFinancialSchemes(),
+          getLoans(),
         ])
 
         if (!active) return
@@ -118,6 +125,7 @@ function AlertCentrePage() {
           regularMoney,
           transactions,
           schemes,
+          loans,
         })
       } catch {
         if (active) {
@@ -175,6 +183,11 @@ function AlertCentrePage() {
           safe.safeToSpendChetrum,
         upcomingCommitmentsChetrum:
           safe.upcomingCommitmentsChetrum,
+        loanReminders:
+          buildLoanReminderReferences(
+            data.loans,
+            getLoanDueReminders(),
+          ),
       })
 
     const visibleAlerts =
@@ -344,36 +357,31 @@ function AlertCentrePage() {
         <section className="alert-centre-summary">
           <article>
             <span>Urgent</span>
-
             <strong>
               {view.counts.urgent}
             </strong>
-
             <small>
-              Due today or overdue recorded expenses.
+              Due today or overdue recorded expenses and verified
+              loan payments.
             </small>
           </article>
 
           <article>
             <span>Needs attention</span>
-
             <strong>
               {view.counts.attention}
             </strong>
-
             <small>
-              Upcoming expenses, passed income dates or safety
+              Upcoming commitments, passed income dates or safety
               status.
             </small>
           </article>
 
           <article>
             <span>Information</span>
-
             <strong>
               {view.counts.info}
             </strong>
-
             <small>
               Useful upcoming references.
             </small>
@@ -558,8 +566,8 @@ function AlertCentrePage() {
 
               <p>
                 New reminders appear from Regular Money, active
-                scheme contribution dates and important Safe to
-                Spend status.
+                scheme contribution dates, verified loan due dates
+                and important Safe to Spend status.
               </p>
             </div>
           ) : (
@@ -638,14 +646,18 @@ function AlertCentrePage() {
         <section className="alert-centre-guardrails">
           <div>
             <strong>
-              No guessed loan reminders
+              Loan dates are user-verified
             </strong>
 
             <p>
-              Loan EMI alerts will only be added once Money Saathi
-              stores a verified due date or you represent the EMI
-              in Regular Money.
+              Loan alerts only appear when you enter the payment
+              amount and next due date yourself. Money Saathi does
+              not infer due dates from EMI calculations.
             </p>
+
+            <Link to="/app/loan-reminders">
+              Manage loan reminders
+            </Link>
           </div>
 
           <div>

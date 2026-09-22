@@ -10,7 +10,12 @@ import {
   markAlertIdsNotified,
 } from '../alerts/alertPreferences'
 import {
+  buildLoanReminderReferences,
+  getLoanDueReminders,
+} from '../alerts/loanDueReminders'
+import {
   getFinancialSchemes,
+  getLoans,
   getRegularMoney,
   getTransactions,
 } from '../storage/db'
@@ -79,26 +84,36 @@ async function showNotification(
 
 function AlertNotifier() {
   const [
-    preferenceVersion,
-    setPreferenceVersion,
+    dataVersion,
+    setDataVersion,
   ] = useState(0)
 
   useEffect(() => {
-    function handlePreferenceChange() {
-      setPreferenceVersion(
+    function handleChange() {
+      setDataVersion(
         (value) => value + 1,
       )
     }
 
     window.addEventListener(
       'money-saathi-alert-preferences-change',
-      handlePreferenceChange,
+      handleChange,
+    )
+
+    window.addEventListener(
+      'money-saathi-loan-reminders-change',
+      handleChange,
     )
 
     return () => {
       window.removeEventListener(
         'money-saathi-alert-preferences-change',
-        handlePreferenceChange,
+        handleChange,
+      )
+
+      window.removeEventListener(
+        'money-saathi-loan-reminders-change',
+        handleChange,
       )
     }
   }, [])
@@ -136,10 +151,12 @@ function AlertNotifier() {
           regularMoney,
           transactions,
           schemes,
+          loans,
         ] = await Promise.all([
           getRegularMoney(),
           getTransactions(),
           getFinancialSchemes(),
+          getLoans(),
         ])
 
         if (!active) return
@@ -177,6 +194,11 @@ function AlertNotifier() {
               safe.safeToSpendChetrum,
             upcomingCommitmentsChetrum:
               safe.upcomingCommitmentsChetrum,
+            loanReminders:
+              buildLoanReminderReferences(
+                loans,
+                getLoanDueReminders(),
+              ),
           })
 
         const notified =
@@ -222,7 +244,7 @@ function AlertNotifier() {
           ),
         )
       } catch {
-        // Notification checks must never interrupt the app.
+        // Reminder checks must never interrupt the app.
       }
     }
 
@@ -242,7 +264,7 @@ function AlertNotifier() {
         interval,
       )
     }
-  }, [preferenceVersion])
+  }, [dataVersion])
 
   return null
 }

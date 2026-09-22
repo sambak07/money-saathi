@@ -320,6 +320,9 @@ function SimpleHomePage() {
           <Link to="/app/alerts">
             Alerts
           </Link>
+          <Link to="/app/loan-reminders">
+            Loan reminders
+          </Link>
           <Link to="/app/financial-safety">
             My safety
           </Link>
@@ -459,6 +462,7 @@ function SimpleHomePage() {
 }
 
 export default SimpleHomePage
+
 
 
 
