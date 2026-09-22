@@ -1,4 +1,5 @@
-﻿import AdaptiveSetupPage from './pages/AdaptiveSetupPage'
+﻿import SafetyBufferPage from './pages/SafetyBufferPage'
+import AdaptiveSetupPage from './pages/AdaptiveSetupPage'
 import InstallPage from './pages/InstallPage'
 import SettingsPage from './pages/SettingsPage'
 import BackupPage from './pages/BackupPage'
@@ -62,6 +63,7 @@ function App() {
         <Route path="/app/settings" element={<SettingsPage />} />
         <Route path="/app/install" element={<InstallPage />} />
         <Route path="/app/setup" element={<AdaptiveSetupPage />} />
+        <Route path="/app/safety-buffer" element={<SafetyBufferPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </AppLockGate>
@@ -70,6 +72,7 @@ function App() {
 }
 
 export default App
+
 
 
 

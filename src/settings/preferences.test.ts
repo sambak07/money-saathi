@@ -16,17 +16,19 @@ describe('Money Saathi preferences', () => {
     ).toEqual(DEFAULT_PREFERENCES)
   })
 
-  it('accepts supported report and dashboard options', () => {
+  it('accepts supported display and safety options', () => {
     expect(
       sanitizePreferences({
         displayName: '  Karma  ',
         reportTrendMonths: 12,
         dashboardRecentCount: 8,
+        safetyBufferChetrum: 250_000,
       }),
     ).toEqual({
       displayName: 'Karma',
       reportTrendMonths: 12,
       dashboardRecentCount: 8,
+      safetyBufferChetrum: 250_000,
     })
   })
 
@@ -36,6 +38,7 @@ describe('Money Saathi preferences', () => {
         displayName: 'User',
         reportTrendMonths: 18,
         dashboardRecentCount: 99,
+        safetyBufferChetrum: -1,
       }),
     ).toEqual({
       displayName: 'User',
@@ -43,6 +46,8 @@ describe('Money Saathi preferences', () => {
         DEFAULT_PREFERENCES.reportTrendMonths,
       dashboardRecentCount:
         DEFAULT_PREFERENCES.dashboardRecentCount,
+      safetyBufferChetrum:
+        DEFAULT_PREFERENCES.safetyBufferChetrum,
     })
   })
 })

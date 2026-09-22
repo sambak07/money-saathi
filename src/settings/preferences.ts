@@ -5,6 +5,7 @@ export interface MoneySaathiPreferences {
   displayName: string
   reportTrendMonths: ReportTrendMonths
   dashboardRecentCount: DashboardRecentCount
+  safetyBufferChetrum: number
 }
 
 const PREFERENCES_KEY = 'money-saathi:preferences:v1'
@@ -13,6 +14,7 @@ export const DEFAULT_PREFERENCES: MoneySaathiPreferences = {
   displayName: '',
   reportTrendMonths: 6,
   dashboardRecentCount: 5,
+  safetyBufferChetrum: 0,
 }
 
 function isRecord(
@@ -61,6 +63,12 @@ export function sanitizePreferences(
     )
       ? value.dashboardRecentCount
       : DEFAULT_PREFERENCES.dashboardRecentCount,
+    safetyBufferChetrum:
+      typeof value.safetyBufferChetrum === 'number' &&
+      Number.isSafeInteger(value.safetyBufferChetrum) &&
+      value.safetyBufferChetrum >= 0
+        ? value.safetyBufferChetrum
+        : DEFAULT_PREFERENCES.safetyBufferChetrum,
   }
 }
 
@@ -100,3 +108,4 @@ export function resetPreferences(): void {
     new Event('money-saathi-preferences-change'),
   )
 }
+

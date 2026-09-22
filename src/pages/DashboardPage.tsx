@@ -18,6 +18,10 @@ import {
   getSavingsAccounts,
   getTransactions,
 } from '../storage/db'
+import {
+  MONEY_NEEDS,
+  getProfile,
+} from '../profile/userProfile'
 import { getPreferences } from '../settings/preferences'
 import type { Budget } from '../types/budget'
 import type { FinancialScheme } from '../types/scheme'
@@ -42,6 +46,9 @@ import {
 import {
   annualContributionChetrum,
 } from '../utils/schemes'
+import {
+  calculateSafeToSpend,
+} from '../utils/safeToSpend'
 
 import '../styles/dashboard2.css'
 
@@ -69,6 +76,9 @@ function DashboardPage() {
 
   const [preferences] = useState(
     () => getPreferences(),
+  )
+  const [profile] = useState(
+    () => getProfile(),
   )
   const currentMonth = today.slice(0, 7)
 
@@ -206,6 +216,14 @@ function DashboardPage() {
     const transactionBalance =
       allTimeIncome -
       allTimeExpense
+    const safeToSpend =
+      calculateSafeToSpend(
+        today,
+        transactionBalance,
+        data.regularMoney,
+        data.transactions,
+        preferences.safetyBufferChetrum,
+      )
 
     const budgetByCategory =
       new Map(
@@ -492,8 +510,10 @@ function DashboardPage() {
         monthlyIncome -
         monthlyExpense,
       transactionBalance,
+      safeToSpend,
 
       budgetPlanned,
+
       budgetSpent,
       budgetRemaining:
         budgetPlanned -
@@ -515,6 +535,7 @@ function DashboardPage() {
         ),
       goalsReached,
 
+      savingsAssets,
       trackedAssets,
       outstandingDebt,
       netTrackedPosition,
@@ -532,6 +553,7 @@ function DashboardPage() {
     data,
     today,
     preferences.dashboardRecentCount,
+    preferences.safetyBufferChetrum,
   ])
 
   if (loading) {
@@ -667,6 +689,204 @@ function DashboardPage() {
             My setup
           </Link>
         </div>
+
+        <section className="dashboard2-adaptive-strip">
+          <div>
+            <p className="dashboard-eyebrow">
+              Your Money Saathi
+            </p>
+
+            <strong>
+              {profile.needs.length === 0
+                ? 'General money view'
+                : profile.needs
+                    .map(
+                      (need) =>
+                        MONEY_NEEDS.find(
+                          (item) =>
+                            item.id === need,
+                        )?.title,
+                    )
+                    .filter(Boolean)
+                    .join(' · ')}
+            </strong>
+
+            <span>
+              {profile.needs.includes('small-business')
+                ? 'Current Home remains one personal ledger. Business money is not silently mixed into these totals.'
+                : profile.needs.includes('irregular-income')
+                  ? 'Conservative mode: unreceived income is never added to Safe to Spend.'
+                  : profile.needs.includes('retirement')
+                    ? 'Focus on available cash, recurring income and commitments without treating protection cover as cash.'
+                    : profile.needs.includes('salary')
+                      ? 'Use Regular Money for salary and commitments so the planning horizon stays useful.'
+                      : profile.needs.includes('savings-goals')
+                        ? 'Goal progress stays separate from spendable cash to avoid double-counting.'
+                        : 'Start with what came in, what went out and what remains.'}
+            </span>
+          </div>
+
+          <Link to="/app/setup">
+            Adjust my setup
+          </Link>
+        </section>
+
+        <section className="dashboard2-safe-to-spend">
+          <div className="dashboard2-safe-main">
+            <p className="dashboard-eyebrow">
+              Decision support
+            </p>
+
+            <span>Safe to Spend</span>
+
+            <strong>
+              {formatNu(
+                dashboard.safeToSpend.safeToSpendChetrum,
+              )}
+            </strong>
+
+            <small>
+              Based on recorded transactions only. Future income
+              is never added before it is actually recorded.
+            </small>
+          </div>
+
+          <div className="dashboard2-safe-breakdown">
+            <div>
+              <span>Recorded balance</span>
+              <strong>
+                {formatNu(
+                  dashboard.safeToSpend.recordedBalanceChetrum,
+                )}
+              </strong>
+            </div>
+
+            <div>
+              <span>Upcoming commitments</span>
+              <strong>
+                −{formatNu(
+                  dashboard.safeToSpend.upcomingCommitmentsChetrum,
+                )}
+              </strong>
+            </div>
+
+            <div>
+              <span>Protected buffer</span>
+              <strong>
+                −{formatNu(
+                  dashboard.safeToSpend.safetyBufferChetrum,
+                )}
+              </strong>
+            </div>
+          </div>
+
+          <div className="dashboard2-safe-footer">
+            <span>
+              {dashboard.safeToSpend.nextExpectedIncomeDate
+                ? `Planning through ${formatScheduleDate(
+                    dashboard.safeToSpend.horizonDate,
+                  )}, the next scheduled income date.`
+                : `No scheduled income found. Planning through ${formatScheduleDate(
+                    dashboard.safeToSpend.horizonDate,
+                  )}.`}
+            </span>
+
+            <Link to="/app/safety-buffer">
+              {dashboard.safeToSpend.safetyBufferChetrum > 0
+                ? 'Adjust buffer'
+                : 'Set a safety buffer'}
+            </Link>
+          </div>
+        </section>
+
+        {profile.needs.length > 0 && (
+          <section className="dashboard2-focus-grid">
+            {profile.needs.includes('daily-money') && (
+              <article>
+                <span>Daily money</span>
+                <strong>
+                  {formatNu(
+                    dashboard.monthlyNet,
+                  )}
+                </strong>
+                <p>
+                  Recorded net cash flow this month.
+                </p>
+              </article>
+            )}
+
+            {profile.needs.includes('salary') && (
+              <article>
+                <span>Salary & commitments</span>
+                <strong>
+                  {dashboard.safeToSpend.nextExpectedIncomeDate
+                    ? formatScheduleDate(
+                        dashboard.safeToSpend.nextExpectedIncomeDate,
+                      )
+                    : 'Not scheduled'}
+                </strong>
+                <p>
+                  Next unrecorded recurring income date.
+                </p>
+              </article>
+            )}
+
+            {profile.needs.includes('irregular-income') && (
+              <article>
+                <span>Irregular income</span>
+                <strong>
+                  {formatNu(
+                    dashboard.safeToSpend.safeToSpendChetrum,
+                  )}
+                </strong>
+                <p>
+                  Unreceived income is not assumed.
+                </p>
+              </article>
+            )}
+
+            {profile.needs.includes('savings-goals') && (
+              <article>
+                <span>Savings goals</span>
+                <strong>
+                  {formatNu(
+                    dashboard.goalSaved,
+                  )}
+                </strong>
+                <p>
+                  Recorded contributions toward goals.
+                </p>
+              </article>
+            )}
+
+            {profile.needs.includes('retirement') && (
+              <article>
+                <span>Liquid savings</span>
+                <strong>
+                  {formatNu(
+                    dashboard.savingsAssets,
+                  )}
+                </strong>
+                <p>
+                  Savings-account balances only; FD and RD are
+                  not presented here as everyday cash.
+                </p>
+              </article>
+            )}
+
+            {profile.needs.includes('small-business') && (
+              <article>
+                <span>Small business</span>
+                <strong>Keep separate</strong>
+                <p>
+                  Current totals are not a dedicated business
+                  ledger. Personal and business money should not
+                  be mixed.
+                </p>
+              </article>
+            )}
+          </section>
+        )}
 
         <section className="dashboard2-month-grid">
           <article className="dashboard2-stat-card">
@@ -1190,6 +1410,7 @@ function DashboardPage() {
 }
 
 export default DashboardPage
+
 
 
 
