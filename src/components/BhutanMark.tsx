@@ -1,4 +1,5 @@
-﻿import {
+﻿import AlertBadge from './AlertBadge'
+import {
   Link,
 } from 'react-router-dom'
 
@@ -38,9 +39,7 @@ function BhutanMark() {
         <Link to="/app/start">
           Start here
         </Link>
-        <Link to="/app/alerts">
-          Alerts
-        </Link>
+        <AlertBadge />
 
         <Link to="/app/about">
           About
@@ -51,6 +50,7 @@ function BhutanMark() {
 }
 
 export default BhutanMark
+
 
 
 

@@ -193,6 +193,12 @@ export function acknowledgeAlertForToday(
     ACKNOWLEDGED_KEY,
     JSON.stringify(state),
   )
+
+  window.dispatchEvent(
+    new Event(
+      'money-saathi-alerts-change',
+    ),
+  )
 }
 
 export function getNotifiedAlertIds():
@@ -290,3 +296,4 @@ export function isWithinQuietHours(
     now < end
   )
 }
+

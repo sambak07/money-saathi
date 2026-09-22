@@ -1,0 +1,26 @@
+﻿.money-saathi-alert-badge {
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.money-saathi-alert-badge > strong {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--color-brand-soft);
+  color: var(--color-brand);
+  font-size: 8px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.money-saathi-alert-badge.urgent > strong {
+  background: var(--color-danger);
+  color: white;
+}
