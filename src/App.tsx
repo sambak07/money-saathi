@@ -5,6 +5,7 @@
   Routes,
 } from 'react-router-dom'
 
+import BudgetPage from './pages/BudgetPage'
 import DashboardPage from './pages/DashboardPage'
 import LandingPage from './pages/LandingPage'
 import OnboardingPage from './pages/OnboardingPage'
@@ -15,7 +16,10 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<LandingPage />} />
+        <Route
+          path="/"
+          element={<LandingPage />}
+        />
 
         <Route
           path="/onboarding"
@@ -43,8 +47,18 @@ function App() {
         />
 
         <Route
+          path="/app/budget"
+          element={<BudgetPage />}
+        />
+
+        <Route
           path="*"
-          element={<Navigate to="/" replace />}
+          element={
+            <Navigate
+              to="/"
+              replace
+            />
+          }
         />
       </Routes>
     </BrowserRouter>

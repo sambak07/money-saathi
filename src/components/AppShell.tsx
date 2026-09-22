@@ -8,7 +8,6 @@ interface AppShellProps {
 }
 
 const futureItems = [
-  'Budget',
   'Regular money',
   'Goals',
   'My Money',
@@ -20,12 +19,20 @@ function AppShell({ children }: AppShellProps) {
   return (
     <div className="app-layout">
       <aside className="app-sidebar">
-        <NavLink to="/" className="app-brand">
-          <span className="app-brand-mark">M</span>
+        <NavLink
+          to="/"
+          className="app-brand"
+        >
+          <span className="app-brand-mark">
+            M
+          </span>
+
           <span>Money Saathi</span>
         </NavLink>
 
-        <p className="sidebar-label">Money</p>
+        <p className="sidebar-label">
+          Money
+        </p>
 
         <nav
           className="sidebar-nav"
@@ -54,6 +61,17 @@ function AppShell({ children }: AppShellProps) {
             Transactions
           </NavLink>
 
+          <NavLink
+            to="/app/budget"
+            className={({ isActive }) =>
+              isActive
+                ? 'sidebar-item active'
+                : 'sidebar-item'
+            }
+          >
+            Budget
+          </NavLink>
+
           {futureItems.map((item) => (
             <button
               key={item}
@@ -67,7 +85,8 @@ function AppShell({ children }: AppShellProps) {
         </nav>
 
         <div className="sidebar-footer">
-          Your core money records stay on this device.
+          Your core money records stay on
+          this device.
         </div>
       </aside>
 
@@ -102,13 +121,16 @@ function AppShell({ children }: AppShellProps) {
           Transactions
         </NavLink>
 
-        <button
-          type="button"
-          className="mobile-nav-item"
-          disabled
+        <NavLink
+          to="/app/budget"
+          className={({ isActive }) =>
+            isActive
+              ? 'mobile-nav-item active'
+              : 'mobile-nav-item'
+          }
         >
-          Goals
-        </button>
+          Budget
+        </NavLink>
 
         <button
           type="button"
