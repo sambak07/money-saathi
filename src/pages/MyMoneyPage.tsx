@@ -4,6 +4,7 @@
   useMemo,
   useState,
 } from 'react'
+import { Link } from 'react-router-dom'
 
 import AppShell from '../components/AppShell'
 import {
@@ -507,6 +508,15 @@ function MyMoneyPage() {
             fixed deposits and recurring deposits without mixing
             those assets into everyday spending.
           </p>
+
+          <div className="my-money-header-actions">
+            <Link
+              to="/app/my-money/loans"
+              className="asset-add-button"
+            >
+              View loans & financial position
+            </Link>
+          </div>
         </header>
 
         <section className="asset-summary-grid">
@@ -1255,3 +1265,4 @@ function MyMoneyPage() {
 }
 
 export default MyMoneyPage
+

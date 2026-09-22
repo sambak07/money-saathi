@@ -4,12 +4,13 @@
   SavingsAccount,
 } from '../types/asset'
 import type { Budget } from '../types/budget'
+import type { Loan } from '../types/loan'
 import type { Goal, GoalContribution } from '../types/goal'
 import type { RegularMoney } from '../types/regularMoney'
 import type { MoneyTransaction } from '../types/transaction'
 
 const DATABASE_NAME = 'money-saathi'
-const DATABASE_VERSION = 5
+const DATABASE_VERSION = 6
 
 const TRANSACTION_STORE = 'transactions'
 const BUDGET_STORE = 'budgets'
@@ -19,6 +20,7 @@ const GOAL_CONTRIBUTION_STORE = 'goal-contributions'
 const SAVINGS_STORE = 'savings-accounts'
 const FIXED_DEPOSIT_STORE = 'fixed-deposits'
 const RECURRING_DEPOSIT_STORE = 'recurring-deposits'
+const LOAN_STORE = 'loans'
 
 function openDatabase(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -90,6 +92,12 @@ function openDatabase(): Promise<IDBDatabase> {
 
       if (!database.objectStoreNames.contains(RECURRING_DEPOSIT_STORE)) {
         database.createObjectStore(RECURRING_DEPOSIT_STORE, {
+          keyPath: 'id',
+        })
+      }
+
+      if (!database.objectStoreNames.contains(LOAN_STORE)) {
+        database.createObjectStore(LOAN_STORE, {
           keyPath: 'id',
         })
       }
@@ -654,6 +662,58 @@ export async function deleteRecurringDeposit(
     )
 
     transaction.objectStore(RECURRING_DEPOSIT_STORE).delete(id)
+    await waitForTransaction(transaction)
+  } finally {
+    database.close()
+  }
+}
+export async function getLoans(): Promise<Loan[]> {
+  const database = await openDatabase()
+
+  try {
+    const records = await getAllFromStore<Loan>(
+      database,
+      LOAN_STORE,
+    )
+
+    return records.sort((a, b) =>
+      a.name.localeCompare(b.name),
+    )
+  } finally {
+    database.close()
+  }
+}
+
+export async function upsertLoan(
+  record: Loan,
+): Promise<void> {
+  const database = await openDatabase()
+
+  try {
+    const transaction = database.transaction(
+      LOAN_STORE,
+      'readwrite',
+    )
+
+    transaction.objectStore(LOAN_STORE).put(record)
+    await waitForTransaction(transaction)
+  } finally {
+    database.close()
+  }
+}
+
+export async function deleteLoan(
+  id: string,
+): Promise<void> {
+  const database = await openDatabase()
+
+  try {
+    const transaction = database.transaction(
+      LOAN_STORE,
+      'readwrite',
+    )
+
+    transaction.objectStore(LOAN_STORE).delete(id)
     await waitForTransaction(transaction)
   } finally {
     database.close()

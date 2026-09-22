@@ -82,6 +82,15 @@ function AppShell({ children }: AppShellProps) {
             My Money
           </NavLink>
 
+          <NavLink
+            to="/app/my-money/loans"
+            className={({ isActive }) =>
+              isActive ? 'sidebar-item active' : 'sidebar-item'
+            }
+          >
+            Loans
+          </NavLink>
+
           {futureItems.map((item) => (
             <button
               key={item}
@@ -165,4 +174,5 @@ function AppShell({ children }: AppShellProps) {
 }
 
 export default AppShell
+
 

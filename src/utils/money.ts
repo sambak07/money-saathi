@@ -1,32 +1,64 @@
-﻿export function parseNuToChetrum(value: string): number | null {
+﻿const MAX_SAFE_MONEY = BigInt(Number.MAX_SAFE_INTEGER)
+
+function parseMoneyString(
+  value: string,
+  allowZero: boolean,
+): number | null {
   const cleaned = value.replace(/,/g, '').trim()
 
   if (!/^\d+(\.\d{0,2})?$/.test(cleaned)) {
     return null
   }
 
-  const numericValue = Number(cleaned)
+  const [wholePart, decimalPart = ''] = cleaned.split('.')
 
-  if (!Number.isFinite(numericValue) || numericValue <= 0) {
+  const wholeChetrum = BigInt(wholePart) * 100n
+
+  const decimalChetrum = BigInt(
+    decimalPart.padEnd(2, '0') || '0',
+  )
+
+  const total = wholeChetrum + decimalChetrum
+
+  if (total > MAX_SAFE_MONEY) {
     return null
   }
 
-  const chetrum = Math.round(numericValue * 100)
-
-  if (!Number.isSafeInteger(chetrum)) {
+  if (!allowZero && total === 0n) {
     return null
   }
 
-  return chetrum
+  return Number(total)
 }
 
-export function formatNu(amountChetrum: number): string {
-  const ngultrum = amountChetrum / 100
+export function parseNuToChetrum(
+  value: string,
+): number | null {
+  return parseMoneyString(value, false)
+}
 
-  return `Nu. ${ngultrum.toLocaleString('en-IN', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`
+export function parseNuToChetrumAllowZero(
+  value: string,
+): number | null {
+  return parseMoneyString(value, true)
+}
+
+export function formatNu(
+  amountChetrum: number,
+): string {
+  if (!Number.isSafeInteger(amountChetrum)) {
+    return 'Nu. —'
+  }
+
+  const negative = amountChetrum < 0
+  const absolute = Math.abs(amountChetrum)
+
+  const whole = Math.floor(absolute / 100)
+  const decimals = String(absolute % 100).padStart(2, '0')
+
+  return `Nu. ${negative ? '-' : ''}${whole.toLocaleString(
+    'en-IN',
+  )}.${decimals}`
 }
 
 export function getLocalToday(): string {
@@ -39,8 +71,8 @@ export function getLocalToday(): string {
   return localDate.toISOString().slice(0, 10)
 }
 
-export function isCurrentMonth(date: string): boolean {
-  const today = getLocalToday()
-
-  return date.slice(0, 7) === today.slice(0, 7)
+export function isCurrentMonth(
+  date: string,
+): boolean {
+  return date.slice(0, 7) === getLocalToday().slice(0, 7)
 }

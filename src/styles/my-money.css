@@ -5,12 +5,19 @@
   letter-spacing: -0.045em;
 }
 
-.my-money-header > p:last-child {
+.my-money-header > p {
   max-width: 700px;
   margin: 14px 0 0;
   color: var(--color-text-secondary);
   font-size: 14px;
   line-height: 1.65;
+}
+
+.my-money-header-actions {
+  margin-top: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .asset-summary-grid {
@@ -485,3 +492,4 @@
     grid-template-columns: 1fr;
   }
 }
+
