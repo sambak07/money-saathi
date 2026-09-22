@@ -1,18 +1,20 @@
 ﻿import type { Budget } from '../types/budget'
+import type { Goal, GoalContribution } from '../types/goal'
+import type { RegularMoney } from '../types/regularMoney'
 import type { MoneyTransaction } from '../types/transaction'
 
 const DATABASE_NAME = 'money-saathi'
-const DATABASE_VERSION = 2
+const DATABASE_VERSION = 4
 
 const TRANSACTION_STORE = 'transactions'
 const BUDGET_STORE = 'budgets'
+const REGULAR_MONEY_STORE = 'regular-money'
+const GOAL_STORE = 'goals'
+const GOAL_CONTRIBUTION_STORE = 'goal-contributions'
 
 function openDatabase(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open(
-      DATABASE_NAME,
-      DATABASE_VERSION,
-    )
+    const request = indexedDB.open(DATABASE_NAME, DATABASE_VERSION)
 
     request.onerror = () => {
       reject(
@@ -21,61 +23,49 @@ function openDatabase(): Promise<IDBDatabase> {
       )
     }
 
-    request.onsuccess = () => {
-      resolve(request.result)
-    }
+    request.onsuccess = () => resolve(request.result)
 
     request.onupgradeneeded = () => {
       const database = request.result
 
       if (!database.objectStoreNames.contains(TRANSACTION_STORE)) {
-        const transactionStore = database.createObjectStore(
+        const store = database.createObjectStore(
           TRANSACTION_STORE,
-          {
-            keyPath: 'id',
-          },
+          { keyPath: 'id' },
         )
-
-        transactionStore.createIndex(
-          'date',
-          'date',
-          {
-            unique: false,
-          },
-        )
-
-        transactionStore.createIndex(
-          'createdAt',
-          'createdAt',
-          {
-            unique: false,
-          },
-        )
+        store.createIndex('date', 'date', { unique: false })
+        store.createIndex('createdAt', 'createdAt', { unique: false })
       }
 
       if (!database.objectStoreNames.contains(BUDGET_STORE)) {
-        const budgetStore = database.createObjectStore(
+        const store = database.createObjectStore(
           BUDGET_STORE,
-          {
-            keyPath: 'id',
-          },
+          { keyPath: 'id' },
         )
+        store.createIndex('month', 'month', { unique: false })
+        store.createIndex('category', 'category', { unique: false })
+      }
 
-        budgetStore.createIndex(
-          'month',
-          'month',
-          {
-            unique: false,
-          },
+      if (!database.objectStoreNames.contains(REGULAR_MONEY_STORE)) {
+        const store = database.createObjectStore(
+          REGULAR_MONEY_STORE,
+          { keyPath: 'id' },
         )
+        store.createIndex('kind', 'kind', { unique: false })
+        store.createIndex('startDate', 'startDate', { unique: false })
+      }
 
-        budgetStore.createIndex(
-          'category',
-          'category',
-          {
-            unique: false,
-          },
+      if (!database.objectStoreNames.contains(GOAL_STORE)) {
+        database.createObjectStore(GOAL_STORE, { keyPath: 'id' })
+      }
+
+      if (!database.objectStoreNames.contains(GOAL_CONTRIBUTION_STORE)) {
+        const store = database.createObjectStore(
+          GOAL_CONTRIBUTION_STORE,
+          { keyPath: 'id' },
         )
+        store.createIndex('goalId', 'goalId', { unique: false })
+        store.createIndex('date', 'date', { unique: false })
       }
     }
   })
@@ -86,20 +76,33 @@ function waitForTransaction(
 ): Promise<void> {
   return new Promise((resolve, reject) => {
     transaction.oncomplete = () => resolve()
-
-    transaction.onerror = () => {
+    transaction.onerror = () =>
       reject(
         transaction.error ??
           new Error('Database transaction failed'),
       )
-    }
-
-    transaction.onabort = () => {
+    transaction.onabort = () =>
       reject(
         transaction.error ??
           new Error('Database transaction was cancelled'),
       )
-    }
+  })
+}
+
+function getAllFromStore<T>(
+  database: IDBDatabase,
+  storeName: string,
+): Promise<T[]> {
+  return new Promise((resolve, reject) => {
+    const transaction = database.transaction(storeName, 'readonly')
+    const request = transaction.objectStore(storeName).getAll()
+
+    request.onsuccess = () => resolve(request.result as T[])
+    request.onerror = () =>
+      reject(
+        request.error ??
+          new Error(`Could not read ${storeName}`),
+      )
   })
 }
 
@@ -109,46 +112,14 @@ export async function getTransactions(): Promise<
   const database = await openDatabase()
 
   try {
-    const transaction = database.transaction(
-      TRANSACTION_STORE,
-      'readonly',
-    )
-
-    const store = transaction.objectStore(
+    const records = await getAllFromStore<MoneyTransaction>(
+      database,
       TRANSACTION_STORE,
     )
-
-    const request = store.getAll()
-
-    const records = await new Promise<
-      MoneyTransaction[]
-    >((resolve, reject) => {
-      request.onsuccess = () => {
-        resolve(
-          request.result as MoneyTransaction[],
-        )
-      }
-
-      request.onerror = () => {
-        reject(
-          request.error ??
-            new Error(
-              'Could not read transactions',
-            ),
-        )
-      }
-    })
-
-    await waitForTransaction(transaction)
 
     return records.sort((a, b) => {
-      const dateComparison =
-        b.date.localeCompare(a.date)
-
-      if (dateComparison !== 0) {
-        return dateComparison
-      }
-
+      const comparison = b.date.localeCompare(a.date)
+      if (comparison !== 0) return comparison
       return b.createdAt - a.createdAt
     })
   } finally {
@@ -166,11 +137,7 @@ export async function addTransaction(
       TRANSACTION_STORE,
       'readwrite',
     )
-
-    transaction
-      .objectStore(TRANSACTION_STORE)
-      .add(record)
-
+    transaction.objectStore(TRANSACTION_STORE).add(record)
     await waitForTransaction(transaction)
   } finally {
     database.close()
@@ -187,11 +154,7 @@ export async function updateTransaction(
       TRANSACTION_STORE,
       'readwrite',
     )
-
-    transaction
-      .objectStore(TRANSACTION_STORE)
-      .put(record)
-
+    transaction.objectStore(TRANSACTION_STORE).put(record)
     await waitForTransaction(transaction)
   } finally {
     database.close()
@@ -208,11 +171,7 @@ export async function deleteTransaction(
       TRANSACTION_STORE,
       'readwrite',
     )
-
-    transaction
-      .objectStore(TRANSACTION_STORE)
-      .delete(id)
-
+    transaction.objectStore(TRANSACTION_STORE).delete(id)
     await waitForTransaction(transaction)
   } finally {
     database.close()
@@ -229,43 +188,30 @@ export async function getTransaction(
       TRANSACTION_STORE,
       'readonly',
     )
-
     const request = transaction
       .objectStore(TRANSACTION_STORE)
       .get(id)
 
-    const record = await new Promise<
-      MoneyTransaction | undefined
-    >((resolve, reject) => {
-      request.onsuccess = () => {
-        resolve(
-          request.result as
-            | MoneyTransaction
-            | undefined,
-        )
-      }
-
-      request.onerror = () => {
-        reject(
-          request.error ??
-            new Error(
-              'Could not read transaction',
-            ),
-        )
-      }
-    })
+    const record = await new Promise<MoneyTransaction | undefined>(
+      (resolve, reject) => {
+        request.onsuccess = () =>
+          resolve(request.result as MoneyTransaction | undefined)
+        request.onerror = () =>
+          reject(
+            request.error ??
+              new Error('Could not read transaction'),
+          )
+      },
+    )
 
     await waitForTransaction(transaction)
-
     return record
   } finally {
     database.close()
   }
 }
 
-export async function getBudgets(
-  month: string,
-): Promise<Budget[]> {
+export async function getBudgets(month: string): Promise<Budget[]> {
   const database = await openDatabase()
 
   try {
@@ -273,36 +219,26 @@ export async function getBudgets(
       BUDGET_STORE,
       'readonly',
     )
+    const request = transaction
+      .objectStore(BUDGET_STORE)
+      .index('month')
+      .getAll(month)
 
-    const store = transaction.objectStore(
-      BUDGET_STORE,
+    const records = await new Promise<Budget[]>(
+      (resolve, reject) => {
+        request.onsuccess = () =>
+          resolve(request.result as Budget[])
+        request.onerror = () =>
+          reject(
+            request.error ??
+              new Error('Could not read budgets'),
+          )
+      },
     )
-
-    const index = store.index('month')
-    const request = index.getAll(month)
-
-    const budgets = await new Promise<
-      Budget[]
-    >((resolve, reject) => {
-      request.onsuccess = () => {
-        resolve(
-          request.result as Budget[],
-        )
-      }
-
-      request.onerror = () => {
-        reject(
-          request.error ??
-            new Error(
-              'Could not read budgets',
-            ),
-        )
-      }
-    })
 
     await waitForTransaction(transaction)
 
-    return budgets.sort((a, b) =>
+    return records.sort((a, b) =>
       a.category.localeCompare(b.category),
     )
   } finally {
@@ -311,7 +247,7 @@ export async function getBudgets(
 }
 
 export async function upsertBudget(
-  budget: Budget,
+  record: Budget,
 ): Promise<void> {
   const database = await openDatabase()
 
@@ -320,11 +256,7 @@ export async function upsertBudget(
       BUDGET_STORE,
       'readwrite',
     )
-
-    transaction
-      .objectStore(BUDGET_STORE)
-      .put(budget)
-
+    transaction.objectStore(BUDGET_STORE).put(record)
     await waitForTransaction(transaction)
   } finally {
     database.close()
@@ -341,12 +273,198 @@ export async function deleteBudget(
       BUDGET_STORE,
       'readwrite',
     )
-
-    transaction
-      .objectStore(BUDGET_STORE)
-      .delete(id)
-
+    transaction.objectStore(BUDGET_STORE).delete(id)
     await waitForTransaction(transaction)
+  } finally {
+    database.close()
+  }
+}
+
+export async function getRegularMoney(): Promise<
+  RegularMoney[]
+> {
+  const database = await openDatabase()
+
+  try {
+    const records = await getAllFromStore<RegularMoney>(
+      database,
+      REGULAR_MONEY_STORE,
+    )
+
+    return records.sort((a, b) =>
+      a.name.localeCompare(b.name),
+    )
+  } finally {
+    database.close()
+  }
+}
+
+export async function upsertRegularMoney(
+  record: RegularMoney,
+): Promise<void> {
+  const database = await openDatabase()
+
+  try {
+    const transaction = database.transaction(
+      REGULAR_MONEY_STORE,
+      'readwrite',
+    )
+    transaction.objectStore(REGULAR_MONEY_STORE).put(record)
+    await waitForTransaction(transaction)
+  } finally {
+    database.close()
+  }
+}
+
+export async function deleteRegularMoney(
+  id: string,
+): Promise<void> {
+  const database = await openDatabase()
+
+  try {
+    const transaction = database.transaction(
+      REGULAR_MONEY_STORE,
+      'readwrite',
+    )
+    transaction.objectStore(REGULAR_MONEY_STORE).delete(id)
+    await waitForTransaction(transaction)
+  } finally {
+    database.close()
+  }
+}
+
+export async function getGoals(): Promise<Goal[]> {
+  const database = await openDatabase()
+
+  try {
+    const records = await getAllFromStore<Goal>(
+      database,
+      GOAL_STORE,
+    )
+
+    return records.sort((a, b) => a.createdAt - b.createdAt)
+  } finally {
+    database.close()
+  }
+}
+
+export async function upsertGoal(
+  record: Goal,
+): Promise<void> {
+  const database = await openDatabase()
+
+  try {
+    const transaction = database.transaction(
+      GOAL_STORE,
+      'readwrite',
+    )
+    transaction.objectStore(GOAL_STORE).put(record)
+    await waitForTransaction(transaction)
+  } finally {
+    database.close()
+  }
+}
+
+export async function getGoalContributions(): Promise<
+  GoalContribution[]
+> {
+  const database = await openDatabase()
+
+  try {
+    const records = await getAllFromStore<GoalContribution>(
+      database,
+      GOAL_CONTRIBUTION_STORE,
+    )
+
+    return records.sort((a, b) => {
+      const comparison = b.date.localeCompare(a.date)
+      if (comparison !== 0) return comparison
+      return b.createdAt - a.createdAt
+    })
+  } finally {
+    database.close()
+  }
+}
+
+export async function addGoalContribution(
+  record: GoalContribution,
+): Promise<void> {
+  const database = await openDatabase()
+
+  try {
+    const transaction = database.transaction(
+      GOAL_CONTRIBUTION_STORE,
+      'readwrite',
+    )
+    transaction.objectStore(GOAL_CONTRIBUTION_STORE).add(record)
+    await waitForTransaction(transaction)
+  } finally {
+    database.close()
+  }
+}
+
+export async function deleteGoalContribution(
+  id: string,
+): Promise<void> {
+  const database = await openDatabase()
+
+  try {
+    const transaction = database.transaction(
+      GOAL_CONTRIBUTION_STORE,
+      'readwrite',
+    )
+    transaction.objectStore(GOAL_CONTRIBUTION_STORE).delete(id)
+    await waitForTransaction(transaction)
+  } finally {
+    database.close()
+  }
+}
+
+export async function deleteGoalWithContributions(
+  goalId: string,
+): Promise<void> {
+  const database = await openDatabase()
+
+  try {
+    const readTransaction = database.transaction(
+      GOAL_CONTRIBUTION_STORE,
+      'readonly',
+    )
+
+    const keysRequest = readTransaction
+      .objectStore(GOAL_CONTRIBUTION_STORE)
+      .index('goalId')
+      .getAllKeys(goalId)
+
+    const keys = await new Promise<IDBValidKey[]>(
+      (resolve, reject) => {
+        keysRequest.onsuccess = () => resolve(keysRequest.result)
+        keysRequest.onerror = () =>
+          reject(
+            keysRequest.error ??
+              new Error('Could not find goal contributions'),
+          )
+      },
+    )
+
+    await waitForTransaction(readTransaction)
+
+    const writeTransaction = database.transaction(
+      [GOAL_STORE, GOAL_CONTRIBUTION_STORE],
+      'readwrite',
+    )
+
+    writeTransaction.objectStore(GOAL_STORE).delete(goalId)
+
+    const contributionStore = writeTransaction.objectStore(
+      GOAL_CONTRIBUTION_STORE,
+    )
+
+    for (const key of keys) {
+      contributionStore.delete(key)
+    }
+
+    await waitForTransaction(writeTransaction)
   } finally {
     database.close()
   }

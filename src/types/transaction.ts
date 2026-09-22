@@ -9,4 +9,6 @@ export interface MoneyTransaction {
   date: string
   createdAt: number
   updatedAt: number
+  recurringSourceId?: string
+  scheduledFor?: string
 }

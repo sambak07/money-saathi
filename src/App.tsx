@@ -7,8 +7,10 @@
 
 import BudgetPage from './pages/BudgetPage'
 import DashboardPage from './pages/DashboardPage'
+import GoalsPage from './pages/GoalsPage'
 import LandingPage from './pages/LandingPage'
 import OnboardingPage from './pages/OnboardingPage'
+import RegularMoneyPage from './pages/RegularMoneyPage'
 import TransactionFormPage from './pages/TransactionFormPage'
 import TransactionsPage from './pages/TransactionsPage'
 
@@ -16,50 +18,25 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route
-          path="/"
-          element={<LandingPage />}
-        />
-
-        <Route
-          path="/onboarding"
-          element={<OnboardingPage />}
-        />
-
-        <Route
-          path="/app"
-          element={<DashboardPage />}
-        />
-
-        <Route
-          path="/app/transactions"
-          element={<TransactionsPage />}
-        />
-
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/onboarding" element={<OnboardingPage />} />
+        <Route path="/app" element={<DashboardPage />} />
+        <Route path="/app/transactions" element={<TransactionsPage />} />
         <Route
           path="/app/transactions/new"
           element={<TransactionFormPage />}
         />
-
         <Route
           path="/app/transactions/:id/edit"
           element={<TransactionFormPage />}
         />
-
+        <Route path="/app/budget" element={<BudgetPage />} />
         <Route
-          path="/app/budget"
-          element={<BudgetPage />}
+          path="/app/regular-money"
+          element={<RegularMoneyPage />}
         />
-
-        <Route
-          path="*"
-          element={
-            <Navigate
-              to="/"
-              replace
-            />
-          }
-        />
+        <Route path="/app/goals" element={<GoalsPage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   )

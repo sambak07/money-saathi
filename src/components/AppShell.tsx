@@ -8,8 +8,6 @@ interface AppShellProps {
 }
 
 const futureItems = [
-  'Regular money',
-  'Goals',
   'My Money',
   'Reports',
   'Settings',
@@ -19,20 +17,12 @@ function AppShell({ children }: AppShellProps) {
   return (
     <div className="app-layout">
       <aside className="app-sidebar">
-        <NavLink
-          to="/"
-          className="app-brand"
-        >
-          <span className="app-brand-mark">
-            M
-          </span>
-
+        <NavLink to="/" className="app-brand">
+          <span className="app-brand-mark">M</span>
           <span>Money Saathi</span>
         </NavLink>
 
-        <p className="sidebar-label">
-          Money
-        </p>
+        <p className="sidebar-label">Money</p>
 
         <nav
           className="sidebar-nav"
@@ -42,9 +32,7 @@ function AppShell({ children }: AppShellProps) {
             to="/app"
             end
             className={({ isActive }) =>
-              isActive
-                ? 'sidebar-item active'
-                : 'sidebar-item'
+              isActive ? 'sidebar-item active' : 'sidebar-item'
             }
           >
             Home
@@ -53,9 +41,7 @@ function AppShell({ children }: AppShellProps) {
           <NavLink
             to="/app/transactions"
             className={({ isActive }) =>
-              isActive
-                ? 'sidebar-item active'
-                : 'sidebar-item'
+              isActive ? 'sidebar-item active' : 'sidebar-item'
             }
           >
             Transactions
@@ -64,12 +50,28 @@ function AppShell({ children }: AppShellProps) {
           <NavLink
             to="/app/budget"
             className={({ isActive }) =>
-              isActive
-                ? 'sidebar-item active'
-                : 'sidebar-item'
+              isActive ? 'sidebar-item active' : 'sidebar-item'
             }
           >
             Budget
+          </NavLink>
+
+          <NavLink
+            to="/app/regular-money"
+            className={({ isActive }) =>
+              isActive ? 'sidebar-item active' : 'sidebar-item'
+            }
+          >
+            Regular money
+          </NavLink>
+
+          <NavLink
+            to="/app/goals"
+            className={({ isActive }) =>
+              isActive ? 'sidebar-item active' : 'sidebar-item'
+            }
+          >
+            Goals
           </NavLink>
 
           {futureItems.map((item) => (
@@ -85,14 +87,11 @@ function AppShell({ children }: AppShellProps) {
         </nav>
 
         <div className="sidebar-footer">
-          Your core money records stay on
-          this device.
+          Your core money records stay on this device.
         </div>
       </aside>
 
-      <main className="app-main">
-        {children}
-      </main>
+      <main className="app-main">{children}</main>
 
       <nav
         className="mobile-nav"
@@ -102,9 +101,7 @@ function AppShell({ children }: AppShellProps) {
           to="/app"
           end
           className={({ isActive }) =>
-            isActive
-              ? 'mobile-nav-item active'
-              : 'mobile-nav-item'
+            isActive ? 'mobile-nav-item active' : 'mobile-nav-item'
           }
         >
           Home
@@ -113,32 +110,38 @@ function AppShell({ children }: AppShellProps) {
         <NavLink
           to="/app/transactions"
           className={({ isActive }) =>
-            isActive
-              ? 'mobile-nav-item active'
-              : 'mobile-nav-item'
+            isActive ? 'mobile-nav-item active' : 'mobile-nav-item'
           }
         >
-          Transactions
+          Txns
         </NavLink>
 
         <NavLink
           to="/app/budget"
           className={({ isActive }) =>
-            isActive
-              ? 'mobile-nav-item active'
-              : 'mobile-nav-item'
+            isActive ? 'mobile-nav-item active' : 'mobile-nav-item'
           }
         >
           Budget
         </NavLink>
 
-        <button
-          type="button"
-          className="mobile-nav-item"
-          disabled
+        <NavLink
+          to="/app/regular-money"
+          className={({ isActive }) =>
+            isActive ? 'mobile-nav-item active' : 'mobile-nav-item'
+          }
         >
-          More
-        </button>
+          Regular
+        </NavLink>
+
+        <NavLink
+          to="/app/goals"
+          className={({ isActive }) =>
+            isActive ? 'mobile-nav-item active' : 'mobile-nav-item'
+          }
+        >
+          Goals
+        </NavLink>
       </nav>
     </div>
   )

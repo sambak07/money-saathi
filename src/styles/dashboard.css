@@ -671,7 +671,7 @@
     padding: 7px;
 
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
 
     border: 1px solid var(--color-border);
     border-radius: 18px;
@@ -760,3 +760,4 @@
     grid-template-columns: 1fr 1fr;
   }
 }
+
