@@ -1,20 +1,22 @@
-﻿function App() {
+﻿import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+} from 'react-router-dom'
+
+import LandingPage from './pages/LandingPage'
+import OnboardingPage from './pages/OnboardingPage'
+
+function App() {
   return (
-    <main className="app-shell">
-      <section className="welcome-card">
-        <p className="brand">Money Saathi</p>
-
-        <h1>Understand your money.</h1>
-
-        <p className="tagline">
-          Plan it. Track it. Grow with it.
-        </p>
-
-        <p className="status">
-          Clean local build is running.
-        </p>
-      </section>
-    </main>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/onboarding" element={<OnboardingPage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
 
