@@ -684,6 +684,11 @@ function DashboardPage() {
             Financial safety
           </Link>
           <Link
+            to="/app/irregular-income"
+          >
+            Income rhythm
+          </Link>
+          <Link
             to="/app/security"
           >
             App Lock
@@ -1427,6 +1432,7 @@ function DashboardPage() {
 }
 
 export default DashboardPage
+
 
 
 

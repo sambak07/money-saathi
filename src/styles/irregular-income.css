@@ -1,0 +1,329 @@
+﻿.irregular-income-page {
+  padding-bottom: 38px;
+}
+
+.irregular-income-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.irregular-income-header h1 {
+  margin: 0;
+  font-size: clamp(34px, 6vw, 54px);
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+
+.irregular-income-header p:last-child {
+  max-width: 780px;
+  margin: 14px 0 0;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.irregular-income-header > a {
+  flex: 0 0 auto;
+  color: var(--color-brand);
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.irregular-income-message,
+.irregular-income-error {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 9px;
+}
+
+.irregular-income-message {
+  border: 1px solid var(--color-border);
+  background: var(--color-brand-soft);
+  color: var(--color-brand);
+}
+
+.irregular-income-error {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-danger);
+}
+
+.irregular-income-core {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.irregular-income-core article {
+  min-height: 150px;
+  padding: 17px;
+  display: grid;
+  align-content: center;
+  gap: 7px;
+  border: 1px solid var(--color-border);
+  border-radius: 17px;
+  background: var(--color-surface);
+}
+
+.irregular-income-core span {
+  color: var(--color-text-muted);
+  font-size: 8px;
+}
+
+.irregular-income-core > article > strong {
+  font-size: 17px;
+}
+
+.irregular-income-core p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 8px;
+  line-height: 1.5;
+}
+
+.irregular-floor-card {
+  margin-top: 14px;
+  padding: 19px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 0.55fr);
+  gap: 22px;
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  background: var(--color-brand-soft);
+}
+
+.irregular-floor-card h2 {
+  margin: 4px 0 0;
+  font-size: 18px;
+}
+
+.irregular-floor-card p:last-child {
+  max-width: 720px;
+  margin: 8px 0 0;
+  color: var(--color-text-secondary);
+  font-size: 9px;
+  line-height: 1.55;
+}
+
+.irregular-floor-card form {
+  display: grid;
+  align-content: center;
+  gap: 7px;
+}
+
+.irregular-floor-card label {
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.irregular-floor-card form > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.irregular-floor-card input {
+  min-height: 44px;
+  padding: 0 11px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 10px;
+  background: white;
+  color: var(--color-text);
+}
+
+.irregular-floor-card button {
+  min-height: 44px;
+  padding: 0 13px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--color-brand);
+  color: white;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.irregular-floor-card small {
+  color: var(--color-text-muted);
+  font-size: 8px;
+}
+
+.irregular-floor-result {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.irregular-floor-result article {
+  min-height: 105px;
+  padding: 16px;
+  display: grid;
+  align-content: center;
+  gap: 6px;
+  border: 1px solid var(--color-border);
+  border-radius: 15px;
+  background: var(--color-surface);
+}
+
+.irregular-floor-result span {
+  color: var(--color-text-muted);
+  font-size: 8px;
+}
+
+.irregular-floor-result strong {
+  font-size: 15px;
+}
+
+.irregular-history {
+  margin-top: 14px;
+  padding: 19px;
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.irregular-history-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.irregular-history-heading h2 {
+  margin: 4px 0 0;
+  font-size: 18px;
+}
+
+.irregular-history-heading > span {
+  color: var(--color-brand);
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.irregular-history-grid {
+  margin-top: 15px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.irregular-history-grid article {
+  padding: 14px;
+  display: grid;
+  gap: 9px;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+}
+
+.irregular-history-grid article > strong {
+  font-size: 10px;
+}
+
+.irregular-history-grid article > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.irregular-history-grid span {
+  color: var(--color-text-muted);
+  font-size: 8px;
+}
+
+.irregular-history-grid article > div strong {
+  font-size: 10px;
+}
+
+.irregular-income-actions {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
+}
+
+.irregular-income-actions a {
+  min-height: 46px;
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+  border-radius: 11px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 9px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.irregular-income-actions a.primary {
+  border-color: var(--color-brand);
+  background: var(--color-brand);
+  color: white;
+}
+
+.irregular-income-guardrails {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.irregular-income-guardrails > div {
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 15px;
+  background: var(--color-surface);
+}
+
+.irregular-income-guardrails strong {
+  font-size: 10px;
+}
+
+.irregular-income-guardrails p {
+  margin: 6px 0 0;
+  color: var(--color-text-secondary);
+  font-size: 9px;
+  line-height: 1.55;
+}
+
+@media (max-width: 980px) {
+  .irregular-income-core {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .irregular-history-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .irregular-income-header,
+  .irregular-history-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .irregular-floor-card,
+  .irregular-floor-result,
+  .irregular-income-guardrails {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .irregular-income-core,
+  .irregular-history-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .irregular-floor-card form > div {
+    grid-template-columns: 1fr;
+  }
+}
