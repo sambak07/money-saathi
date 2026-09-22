@@ -650,6 +650,11 @@ function DashboardPage() {
           >
             Regular money
           </Link>
+          <Link
+            to="/app/upcoming"
+          >
+            Upcoming
+          </Link>
 
           <Link
             to="/app/goals"
@@ -1412,6 +1417,7 @@ function DashboardPage() {
 }
 
 export default DashboardPage
+
 
 
 
