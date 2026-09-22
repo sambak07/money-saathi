@@ -1,0 +1,341 @@
+﻿.transactions-header {
+  align-items: center;
+}
+
+.transaction-filter-panel {
+  margin-top: 30px;
+  padding: 20px;
+
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.transaction-search,
+.filter-field {
+  display: grid;
+  gap: 8px;
+}
+
+.transaction-search label,
+.filter-field label {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.transaction-search input,
+.filter-field input,
+.filter-field select {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 13px;
+
+  border: 1px solid var(--color-border-strong);
+  border-radius: 12px;
+
+  background: white;
+  color: var(--color-text);
+
+  font-size: 14px;
+}
+
+.transaction-search input:focus,
+.filter-field input:focus,
+.filter-field select:focus {
+  border-color: var(--color-brand);
+  outline: none;
+
+  box-shadow:
+    0 0 0 4px rgba(23, 107, 75, 0.08);
+}
+
+.transaction-filter-grid {
+  margin-top: 14px;
+
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.custom-date-grid {
+  margin-top: 12px;
+
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.filter-footer {
+  min-height: 34px;
+  margin-top: 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.filter-footer p {
+  margin: 0;
+
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+
+.clear-filter-button {
+  min-height: 34px;
+  padding: 0 11px;
+
+  border: 1px solid var(--color-border);
+  border-radius: 9px;
+
+  background: white;
+  color: var(--color-text-secondary);
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.clear-filter-button:hover {
+  border-color: var(--color-border-strong);
+  color: var(--color-brand);
+}
+
+.transactions-error {
+  margin-top: 18px;
+  padding: 14px 16px;
+
+  border: 1px solid rgba(196, 54, 46, 0.22);
+  border-radius: 13px;
+
+  background: rgba(196, 54, 46, 0.06);
+  color: var(--color-danger);
+
+  font-size: 13px;
+}
+
+.grouped-transactions {
+  padding: 0;
+  overflow: hidden;
+}
+
+.transaction-date-group {
+  padding: 0 22px;
+}
+
+.transaction-date-group + .transaction-date-group {
+  border-top: 8px solid var(--color-bg);
+}
+
+.transaction-date-heading {
+  min-height: 66px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+
+  border-bottom: 1px solid var(--color-border);
+}
+
+.transaction-date-heading h2 {
+  margin: 0;
+
+  font-size: 15px;
+  letter-spacing: -0.015em;
+}
+
+.transaction-date-heading div > span {
+  display: block;
+  margin-top: 3px;
+
+  color: var(--color-text-muted);
+  font-size: 11px;
+}
+
+.date-count {
+  color: var(--color-text-muted);
+  font-size: 11px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.delete-dialog-backdrop {
+  position: fixed;
+  z-index: 100;
+
+  inset: 0;
+
+  padding: 20px;
+
+  display: grid;
+  place-items: center;
+
+  background: rgba(10, 18, 14, 0.42);
+  backdrop-filter: blur(4px);
+}
+
+.delete-dialog {
+  width: min(100%, 430px);
+  padding: 28px;
+
+  border: 1px solid var(--color-border);
+  border-radius: 22px;
+
+  background: white;
+
+  box-shadow:
+    0 24px 80px rgba(10, 18, 14, 0.22);
+}
+
+.delete-dialog-icon {
+  width: 46px;
+  height: 46px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 14px;
+
+  background: rgba(196, 54, 46, 0.09);
+  color: var(--color-danger);
+
+  font-size: 20px;
+  font-weight: 850;
+}
+
+.delete-dialog h2 {
+  margin: 20px 0 0;
+
+  font-size: 24px;
+  letter-spacing: -0.03em;
+}
+
+.delete-dialog p {
+  margin: 12px 0 0;
+
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.delete-dialog p strong {
+  color: var(--color-text);
+}
+
+.delete-warning {
+  font-size: 12px !important;
+  color: var(--color-danger) !important;
+}
+
+.delete-error {
+  margin-top: 15px;
+  padding: 12px;
+
+  border-radius: 11px;
+
+  background: rgba(196, 54, 46, 0.07);
+  color: var(--color-danger);
+
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.delete-dialog-actions {
+  margin-top: 24px;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.dialog-cancel-button,
+.dialog-delete-button {
+  min-height: 48px;
+  padding: 0 14px;
+
+  border-radius: 12px;
+
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.dialog-cancel-button {
+  border: 1px solid var(--color-border);
+  background: white;
+  color: var(--color-text);
+}
+
+.dialog-delete-button {
+  border: 1px solid var(--color-danger);
+  background: var(--color-danger);
+  color: white;
+}
+
+.dialog-cancel-button:disabled,
+.dialog-delete-button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+@media (max-width: 640px) {
+  .transactions-header {
+    align-items: flex-start;
+  }
+
+  .transactions-header .add-money-button {
+    white-space: nowrap;
+  }
+
+  .transaction-filter-panel {
+    padding: 16px;
+  }
+
+  .transaction-filter-grid,
+  .custom-date-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .clear-filter-button {
+    width: 100%;
+  }
+
+  .transaction-date-group {
+    padding: 0 16px;
+  }
+
+  .transaction-date-heading {
+    min-height: 60px;
+  }
+
+  .date-count {
+    display: none;
+  }
+
+  .delete-dialog {
+    padding: 22px;
+  }
+
+  .delete-dialog-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 420px) {
+  .transactions-header {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .transactions-header .add-money-button {
+    width: 100%;
+  }
+}
