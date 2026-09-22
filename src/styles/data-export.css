@@ -1,0 +1,240 @@
+﻿.data-export-page {
+  padding-bottom: 38px;
+}
+
+.data-export-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.data-export-header h1 {
+  margin: 0;
+  font-size: clamp(34px, 6vw, 54px);
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+
+.data-export-header p:last-child {
+  max-width: 760px;
+  margin: 14px 0 0;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.data-export-header > a {
+  flex: 0 0 auto;
+  color: var(--color-brand);
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.data-export-message {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-brand-soft);
+  color: var(--color-brand);
+  font-size: 9px;
+}
+
+.data-export-warning {
+  margin-top: 14px;
+  padding: 14px 16px;
+  display: grid;
+  gap: 4px;
+  border-radius: 14px;
+  background: var(--color-brand-soft);
+}
+
+.data-export-warning strong {
+  font-size: 10px;
+}
+
+.data-export-warning span {
+  color: var(--color-text-secondary);
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+.data-export-primary {
+  margin-top: 14px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.data-export-primary h2,
+.data-export-section-heading h2 {
+  margin: 4px 0 0;
+  font-size: 18px;
+}
+
+.data-export-primary p {
+  max-width: 720px;
+  margin: 8px 0 0;
+  color: var(--color-text-secondary);
+  font-size: 9px;
+  line-height: 1.55;
+}
+
+.data-export-primary span {
+  display: inline-block;
+  margin-top: 8px;
+  color: var(--color-text-muted);
+  font-size: 8px;
+}
+
+.data-export-primary button,
+.data-export-businesses button {
+  min-height: 42px;
+  padding: 0 13px;
+  flex: 0 0 auto;
+  border: 0;
+  border-radius: 10px;
+  background: var(--color-brand);
+  color: white;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.data-export-primary button:disabled,
+.data-export-businesses button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.data-export-section {
+  margin-top: 14px;
+  padding: 19px;
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  background: var(--color-surface);
+}
+
+.data-export-section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.data-export-section-heading > a {
+  color: var(--color-brand);
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.data-export-businesses {
+  margin-top: 14px;
+  display: grid;
+  gap: 8px;
+}
+
+.data-export-businesses article {
+  min-height: 64px;
+  padding: 11px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+}
+
+.data-export-businesses article > div {
+  display: grid;
+  gap: 4px;
+}
+
+.data-export-businesses strong {
+  font-size: 10px;
+}
+
+.data-export-businesses span {
+  color: var(--color-text-secondary);
+  font-size: 8px;
+}
+
+.data-export-empty {
+  margin-top: 14px;
+  padding: 20px;
+  border: 1px dashed var(--color-border-strong);
+  border-radius: 13px;
+  color: var(--color-text-secondary);
+  font-size: 9px;
+  text-align: center;
+}
+
+.data-export-explainer {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.data-export-explainer > div {
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 15px;
+  background: var(--color-surface);
+}
+
+.data-export-explainer strong,
+.data-export-backup strong {
+  font-size: 10px;
+}
+
+.data-export-explainer p,
+.data-export-backup p {
+  margin: 6px 0 0;
+  color: var(--color-text-secondary);
+  font-size: 9px;
+  line-height: 1.55;
+}
+
+.data-export-backup {
+  margin-top: 14px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  border-radius: 15px;
+  background: var(--color-brand-soft);
+}
+
+.data-export-backup > a {
+  min-height: 40px;
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  border-radius: 10px;
+  background: var(--color-brand);
+  color: white;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+@media (max-width: 720px) {
+  .data-export-header,
+  .data-export-primary,
+  .data-export-backup {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .data-export-explainer {
+    grid-template-columns: 1fr;
+  }
+}

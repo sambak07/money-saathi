@@ -684,6 +684,11 @@ function DashboardPage() {
             Explain my money
           </Link>
           <Link
+            to="/app/data-export"
+          >
+            Export data
+          </Link>
+          <Link
             to="/app/financial-safety"
           >
             Financial safety
@@ -1437,6 +1442,7 @@ function DashboardPage() {
 }
 
 export default DashboardPage
+
 
 
 

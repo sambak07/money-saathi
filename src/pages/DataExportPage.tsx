@@ -1,0 +1,403 @@
+﻿import {
+  useEffect,
+  useState,
+} from 'react'
+import {
+  Link,
+} from 'react-router-dom'
+
+import AppShell from '../components/AppShell'
+import {
+  buildBusinessTransactionsCsv,
+  buildPersonalTransactionsCsv,
+  safeExportFileName,
+} from '../export/csvExport'
+import {
+  getBusinessProfiles,
+  getBusinessTransactions,
+  getTransactions,
+} from '../storage/db'
+import type {
+  BusinessProfile,
+  BusinessTransaction,
+} from '../types/business'
+import type {
+  MoneyTransaction,
+} from '../types/transaction'
+import {
+  getLocalToday,
+} from '../utils/money'
+
+import '../styles/data-export.css'
+
+interface BusinessExportData {
+  business: BusinessProfile
+  transactions: BusinessTransaction[]
+}
+
+interface ExportData {
+  personalTransactions: MoneyTransaction[]
+  businesses: BusinessExportData[]
+}
+
+function downloadCsv(
+  csv: string,
+  fileName: string,
+): void {
+  const blob =
+    new Blob(
+      [csv],
+      {
+        type: 'text/csv;charset=utf-8',
+      },
+    )
+
+  const objectUrl =
+    URL.createObjectURL(blob)
+
+  const anchor =
+    document.createElement('a')
+
+  anchor.href = objectUrl
+  anchor.download = fileName
+  anchor.rel = 'noopener'
+  anchor.click()
+
+  URL.revokeObjectURL(objectUrl)
+}
+
+function DataExportPage() {
+  const [today] =
+    useState(() => getLocalToday())
+
+  const [data, setData] =
+    useState<ExportData | null>(null)
+
+  const [loading, setLoading] =
+    useState(true)
+
+  const [error, setError] =
+    useState('')
+
+  const [message, setMessage] =
+    useState('')
+
+  useEffect(() => {
+    let active = true
+
+    async function load() {
+      try {
+        const [
+          personalTransactions,
+          businessProfiles,
+        ] = await Promise.all([
+          getTransactions(),
+          getBusinessProfiles(),
+        ])
+
+        const businesses =
+          await Promise.all(
+            businessProfiles.map(
+              async (business) => ({
+                business,
+                transactions:
+                  await getBusinessTransactions(
+                    business.id,
+                  ),
+              }),
+            ),
+          )
+
+        if (!active) return
+
+        setData({
+          personalTransactions,
+          businesses,
+        })
+      } catch {
+        if (active) {
+          setError(
+            'Money Saathi could not prepare your export.',
+          )
+        }
+      } finally {
+        if (active) {
+          setLoading(false)
+        }
+      }
+    }
+
+    void load()
+
+    return () => {
+      active = false
+    }
+  }, [])
+
+  function exportPersonal() {
+    if (!data) return
+
+    const csv =
+      buildPersonalTransactionsCsv(
+        data.personalTransactions,
+      )
+
+    downloadCsv(
+      csv,
+      safeExportFileName(
+        'Money Saathi Personal',
+        today,
+      ),
+    )
+
+    setMessage(
+      'Personal transaction CSV prepared on this device.',
+    )
+  }
+
+  function exportBusiness(
+    item: BusinessExportData,
+  ) {
+    const csv =
+      buildBusinessTransactionsCsv(
+        item.business,
+        item.transactions,
+      )
+
+    downloadCsv(
+      csv,
+      safeExportFileName(
+        `Money Saathi Business ${item.business.id.slice(0, 8)}`,
+        today,
+      ),
+    )
+
+    setMessage(
+      `${item.business.name} CSV prepared on this device.`,
+    )
+  }
+
+  if (loading) {
+    return (
+      <AppShell>
+        <div className="dashboard-container">
+          <div className="dashboard2-loading">
+            Preparing your local data export...
+          </div>
+        </div>
+      </AppShell>
+    )
+  }
+
+  if (error || !data) {
+    return (
+      <AppShell>
+        <div className="dashboard-container">
+          <div
+            className="dashboard2-error"
+            role="alert"
+          >
+            {error ||
+              'Money Saathi could not prepare your export.'}
+          </div>
+        </div>
+      </AppShell>
+    )
+  }
+
+  return (
+    <AppShell>
+      <div className="dashboard-container data-export-page">
+        <header className="data-export-header">
+          <div>
+            <p className="dashboard-eyebrow">
+              Your data belongs to you
+            </p>
+
+            <h1>Export my data</h1>
+
+            <p>
+              Create spreadsheet-friendly CSV files directly on
+              this device. Money Saathi does not upload these
+              exports to a server.
+            </p>
+          </div>
+
+          <Link to="/app/backup">
+            Encrypted backup
+          </Link>
+        </header>
+
+        {message && (
+          <div
+            className="data-export-message"
+            role="status"
+          >
+            {message}
+          </div>
+        )}
+
+        <section className="data-export-warning">
+          <strong>
+            CSV files are readable plain text.
+          </strong>
+
+          <span>
+            They are useful for your own spreadsheet, review or
+            accountant, but they are not encrypted like a
+            Money Saathi backup. Store and share them carefully.
+          </span>
+        </section>
+
+        <section className="data-export-primary">
+          <div>
+            <p className="dashboard-eyebrow">
+              Personal ledger
+            </p>
+
+            <h2>
+              Personal transactions
+            </h2>
+
+            <p>
+              Exports date, income/expense type, exact Nu. amount,
+              category, note and recurring-record references.
+            </p>
+
+            <span>
+              {data.personalTransactions.length}{' '}
+              {data.personalTransactions.length === 1
+                ? 'transaction'
+                : 'transactions'}
+            </span>
+          </div>
+
+          <button
+            type="button"
+            onClick={exportPersonal}
+            disabled={
+              data.personalTransactions.length === 0
+            }
+          >
+            Export personal CSV
+          </button>
+        </section>
+
+        <section className="data-export-section">
+          <div className="data-export-section-heading">
+            <div>
+              <p className="dashboard-eyebrow">
+                Separate business records
+              </p>
+
+              <h2>
+                Business exports
+              </h2>
+            </div>
+
+            <Link to="/app/business">
+              Business workspace
+            </Link>
+          </div>
+
+          {data.businesses.length === 0 ? (
+            <div className="data-export-empty">
+              No business workspace has been created.
+            </div>
+          ) : (
+            <div className="data-export-businesses">
+              {data.businesses.map(
+                (item) => (
+                  <article
+                    key={item.business.id}
+                  >
+                    <div>
+                      <strong>
+                        {item.business.name}
+                      </strong>
+
+                      <span>
+                        {item.transactions.length}{' '}
+                        {item.transactions.length === 1
+                          ? 'transaction'
+                          : 'transactions'}
+                      </span>
+                    </div>
+
+                    <button
+                      type="button"
+                      disabled={
+                        item.transactions.length === 0
+                      }
+                      onClick={() =>
+                        exportBusiness(item)
+                      }
+                    >
+                      Export CSV
+                    </button>
+                  </article>
+                ),
+              )}
+            </div>
+          )}
+        </section>
+
+        <section className="data-export-explainer">
+          <div>
+            <strong>
+              Exact money values
+            </strong>
+
+            <p>
+              Amounts are converted from integer chetrum into
+              two-decimal Ngultrum text without floating-point
+              money arithmetic.
+            </p>
+          </div>
+
+          <div>
+            <strong>
+              Spreadsheet injection protection
+            </strong>
+
+            <p>
+              User-entered text beginning with spreadsheet formula
+              characters is neutralized before export.
+            </p>
+          </div>
+
+          <div>
+            <strong>
+              Personal and business stay separate
+            </strong>
+
+            <p>
+              A business CSV contains only that business workspace.
+              Personal transactions are exported in their own file.
+            </p>
+          </div>
+        </section>
+
+        <section className="data-export-backup">
+          <div>
+            <strong>
+              CSV is not a replacement for backup
+            </strong>
+
+            <p>
+              CSV is designed for portability and review. Use the
+              encrypted Money Saathi backup when you want to
+              preserve and later restore the app’s structured data.
+            </p>
+          </div>
+
+          <Link to="/app/backup">
+            Open encrypted backup
+          </Link>
+        </section>
+      </div>
+    </AppShell>
+  )
+}
+
+export default DataExportPage

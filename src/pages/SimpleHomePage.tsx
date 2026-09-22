@@ -323,6 +323,9 @@ function SimpleHomePage() {
           <Link to="/app/explain">
             Explain my money
           </Link>
+          <Link to="/app/data-export">
+            Export data
+          </Link>
 
           <Link to="/app/goals">
             My goals
@@ -450,6 +453,7 @@ function SimpleHomePage() {
 }
 
 export default SimpleHomePage
+
 
 
 
