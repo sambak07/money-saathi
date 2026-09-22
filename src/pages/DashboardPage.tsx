@@ -674,6 +674,11 @@ function DashboardPage() {
             Reports
           </Link>
           <Link
+            to="/app/money-health"
+          >
+            Money health
+          </Link>
+          <Link
             to="/app/security"
           >
             App Lock
@@ -1417,6 +1422,7 @@ function DashboardPage() {
 }
 
 export default DashboardPage
+
 
 
 

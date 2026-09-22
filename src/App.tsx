@@ -1,4 +1,5 @@
-﻿import MoneyTimelinePage from './pages/MoneyTimelinePage'
+﻿import MoneyHealthPage from './pages/MoneyHealthPage'
+import MoneyTimelinePage from './pages/MoneyTimelinePage'
 import BusinessPage from './pages/BusinessPage'
 import SafetyBufferPage from './pages/SafetyBufferPage'
 import AdaptiveSetupPage from './pages/AdaptiveSetupPage'
@@ -68,6 +69,7 @@ function App() {
         <Route path="/app/safety-buffer" element={<SafetyBufferPage />} />
         <Route path="/app/business" element={<BusinessPage />} />
         <Route path="/app/upcoming" element={<MoneyTimelinePage />} />
+        <Route path="/app/money-health" element={<MoneyHealthPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </AppLockGate>
@@ -76,6 +78,7 @@ function App() {
 }
 
 export default App
+
 
 
 
