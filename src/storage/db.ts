@@ -5,12 +5,13 @@
 } from '../types/asset'
 import type { Budget } from '../types/budget'
 import type { Loan } from '../types/loan'
+import type { FinancialScheme } from '../types/scheme'
 import type { Goal, GoalContribution } from '../types/goal'
 import type { RegularMoney } from '../types/regularMoney'
 import type { MoneyTransaction } from '../types/transaction'
 
 const DATABASE_NAME = 'money-saathi'
-const DATABASE_VERSION = 6
+const DATABASE_VERSION = 7
 
 const TRANSACTION_STORE = 'transactions'
 const BUDGET_STORE = 'budgets'
@@ -21,6 +22,7 @@ const SAVINGS_STORE = 'savings-accounts'
 const FIXED_DEPOSIT_STORE = 'fixed-deposits'
 const RECURRING_DEPOSIT_STORE = 'recurring-deposits'
 const LOAN_STORE = 'loans'
+const SCHEME_STORE = 'financial-schemes'
 
 function openDatabase(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -98,6 +100,12 @@ function openDatabase(): Promise<IDBDatabase> {
 
       if (!database.objectStoreNames.contains(LOAN_STORE)) {
         database.createObjectStore(LOAN_STORE, {
+          keyPath: 'id',
+        })
+      }
+
+      if (!database.objectStoreNames.contains(SCHEME_STORE)) {
+        database.createObjectStore(SCHEME_STORE, {
           keyPath: 'id',
         })
       }
@@ -714,6 +722,67 @@ export async function deleteLoan(
     )
 
     transaction.objectStore(LOAN_STORE).delete(id)
+    await waitForTransaction(transaction)
+  } finally {
+    database.close()
+  }
+}
+export async function getFinancialSchemes(): Promise<
+  FinancialScheme[]
+> {
+  const database = await openDatabase()
+
+  try {
+    const records = await getAllFromStore<FinancialScheme>(
+      database,
+      SCHEME_STORE,
+    )
+
+    return records.sort((a, b) => {
+      const statusComparison =
+        a.status.localeCompare(b.status)
+
+      if (statusComparison !== 0) {
+        return statusComparison
+      }
+
+      return a.name.localeCompare(b.name)
+    })
+  } finally {
+    database.close()
+  }
+}
+
+export async function upsertFinancialScheme(
+  record: FinancialScheme,
+): Promise<void> {
+  const database = await openDatabase()
+
+  try {
+    const transaction = database.transaction(
+      SCHEME_STORE,
+      'readwrite',
+    )
+
+    transaction.objectStore(SCHEME_STORE).put(record)
+    await waitForTransaction(transaction)
+  } finally {
+    database.close()
+  }
+}
+
+export async function deleteFinancialScheme(
+  id: string,
+): Promise<void> {
+  const database = await openDatabase()
+
+  try {
+    const transaction = database.transaction(
+      SCHEME_STORE,
+      'readwrite',
+    )
+
+    transaction.objectStore(SCHEME_STORE).delete(id)
     await waitForTransaction(transaction)
   } finally {
     database.close()

@@ -516,6 +516,13 @@ function MyMoneyPage() {
             >
               View loans & financial position
             </Link>
+
+            <Link
+              to="/app/my-money/schemes"
+              className="asset-close-button"
+            >
+              Schemes & commitments
+            </Link>
           </div>
         </header>
 
@@ -1265,4 +1272,5 @@ function MyMoneyPage() {
 }
 
 export default MyMoneyPage
+
 
