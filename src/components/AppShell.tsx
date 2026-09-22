@@ -8,7 +8,6 @@ interface AppShellProps {
 }
 
 const futureItems = [
-  'My Money',
   'Reports',
   'Settings',
 ]
@@ -72,6 +71,15 @@ function AppShell({ children }: AppShellProps) {
             }
           >
             Goals
+          </NavLink>
+
+          <NavLink
+            to="/app/my-money"
+            className={({ isActive }) =>
+              isActive ? 'sidebar-item active' : 'sidebar-item'
+            }
+          >
+            My Money
           </NavLink>
 
           {futureItems.map((item) => (
@@ -142,9 +150,19 @@ function AppShell({ children }: AppShellProps) {
         >
           Goals
         </NavLink>
+
+        <NavLink
+          to="/app/my-money"
+          className={({ isActive }) =>
+            isActive ? 'mobile-nav-item active' : 'mobile-nav-item'
+          }
+        >
+          Money
+        </NavLink>
       </nav>
     </div>
   )
 }
 
 export default AppShell
+

@@ -9,6 +9,7 @@ import BudgetPage from './pages/BudgetPage'
 import DashboardPage from './pages/DashboardPage'
 import GoalsPage from './pages/GoalsPage'
 import LandingPage from './pages/LandingPage'
+import MyMoneyPage from './pages/MyMoneyPage'
 import OnboardingPage from './pages/OnboardingPage'
 import RegularMoneyPage from './pages/RegularMoneyPage'
 import TransactionFormPage from './pages/TransactionFormPage'
@@ -36,6 +37,7 @@ function App() {
           element={<RegularMoneyPage />}
         />
         <Route path="/app/goals" element={<GoalsPage />} />
+        <Route path="/app/my-money" element={<MyMoneyPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
@@ -43,3 +45,4 @@ function App() {
 }
 
 export default App
+

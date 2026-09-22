@@ -1,16 +1,24 @@
-﻿import type { Budget } from '../types/budget'
+﻿import type {
+  FixedDeposit,
+  RecurringDeposit,
+  SavingsAccount,
+} from '../types/asset'
+import type { Budget } from '../types/budget'
 import type { Goal, GoalContribution } from '../types/goal'
 import type { RegularMoney } from '../types/regularMoney'
 import type { MoneyTransaction } from '../types/transaction'
 
 const DATABASE_NAME = 'money-saathi'
-const DATABASE_VERSION = 4
+const DATABASE_VERSION = 5
 
 const TRANSACTION_STORE = 'transactions'
 const BUDGET_STORE = 'budgets'
 const REGULAR_MONEY_STORE = 'regular-money'
 const GOAL_STORE = 'goals'
 const GOAL_CONTRIBUTION_STORE = 'goal-contributions'
+const SAVINGS_STORE = 'savings-accounts'
+const FIXED_DEPOSIT_STORE = 'fixed-deposits'
+const RECURRING_DEPOSIT_STORE = 'recurring-deposits'
 
 function openDatabase(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -66,6 +74,24 @@ function openDatabase(): Promise<IDBDatabase> {
         )
         store.createIndex('goalId', 'goalId', { unique: false })
         store.createIndex('date', 'date', { unique: false })
+      }
+
+      if (!database.objectStoreNames.contains(SAVINGS_STORE)) {
+        database.createObjectStore(SAVINGS_STORE, {
+          keyPath: 'id',
+        })
+      }
+
+      if (!database.objectStoreNames.contains(FIXED_DEPOSIT_STORE)) {
+        database.createObjectStore(FIXED_DEPOSIT_STORE, {
+          keyPath: 'id',
+        })
+      }
+
+      if (!database.objectStoreNames.contains(RECURRING_DEPOSIT_STORE)) {
+        database.createObjectStore(RECURRING_DEPOSIT_STORE, {
+          keyPath: 'id',
+        })
       }
     }
   })
@@ -465,6 +491,170 @@ export async function deleteGoalWithContributions(
     }
 
     await waitForTransaction(writeTransaction)
+  } finally {
+    database.close()
+  }
+}
+export async function getSavingsAccounts(): Promise<
+  SavingsAccount[]
+> {
+  const database = await openDatabase()
+
+  try {
+    const records = await getAllFromStore<SavingsAccount>(
+      database,
+      SAVINGS_STORE,
+    )
+
+    return records.sort((a, b) =>
+      a.name.localeCompare(b.name),
+    )
+  } finally {
+    database.close()
+  }
+}
+
+export async function upsertSavingsAccount(
+  record: SavingsAccount,
+): Promise<void> {
+  const database = await openDatabase()
+
+  try {
+    const transaction = database.transaction(
+      SAVINGS_STORE,
+      'readwrite',
+    )
+
+    transaction.objectStore(SAVINGS_STORE).put(record)
+    await waitForTransaction(transaction)
+  } finally {
+    database.close()
+  }
+}
+
+export async function deleteSavingsAccount(
+  id: string,
+): Promise<void> {
+  const database = await openDatabase()
+
+  try {
+    const transaction = database.transaction(
+      SAVINGS_STORE,
+      'readwrite',
+    )
+
+    transaction.objectStore(SAVINGS_STORE).delete(id)
+    await waitForTransaction(transaction)
+  } finally {
+    database.close()
+  }
+}
+
+export async function getFixedDeposits(): Promise<
+  FixedDeposit[]
+> {
+  const database = await openDatabase()
+
+  try {
+    const records = await getAllFromStore<FixedDeposit>(
+      database,
+      FIXED_DEPOSIT_STORE,
+    )
+
+    return records.sort((a, b) =>
+      a.name.localeCompare(b.name),
+    )
+  } finally {
+    database.close()
+  }
+}
+
+export async function upsertFixedDeposit(
+  record: FixedDeposit,
+): Promise<void> {
+  const database = await openDatabase()
+
+  try {
+    const transaction = database.transaction(
+      FIXED_DEPOSIT_STORE,
+      'readwrite',
+    )
+
+    transaction.objectStore(FIXED_DEPOSIT_STORE).put(record)
+    await waitForTransaction(transaction)
+  } finally {
+    database.close()
+  }
+}
+
+export async function deleteFixedDeposit(
+  id: string,
+): Promise<void> {
+  const database = await openDatabase()
+
+  try {
+    const transaction = database.transaction(
+      FIXED_DEPOSIT_STORE,
+      'readwrite',
+    )
+
+    transaction.objectStore(FIXED_DEPOSIT_STORE).delete(id)
+    await waitForTransaction(transaction)
+  } finally {
+    database.close()
+  }
+}
+
+export async function getRecurringDeposits(): Promise<
+  RecurringDeposit[]
+> {
+  const database = await openDatabase()
+
+  try {
+    const records = await getAllFromStore<RecurringDeposit>(
+      database,
+      RECURRING_DEPOSIT_STORE,
+    )
+
+    return records.sort((a, b) =>
+      a.name.localeCompare(b.name),
+    )
+  } finally {
+    database.close()
+  }
+}
+
+export async function upsertRecurringDeposit(
+  record: RecurringDeposit,
+): Promise<void> {
+  const database = await openDatabase()
+
+  try {
+    const transaction = database.transaction(
+      RECURRING_DEPOSIT_STORE,
+      'readwrite',
+    )
+
+    transaction.objectStore(RECURRING_DEPOSIT_STORE).put(record)
+    await waitForTransaction(transaction)
+  } finally {
+    database.close()
+  }
+}
+
+export async function deleteRecurringDeposit(
+  id: string,
+): Promise<void> {
+  const database = await openDatabase()
+
+  try {
+    const transaction = database.transaction(
+      RECURRING_DEPOSIT_STORE,
+      'readwrite',
+    )
+
+    transaction.objectStore(RECURRING_DEPOSIT_STORE).delete(id)
+    await waitForTransaction(transaction)
   } finally {
     database.close()
   }
