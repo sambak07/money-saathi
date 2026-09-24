@@ -217,8 +217,13 @@ export function isValidDurableSettingsBackup(
   return true
 }
 
+export interface RestoreDurableSettingsOptions {
+  requireFreshNotificationPermission?: boolean
+}
+
 export function restoreDurableSettingsBackup(
   snapshot: DurableSettingsBackup,
+  options: RestoreDurableSettingsOptions = {},
 ): void {
   if (
     !isValidDurableSettingsBackup(
@@ -250,7 +255,10 @@ export function restoreDurableSettingsBackup(
   // Restore the reminder policy but require a fresh notification opt-in.
   saveAlertPreferences({
     ...snapshot.alertPreferences,
-    browserNotifications: false,
+    browserNotifications:
+      options.requireFreshNotificationPermission === false
+        ? snapshot.alertPreferences.browserNotifications
+        : false,
   })
 
   const currentLoanReminders =

@@ -9,7 +9,8 @@ import {
 export const BACKUP_FORMAT = 'MoneySaathiBackup'
 export const BACKUP_VERSION = 1
 export const BACKUP_AAD = 'MoneySaathiBackup:v1'
-export const BACKUP_MAX_BYTES = 10 * 1024 * 1024
+export const BACKUP_MAX_BYTES = 25 * 1024 * 1024
+export const BACKUP_MAX_MEGABYTES = 25
 
 const PBKDF2_ITERATIONS = 600_000
 const SALT_BYTES = 16
@@ -50,6 +51,8 @@ export interface BackupSummary {
   recurringDeposits: number
   loans: number
   financialSchemes: number
+  businessProfiles: number
+  businessTransactions: number
 }
 
 function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {
@@ -258,29 +261,601 @@ function isValidCollection(
   return true
 }
 
+function isNonEmptyText(
+  value: unknown,
+): value is string {
+  return (
+    typeof value === 'string' &&
+    value.trim().length > 0 &&
+    value.length <= MAX_TEXT_LENGTH
+  )
+}
+
+function isText(
+  value: unknown,
+): value is string {
+  return (
+    typeof value === 'string' &&
+    value.length <= MAX_TEXT_LENGTH
+  )
+}
+
+function isSafeNonNegativeInteger(
+  value: unknown,
+): value is number {
+  return (
+    typeof value === 'number' &&
+    Number.isSafeInteger(value) &&
+    value >= 0
+  )
+}
+
+function isSafePositiveInteger(
+  value: unknown,
+): value is number {
+  return (
+    isSafeNonNegativeInteger(value) &&
+    value > 0
+  )
+}
+
+function isRequiredDate(
+  value: unknown,
+): value is string {
+  return (
+    typeof value === 'string' &&
+    value !== '' &&
+    isValidDateText(value)
+  )
+}
+
+function isOptionalDate(
+  value: unknown,
+): value is string {
+  return (
+    typeof value === 'string' &&
+    isValidDateText(value)
+  )
+}
+
+function hasValidTimes(
+  value: Record<string, unknown>,
+  requireUpdated = true,
+): boolean {
+  return (
+    isSafeNonNegativeInteger(
+      value.createdAt,
+    ) &&
+    (
+      !requireUpdated ||
+      isSafeNonNegativeInteger(
+        value.updatedAt,
+      )
+    )
+  )
+}
+
+function isValidTransaction(
+  value: unknown,
+): boolean {
+  if (!isValidBackupRecord(value)) return false
+
+  const recurrenceValid =
+    (
+      value.recurringSourceId === undefined &&
+      value.scheduledFor === undefined
+    ) ||
+    (
+      isNonEmptyText(
+        value.recurringSourceId,
+      ) &&
+      isRequiredDate(
+        value.scheduledFor,
+      )
+    )
+
+  return (
+    (
+      value.kind === 'income' ||
+      value.kind === 'expense'
+    ) &&
+    isSafePositiveInteger(
+      value.amountChetrum,
+    ) &&
+    isNonEmptyText(
+      value.category,
+    ) &&
+    isText(
+      value.note,
+    ) &&
+    isRequiredDate(
+      value.date,
+    ) &&
+    hasValidTimes(
+      value,
+    ) &&
+    recurrenceValid
+  )
+}
+
+function isValidBudget(
+  value: unknown,
+): boolean {
+  if (!isValidBackupRecord(value)) return false
+
+  return (
+    typeof value.month === 'string' &&
+    /^\d{4}-\d{2}$/.test(
+      value.month,
+    ) &&
+    isRequiredDate(
+      `${value.month}-01`,
+    ) &&
+    isNonEmptyText(
+      value.category,
+    ) &&
+    isSafePositiveInteger(
+      value.limitChetrum,
+    ) &&
+    hasValidTimes(
+      value,
+    )
+  )
+}
+
+function isValidRegularMoney(
+  value: unknown,
+): boolean {
+  if (!isValidBackupRecord(value)) return false
+
+  return (
+    isNonEmptyText(
+      value.name,
+    ) &&
+    (
+      value.kind === 'income' ||
+      value.kind === 'expense'
+    ) &&
+    isSafePositiveInteger(
+      value.amountChetrum,
+    ) &&
+    isNonEmptyText(
+      value.category,
+    ) &&
+    (
+      value.frequency === 'weekly' ||
+      value.frequency === 'monthly' ||
+      value.frequency === 'yearly'
+    ) &&
+    isRequiredDate(
+      value.startDate,
+    ) &&
+    isOptionalDate(
+      value.endDate,
+    ) &&
+    (
+      value.endDate === '' ||
+      String(value.endDate) >=
+        String(value.startDate)
+    ) &&
+    isText(
+      value.note,
+    ) &&
+    hasValidTimes(
+      value,
+    )
+  )
+}
+
+function isValidGoal(
+  value: unknown,
+): boolean {
+  if (!isValidBackupRecord(value)) return false
+
+  return (
+    isNonEmptyText(
+      value.name,
+    ) &&
+    isSafePositiveInteger(
+      value.targetChetrum,
+    ) &&
+    isOptionalDate(
+      value.targetDate,
+    ) &&
+    isText(
+      value.note,
+    ) &&
+    hasValidTimes(
+      value,
+    )
+  )
+}
+
+function isValidGoalContribution(
+  value: unknown,
+): boolean {
+  if (!isValidBackupRecord(value)) return false
+
+  return (
+    isNonEmptyText(
+      value.goalId,
+    ) &&
+    isSafePositiveInteger(
+      value.amountChetrum,
+    ) &&
+    isRequiredDate(
+      value.date,
+    ) &&
+    isText(
+      value.note,
+    ) &&
+    hasValidTimes(
+      value,
+      false,
+    )
+  )
+}
+
+function isValidSavingsAccount(
+  value: unknown,
+): boolean {
+  if (!isValidBackupRecord(value)) return false
+
+  return (
+    isNonEmptyText(
+      value.name,
+    ) &&
+    isSafeNonNegativeInteger(
+      value.balanceChetrum,
+    ) &&
+    isText(
+      value.note,
+    ) &&
+    hasValidTimes(
+      value,
+    )
+  )
+}
+
+function isValidFixedDeposit(
+  value: unknown,
+): boolean {
+  if (!isValidBackupRecord(value)) return false
+
+  return (
+    isNonEmptyText(
+      value.name,
+    ) &&
+    isSafePositiveInteger(
+      value.principalChetrum,
+    ) &&
+    isSafeNonNegativeInteger(
+      value.annualRateBps,
+    ) &&
+    isSafePositiveInteger(
+      value.tenureMonths,
+    ) &&
+    isRequiredDate(
+      value.startDate,
+    ) &&
+    isText(
+      value.note,
+    ) &&
+    hasValidTimes(
+      value,
+    )
+  )
+}
+
+function isValidRecurringDeposit(
+  value: unknown,
+): boolean {
+  if (!isValidBackupRecord(value)) return false
+
+  return (
+    isNonEmptyText(
+      value.name,
+    ) &&
+    isSafePositiveInteger(
+      value.installmentChetrum,
+    ) &&
+    isSafeNonNegativeInteger(
+      value.annualRateBps,
+    ) &&
+    isSafePositiveInteger(
+      value.tenureMonths,
+    ) &&
+    isSafeNonNegativeInteger(
+      value.installmentsPaid,
+    ) &&
+    value.installmentsPaid <=
+      value.tenureMonths &&
+    isRequiredDate(
+      value.startDate,
+    ) &&
+    isText(
+      value.note,
+    ) &&
+    hasValidTimes(
+      value,
+    )
+  )
+}
+
+function isValidLoan(
+  value: unknown,
+): boolean {
+  if (!isValidBackupRecord(value)) return false
+
+  return (
+    isNonEmptyText(
+      value.name,
+    ) &&
+    isText(
+      value.lender,
+    ) &&
+    isSafePositiveInteger(
+      value.originalPrincipalChetrum,
+    ) &&
+    isSafeNonNegativeInteger(
+      value.outstandingPrincipalChetrum,
+    ) &&
+    isSafeNonNegativeInteger(
+      value.annualRateBps,
+    ) &&
+    isSafeNonNegativeInteger(
+      value.emiChetrum,
+    ) &&
+    isSafePositiveInteger(
+      value.tenureMonths,
+    ) &&
+    isRequiredDate(
+      value.startDate,
+    ) &&
+    isText(
+      value.note,
+    ) &&
+    hasValidTimes(
+      value,
+    )
+  )
+}
+
+function isValidFinancialScheme(
+  value: unknown,
+): boolean {
+  if (!isValidBackupRecord(value)) return false
+
+  const categories = [
+    'provident-fund',
+    'annuity',
+    'endowment',
+    'education',
+    'hybrid-insurance',
+    'other',
+  ]
+
+  const frequencies = [
+    'monthly',
+    'quarterly',
+    'half-yearly',
+    'yearly',
+    'irregular',
+    'none',
+  ]
+
+  const statuses = [
+    'active',
+    'paused',
+    'matured',
+    'closed',
+  ]
+
+  return (
+    isNonEmptyText(
+      value.name,
+    ) &&
+    isText(
+      value.provider,
+    ) &&
+    categories.includes(
+      String(value.category),
+    ) &&
+    statuses.includes(
+      String(value.status),
+    ) &&
+    isSafeNonNegativeInteger(
+      value.contributionChetrum,
+    ) &&
+    frequencies.includes(
+      String(
+        value.contributionFrequency,
+      ),
+    ) &&
+    isSafeNonNegativeInteger(
+      value.currentValueChetrum,
+    ) &&
+    isSafeNonNegativeInteger(
+      value.protectionCoverChetrum,
+    ) &&
+    isSafeNonNegativeInteger(
+      value.futureBenefitChetrum,
+    ) &&
+    isRequiredDate(
+      value.startDate,
+    ) &&
+    isOptionalDate(
+      value.nextContributionDate,
+    ) &&
+    isOptionalDate(
+      value.maturityDate,
+    ) &&
+    isText(
+      value.note,
+    ) &&
+    hasValidTimes(
+      value,
+    )
+  )
+}
+
+function isValidBusinessProfile(
+  value: unknown,
+): boolean {
+  if (!isValidBackupRecord(value)) return false
+
+  return (
+    isNonEmptyText(
+      value.name,
+    ) &&
+    hasValidTimes(
+      value,
+    )
+  )
+}
+
+function isValidBusinessTransaction(
+  value: unknown,
+): boolean {
+  if (!isValidBackupRecord(value)) return false
+
+  return (
+    isNonEmptyText(
+      value.businessId,
+    ) &&
+    (
+      value.kind === 'income' ||
+      value.kind === 'expense'
+    ) &&
+    isSafePositiveInteger(
+      value.amountChetrum,
+    ) &&
+    isNonEmptyText(
+      value.category,
+    ) &&
+    isText(
+      value.note,
+    ) &&
+    isRequiredDate(
+      value.date,
+    ) &&
+    hasValidTimes(
+      value,
+    )
+  )
+}
+
+function isValidTypedCollection(
+  value: unknown,
+  validator: (
+    item: unknown,
+  ) => boolean,
+): value is Record<string, unknown>[] {
+  return (
+    isValidCollection(value) &&
+    value.every(
+      validator,
+    )
+  )
+}
+
 function hasSnapshotArrays(
   value: unknown,
 ): value is MoneySaathiDatabaseSnapshot {
   if (!isRecord(value)) return false
 
-  const keys = [
-    'transactions',
-    'budgets',
-    'regularMoney',
-    'goals',
-    'goalContributions',
-    'savingsAccounts',
-    'fixedDeposits',
-    'recurringDeposits',
-    'loans',
-    'financialSchemes',
-    'businessProfiles',
-    'businessTransactions',
-  ]
+  if (
+    !isValidTypedCollection(
+      value.transactions,
+      isValidTransaction,
+    ) ||
+    !isValidTypedCollection(
+      value.budgets,
+      isValidBudget,
+    ) ||
+    !isValidTypedCollection(
+      value.regularMoney,
+      isValidRegularMoney,
+    ) ||
+    !isValidTypedCollection(
+      value.goals,
+      isValidGoal,
+    ) ||
+    !isValidTypedCollection(
+      value.goalContributions,
+      isValidGoalContribution,
+    ) ||
+    !isValidTypedCollection(
+      value.savingsAccounts,
+      isValidSavingsAccount,
+    ) ||
+    !isValidTypedCollection(
+      value.fixedDeposits,
+      isValidFixedDeposit,
+    ) ||
+    !isValidTypedCollection(
+      value.recurringDeposits,
+      isValidRecurringDeposit,
+    ) ||
+    !isValidTypedCollection(
+      value.loans,
+      isValidLoan,
+    ) ||
+    !isValidTypedCollection(
+      value.financialSchemes,
+      isValidFinancialScheme,
+    ) ||
+    !isValidTypedCollection(
+      value.businessProfiles,
+      isValidBusinessProfile,
+    ) ||
+    !isValidTypedCollection(
+      value.businessTransactions,
+      isValidBusinessTransaction,
+    )
+  ) {
+    return false
+  }
 
-  return keys.every(
-    (key) => isValidCollection(value[key]),
-  )
+  const goalIds =
+    new Set(
+      value.goals.map(
+        (goal) =>
+          goal.id,
+      ),
+    )
+
+  if (
+    value.goalContributions.some(
+      (contribution) =>
+        !goalIds.has(
+          contribution.goalId,
+        ),
+    )
+  ) {
+    return false
+  }
+
+  const businessIds =
+    new Set(
+      value.businessProfiles.map(
+        (business) =>
+          business.id,
+      ),
+    )
+
+  if (
+    value.businessTransactions.some(
+      (transaction) =>
+        !businessIds.has(
+          transaction.businessId,
+        ),
+    )
+  ) {
+    return false
+  }
+
+  return true
 }
 
 export function isValidBackupPayload(
@@ -292,6 +867,11 @@ export function isValidBackupPayload(
     value.format === BACKUP_FORMAT &&
     value.version === BACKUP_VERSION &&
     typeof value.exportedAt === 'string' &&
+    !Number.isNaN(
+      Date.parse(
+        value.exportedAt,
+      ),
+    ) &&
     hasSnapshotArrays(value.data) &&
     (
       value.settings === undefined ||
@@ -300,6 +880,63 @@ export function isValidBackupPayload(
       )
     )
   )
+}
+
+export function migrateBackupPayload(
+  value: unknown,
+): MoneySaathiBackupPayload | null {
+  if (
+    !isRecord(value) ||
+    value.format !== BACKUP_FORMAT ||
+    value.version !== BACKUP_VERSION ||
+    !isRecord(value.data)
+  ) {
+    return null
+  }
+
+  const data =
+    value.data
+
+  const originalVersionOneKeys = [
+    'transactions',
+    'budgets',
+    'regularMoney',
+    'goals',
+    'goalContributions',
+    'savingsAccounts',
+    'fixedDeposits',
+    'recurringDeposits',
+    'loans',
+    'financialSchemes',
+  ]
+
+  const originalVersionOne =
+    originalVersionOneKeys.every(
+      (key) =>
+        Array.isArray(
+          data[key],
+        ),
+    ) &&
+    data.businessProfiles === undefined &&
+    data.businessTransactions === undefined
+
+  const candidate: unknown =
+    originalVersionOne
+      ? {
+          ...value,
+          data: {
+            ...data,
+            businessProfiles: [],
+            businessTransactions: [],
+          },
+        }
+      : value
+
+  return isValidBackupPayload(
+    candidate,
+  )
+    ? candidate
+    : null
 }
 
 export function isValidEncryptedEnvelope(
@@ -337,6 +974,8 @@ export function buildBackupSummary(
     recurringDeposits: data.recurringDeposits.length,
     loans: data.loans.length,
     financialSchemes: data.financialSchemes.length,
+    businessProfiles: data.businessProfiles.length,
+    businessTransactions: data.businessTransactions.length,
   }
 
   return {
@@ -436,13 +1075,18 @@ export async function decryptBackupEnvelope(
     new TextDecoder().decode(plaintext),
   )
 
-  if (!isValidBackupPayload(parsed)) {
+  const migrated =
+    migrateBackupPayload(
+      parsed,
+    )
+
+  if (!migrated) {
     throw new Error(
       'The decrypted file is not a valid Money Saathi backup.',
     )
   }
 
-  return parsed
+  return migrated
 }
 
 export function parseEncryptedBackupText(

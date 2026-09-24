@@ -17,6 +17,7 @@ import {
 import {
   BACKUP_FORMAT,
   BACKUP_MAX_BYTES,
+  BACKUP_MAX_MEGABYTES,
   BACKUP_VERSION,
   type BackupSummary,
   type MoneySaathiBackupPayload,
@@ -127,6 +128,16 @@ function BackupPage() {
         },
       )
 
+      if (
+        blob.size >
+        BACKUP_MAX_BYTES
+      ) {
+        setError(
+          `This backup would be larger than the ${BACKUP_MAX_MEGABYTES} MB safety limit and was not downloaded. Export or remove older records before trying again.`,
+        )
+        return
+      }
+
       const url = URL.createObjectURL(blob)
       const anchor = document.createElement('a')
       const date = new Date().toISOString().slice(0, 10)
@@ -166,7 +177,7 @@ function BackupPage() {
     if (file && file.size > BACKUP_MAX_BYTES) {
       setRestoreFile(null)
       setError(
-        'Backup file is larger than the 10 MB safety limit.',
+        `Backup file is larger than the ${BACKUP_MAX_MEGABYTES} MB safety limit.`,
       )
       event.target.value = ''
     }
@@ -231,16 +242,27 @@ function BackupPage() {
 
     setRestoring(true)
 
-    try {
-      await replaceDatabaseSnapshot(
-        verifiedPayload.data,
-      )
+    const previousSettings =
+      captureDurableSettingsBackup()
 
+    let settingsRestoreAttempted =
+      false
+
+    try {
       if (verifiedPayload.settings) {
+        settingsRestoreAttempted =
+          true
+
         restoreDurableSettingsBackup(
           verifiedPayload.settings,
         )
       }
+
+      // IndexedDB replacement is one transaction. It runs only after
+      // durable settings have restored successfully.
+      await replaceDatabaseSnapshot(
+        verifiedPayload.data,
+      )
 
       setMessage(
         verifiedPayload.settings
@@ -252,8 +274,28 @@ function BackupPage() {
         window.location.assign('/app')
       }, 700)
     } catch {
+      let settingsRollbackFailed =
+        false
+
+      if (settingsRestoreAttempted) {
+        try {
+          restoreDurableSettingsBackup(
+            previousSettings,
+            {
+              requireFreshNotificationPermission:
+                false,
+            },
+          )
+        } catch {
+          settingsRollbackFailed =
+            true
+        }
+      }
+
       setError(
-        'Restore failed. Your current data may not have been replaced completely. Do not close the app; create a fresh backup and review the database before retrying.',
+        settingsRollbackFailed
+          ? 'Restore stopped before Money Saathi could safely complete it. The financial database was not intentionally replaced, but some device preferences may need review before retrying.'
+          : 'Restore failed safely. The financial database was not replaced, and prior durable preferences were restored.',
       )
     } finally {
       setRestoring(false)
@@ -366,7 +408,9 @@ function BackupPage() {
               <span>Included</span>
               <p>
                 Transactions, budgets, Regular Money, goals,
-                savings, FDs, RDs, loans and financial schemes.
+                savings, FDs, RDs, loans, financial schemes,
+                business workspaces and business transactions,
+                plus durable planning/preferences.
               </p>
 
               <span>Excluded</span>
@@ -518,6 +562,20 @@ function BackupPage() {
                 <span>Schemes</span>
                 <strong>
                   {verifiedSummary.financialSchemes}
+                </strong>
+              </div>
+
+              <div>
+                <span>Businesses</span>
+                <strong>
+                  {verifiedSummary.businessProfiles}
+                </strong>
+              </div>
+
+              <div>
+                <span>Business transactions</span>
+                <strong>
+                  {verifiedSummary.businessTransactions}
                 </strong>
               </div>
             </div>
