@@ -27,6 +27,10 @@ import {
   VAULT_MIN_PASSPHRASE_LENGTH,
 } from '../vault/vaultCrypto'
 import {
+  changeVaultPassphrase,
+  VaultCurrentPassphraseError,
+} from '../vault/vaultRekey'
+import {
   clearVaultSessionKey,
   getVaultSessionKey,
   setVaultSessionKey,
@@ -157,6 +161,26 @@ function VaultPage() {
     working,
     setWorking,
   ] = useState(false)
+
+  const [
+    currentVaultPassphrase,
+    setCurrentVaultPassphrase,
+  ] = useState('')
+
+  const [
+    newVaultPassphrase,
+    setNewVaultPassphrase,
+  ] = useState('')
+
+  const [
+    confirmNewVaultPassphrase,
+    setConfirmNewVaultPassphrase,
+  ] = useState('')
+
+  const [
+    passphraseChangeMessage,
+    setPassphraseChangeMessage,
+  ] = useState('')
 
   const [
     backupMessage,
@@ -301,6 +325,10 @@ function VaultPage() {
       )
       setEditingId(null)
       setPendingDeleteId(null)
+      setCurrentVaultPassphrase('')
+      setNewVaultPassphrase('')
+      setConfirmNewVaultPassphrase('')
+      setPassphraseChangeMessage('')
       setStatus('locked')
       setError(reason)
     }
@@ -565,6 +593,10 @@ function VaultPage() {
     )
     setEditingId(null)
     setPendingDeleteId(null)
+    setCurrentVaultPassphrase('')
+    setNewVaultPassphrase('')
+    setConfirmNewVaultPassphrase('')
+    setPassphraseChangeMessage('')
     setStatus('locked')
   }
 
@@ -738,6 +770,119 @@ function VaultPage() {
     } catch {
       setError(
         'Money Vault could not be erased.',
+      )
+    } finally {
+      setWorking(false)
+    }
+  }
+
+  async function handleChangeVaultPassphrase() {
+    setError('')
+    setPassphraseChangeMessage('')
+
+    if (
+      !currentVaultPassphrase
+    ) {
+      setError(
+        'Enter your current Vault passphrase.',
+      )
+      return
+    }
+
+    if (
+      newVaultPassphrase.length <
+      VAULT_MIN_PASSPHRASE_LENGTH
+    ) {
+      setError(
+        `Use at least ${VAULT_MIN_PASSPHRASE_LENGTH} characters for the new Vault passphrase.`,
+      )
+      return
+    }
+
+    if (
+      newVaultPassphrase !==
+      confirmNewVaultPassphrase
+    ) {
+      setError(
+        'The two new Vault passphrases do not match.',
+      )
+      return
+    }
+
+    if (
+      currentVaultPassphrase ===
+      newVaultPassphrase
+    ) {
+      setError(
+        'Choose a new Vault passphrase that is different from the current one.',
+      )
+      return
+    }
+
+    const guard =
+      getVaultUnlockGuard()
+
+    if (
+      guard.blocked
+    ) {
+      setError(
+        `Vault passphrase verification is temporarily locked. Try again in ${formatVaultUnlockCooldown(guard.remainingMs)}.`,
+      )
+      return
+    }
+
+    setWorking(true)
+
+    try {
+      let nextKey: CryptoKey
+
+      try {
+        nextKey =
+          await changeVaultPassphrase(
+            currentVaultPassphrase,
+            newVaultPassphrase,
+          )
+      } catch (changeError) {
+        if (
+          changeError instanceof
+          VaultCurrentPassphraseError
+        ) {
+          const afterFailure =
+            recordVaultUnlockFailure()
+
+          if (
+            afterFailure.blocked
+          ) {
+            setError(
+              `The current Vault passphrase is incorrect. A temporary cooldown is active for ${formatVaultUnlockCooldown(afterFailure.remainingMs)}.`,
+            )
+          } else {
+            setError(
+              `The current Vault passphrase is incorrect. ${afterFailure.failuresRemaining} attempt${afterFailure.failuresRemaining === 1 ? '' : 's'} remain before a temporary cooldown.`,
+            )
+          }
+
+          return
+        }
+
+        throw changeError
+      }
+
+      resetVaultUnlockGuard()
+      setVaultSessionKey(
+        nextKey,
+      )
+
+      setCurrentVaultPassphrase('')
+      setNewVaultPassphrase('')
+      setConfirmNewVaultPassphrase('')
+
+      setPassphraseChangeMessage(
+        'Vault passphrase changed. Existing Vault records were re-encrypted with the new passphrase. Older exported Vault backups still require the passphrase that protected them, so create a fresh backup when convenient.',
+      )
+    } catch {
+      setError(
+        'Money Vault could not change the passphrase safely. The existing stored Vault was kept unless the atomic replacement completed successfully.',
       )
     } finally {
       setWorking(false)
@@ -1597,6 +1742,100 @@ function VaultPage() {
                       )
                     },
                   )}
+                </div>
+              )}
+            </section>
+
+            <section className="vault-backup-card">
+              <div className="vault-section-heading">
+                <div>
+                  <p className="dashboard-eyebrow">
+                    Security
+                  </p>
+
+                  <h2>
+                    Change Vault passphrase
+                  </h2>
+                </div>
+              </div>
+
+              <p className="vault-backup-intro">
+                Changing the passphrase verifies your current
+                passphrase, decrypts every Vault record in memory,
+                creates a fresh encryption key and replaces the
+                encrypted Vault atomically. Existing exported Vault
+                backups keep their original passphrases.
+              </p>
+
+              <div className="vault-restore-box">
+                <label>
+                  Current Vault passphrase
+                  <input
+                    type="password"
+                    autoComplete="current-password"
+                    value={currentVaultPassphrase}
+                    onChange={(event) => {
+                      setCurrentVaultPassphrase(
+                        event.target.value,
+                      )
+                      setPassphraseChangeMessage('')
+                      setError('')
+                    }}
+                  />
+                </label>
+
+                <label>
+                  New Vault passphrase
+                  <input
+                    type="password"
+                    autoComplete="new-password"
+                    value={newVaultPassphrase}
+                    onChange={(event) => {
+                      setNewVaultPassphrase(
+                        event.target.value,
+                      )
+                      setPassphraseChangeMessage('')
+                      setError('')
+                    }}
+                  />
+                </label>
+
+                <label>
+                  Confirm new Vault passphrase
+                  <input
+                    type="password"
+                    autoComplete="new-password"
+                    value={confirmNewVaultPassphrase}
+                    onChange={(event) => {
+                      setConfirmNewVaultPassphrase(
+                        event.target.value,
+                      )
+                      setPassphraseChangeMessage('')
+                      setError('')
+                    }}
+                  />
+                </label>
+
+                <button
+                  type="button"
+                  className="vault-primary-button"
+                  disabled={working}
+                  onClick={() => {
+                    void handleChangeVaultPassphrase()
+                  }}
+                >
+                  {working
+                    ? 'Changing…'
+                    : 'Change Vault passphrase'}
+                </button>
+              </div>
+
+              {passphraseChangeMessage && (
+                <div
+                  className="vault-success"
+                  role="status"
+                >
+                  {passphraseChangeMessage}
                 </div>
               )}
             </section>
