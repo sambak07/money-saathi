@@ -1,7 +1,4 @@
 ﻿import AlertBadge from './AlertBadge'
-import {
-  Link,
-} from 'react-router-dom'
 
 import {
   BHUTAN_IDENTITY,
@@ -36,21 +33,10 @@ function BhutanMark() {
       </div>
 
       <div className="bhutan-mark-links">
-        <Link to="/app/start">
-          Start here
-        </Link>
         <AlertBadge />
-
-        <Link to="/app/about">
-          About
-        </Link>
       </div>
     </div>
   )
 }
 
 export default BhutanMark
-
-
-
-

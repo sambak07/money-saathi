@@ -7,6 +7,10 @@ import {
   useLocation,
 } from 'react-router-dom'
 
+import {
+  getProfile,
+} from '../profile/userProfile'
+
 import '../styles/dashboard.css'
 
 interface AppShellProps {
@@ -53,11 +57,26 @@ function isWithin(
 function AppShell({ children }: AppShellProps) {
   const { pathname } = useLocation()
 
+  const showBusiness =
+    getProfile().needs.includes(
+      'small-business',
+    )
+
   const sidebarMoreActive =
-    sidebarMorePrefixes.some((prefix) =>
-      isWithin(pathname, prefix),
-    ) ||
-    pathname === '/app/more'
+    pathname === '/app/more' ||
+    sidebarMorePrefixes.some((prefix) => {
+      if (
+        prefix === '/app/business' &&
+        showBusiness
+      ) {
+        return false
+      }
+
+      return isWithin(
+        pathname,
+        prefix,
+      )
+    })
 
   const mobileHomeActive =
     pathname === '/app'
@@ -167,6 +186,19 @@ function AppShell({ children }: AppShellProps) {
           >
             My Money
           </NavLink>
+
+          {showBusiness && (
+            <NavLink
+              to="/app/business"
+              className={({ isActive }) =>
+                isActive
+                  ? 'sidebar-item active'
+                  : 'sidebar-item'
+              }
+            >
+              Business
+            </NavLink>
+          )}
 
           <NavLink
             to="/app/reports"

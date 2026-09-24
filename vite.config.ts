@@ -15,8 +15,8 @@ export default defineConfig({
         short_name: 'Money Saathi',
         description:
           'Bhutan-first personal finance tracker for understanding, planning and tracking money.',
-        theme_color: '#176b4b',
-        background_color: '#f7f5ef',
+        theme_color: '#175a43',
+        background_color: '#f7f2e8',
         display: 'standalone',
         start_url: '/app',
         scope: '/',
