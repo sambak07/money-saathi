@@ -114,6 +114,11 @@ const groups: MoreGroup[] = [
         description: 'Review reminders that need attention.',
       },
       {
+        to: '/app/saathi/privacy',
+        label: 'Saathi data permissions',
+        description: 'Control and preview what a future AI request may use.',
+      },
+      {
         to: '/app/security',
         label: 'App Lock',
         description: 'Manage the local six-digit privacy lock.',

@@ -226,3 +226,10 @@
     padding: 18px;
   }
 }
+.saathi-privacy-link {
+  margin-top: 5px;
+  justify-self: start;
+  color: var(--color-brand);
+  font-size: var(--font-size-small);
+  font-weight: 750;
+}

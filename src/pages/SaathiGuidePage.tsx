@@ -3,6 +3,9 @@
   useMemo,
   useState,
 } from 'react'
+import {
+  Link,
+} from 'react-router-dom'
 
 import AppShell from '../components/AppShell'
 import {
@@ -307,6 +310,13 @@ function SaathiGuidePage() {
             the records you entered. It does not guess your income,
             background or financial situation.
           </span>
+
+          <Link
+            to="/app/saathi/privacy"
+            className="saathi-privacy-link"
+          >
+            Review future AI data permissions
+          </Link>
         </section>
 
         <section className="saathi-facts">
