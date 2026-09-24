@@ -29,6 +29,8 @@ const emptyData = {
   businessParties: [],
   businessOpenItems: [],
   businessTradeEntries: [],
+  businessInventoryItems: [],
+  businessTradeLines: [],
 }
 
 const durableSettings = {

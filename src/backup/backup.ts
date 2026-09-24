@@ -56,6 +56,8 @@ export interface BackupSummary {
   businessParties: number
   businessOpenItems: number
   businessTradeEntries: number
+  businessInventoryItems: number
+  businessTradeLines: number
 }
 
 function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {
@@ -881,6 +883,87 @@ function isValidBusinessTradeEntry(
   )
 }
 
+function isValidBusinessInventoryItem(
+  value: unknown,
+): boolean {
+  if (!isValidBackupRecord(value)) return false
+
+  return (
+    isNonEmptyText(
+      value.businessId,
+    ) &&
+    isNonEmptyText(
+      value.name,
+    ) &&
+    isText(
+      value.sku,
+    ) &&
+    isNonEmptyText(
+      value.unit,
+    ) &&
+    isSafeNonNegativeInteger(
+      value.openingQuantityMilliUnits,
+    ) &&
+    isSafeNonNegativeInteger(
+      value.currentUnitCostChetrum,
+    ) &&
+    isSafeNonNegativeInteger(
+      value.lowStockQuantityMilliUnits,
+    ) &&
+    typeof value.active ===
+      'boolean' &&
+    isText(
+      value.note,
+    ) &&
+    hasValidTimes(
+      value,
+    )
+  )
+}
+
+function isValidBusinessTradeLine(
+  value: unknown,
+): boolean {
+  if (!isValidBackupRecord(value)) return false
+
+  return (
+    isNonEmptyText(
+      value.businessId,
+    ) &&
+    isNonEmptyText(
+      value.tradeEntryId,
+    ) &&
+    isNonEmptyText(
+      value.inventoryItemId,
+    ) &&
+    isNonEmptyText(
+      value.itemName,
+    ) &&
+    (
+      value.kind === 'sale' ||
+      value.kind === 'purchase'
+    ) &&
+    isSafePositiveInteger(
+      value.quantityMilliUnits,
+    ) &&
+    isSafePositiveInteger(
+      value.lineAmountChetrum,
+    ) &&
+    isSafeNonNegativeInteger(
+      value.costOfGoodsSoldChetrum,
+    ) &&
+    (
+      value.kind ===
+        'sale' ||
+      value.costOfGoodsSoldChetrum ===
+        0
+    ) &&
+    hasValidTimes(
+      value,
+    )
+  )
+}
+
 function isValidTypedCollection(
   value: unknown,
   validator: (
@@ -960,6 +1043,14 @@ function hasSnapshotArrays(
     !isValidTypedCollection(
       value.businessTradeEntries,
       isValidBusinessTradeEntry,
+    ) ||
+    !isValidTypedCollection(
+      value.businessInventoryItems,
+      isValidBusinessInventoryItem,
+    ) ||
+    !isValidTypedCollection(
+      value.businessTradeLines,
+      isValidBusinessTradeLine,
     )
   ) {
     return false
@@ -1042,6 +1133,66 @@ function hasSnapshotArrays(
         !businessIds.has(
           entry.businessId,
         ),
+    )
+  ) {
+    return false
+  }
+
+  if (
+    value.businessInventoryItems.some(
+      (item) =>
+        !businessIds.has(
+          item.businessId,
+        ),
+    )
+  ) {
+    return false
+  }
+
+  const tradeEntryById =
+    new Map(
+      value.businessTradeEntries.map(
+        (entry) => [
+          entry.id,
+          entry,
+        ],
+      ),
+    )
+
+  const inventoryItemById =
+    new Map(
+      value.businessInventoryItems.map(
+        (item) => [
+          item.id,
+          item,
+        ],
+      ),
+    )
+
+  if (
+    value.businessTradeLines.some(
+      (line) => {
+        const tradeEntry =
+          tradeEntryById.get(
+            line.tradeEntryId,
+          )
+
+        const inventoryItem =
+          inventoryItemById.get(
+            line.inventoryItemId,
+          )
+
+        return (
+          !tradeEntry ||
+          !inventoryItem ||
+          line.businessId !==
+            tradeEntry.businessId ||
+          line.businessId !==
+            inventoryItem.businessId ||
+          line.kind !==
+            tradeEntry.kind
+        )
+      },
     )
   ) {
     return false
@@ -1147,6 +1298,18 @@ export function migrateBackupPayload(
         )
           ? data.businessTradeEntries
           : [],
+      businessInventoryItems:
+        Array.isArray(
+          data.businessInventoryItems,
+        )
+          ? data.businessInventoryItems
+          : [],
+      businessTradeLines:
+        Array.isArray(
+          data.businessTradeLines,
+        )
+          ? data.businessTradeLines
+          : [],
     },
   }
 
@@ -1197,6 +1360,8 @@ export function buildBackupSummary(
     businessParties: data.businessParties.length,
     businessOpenItems: data.businessOpenItems.length,
     businessTradeEntries: data.businessTradeEntries.length,
+    businessInventoryItems: data.businessInventoryItems.length,
+    businessTradeLines: data.businessTradeLines.length,
   }
 
   return {

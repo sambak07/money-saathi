@@ -33,7 +33,7 @@ const types =
 describe('business sales and purchases data integration', () => {
   it('upgrades IndexedDB and creates a dedicated trade register store', () => {
     expect(db).toContain(
-      'const DATABASE_VERSION = 10',
+      'const DATABASE_VERSION = 11',
     )
 
     expect(db).toContain(

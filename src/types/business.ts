@@ -81,3 +81,32 @@ export interface BusinessTradeEntry {
   createdAt: number
   updatedAt: number
 }
+
+export interface BusinessInventoryItem {
+  id: string
+  businessId: string
+  name: string
+  sku: string
+  unit: string
+  openingQuantityMilliUnits: number
+  currentUnitCostChetrum: number
+  lowStockQuantityMilliUnits: number
+  active: boolean
+  note: string
+  createdAt: number
+  updatedAt: number
+}
+
+export interface BusinessTradeLine {
+  id: string
+  businessId: string
+  tradeEntryId: string
+  inventoryItemId: string
+  itemName: string
+  kind: BusinessTradeKind
+  quantityMilliUnits: number
+  lineAmountChetrum: number
+  costOfGoodsSoldChetrum: number
+  createdAt: number
+  updatedAt: number
+}
