@@ -431,3 +431,124 @@
     );
   }
 }
+
+/* === First-run App Lock integration === */
+
+.onboarding-pin-box,
+.onboarding-lock-status {
+  margin-top: 30px;
+  padding: 22px;
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  background: var(--color-surface);
+}
+
+.onboarding-pin-fields {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.onboarding-pin-field {
+  display: grid;
+  gap: 8px;
+}
+
+.onboarding-pin-field label {
+  color: var(--color-text);
+  font-size: var(--font-size-ui);
+  font-weight: 700;
+}
+
+.onboarding-pin-field input {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 14px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 13px;
+  background: white;
+  color: var(--color-text);
+  font-size: 18px;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+}
+
+.onboarding-pin-field input:focus {
+  border-color: var(--color-brand);
+  outline: none;
+  box-shadow:
+    0 0 0 4px rgba(23, 107, 75, 0.09);
+}
+
+.onboarding-security-error {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid rgba(196, 54, 46, 0.22);
+  border-radius: 12px;
+  background: rgba(196, 54, 46, 0.06);
+  color: var(--color-danger);
+  font-size: var(--font-size-small);
+  line-height: 1.5;
+}
+
+.onboarding-pin-note {
+  margin: 14px 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-small);
+  line-height: 1.55;
+}
+
+.onboarding-lock-status {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  background: var(--color-brand-soft);
+}
+
+.onboarding-lock-status-mark {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--color-brand);
+  color: white;
+  font-weight: 850;
+}
+
+.onboarding-lock-status strong {
+  font-size: var(--font-size-ui);
+}
+
+.onboarding-lock-status p {
+  margin: 6px 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  line-height: 1.5;
+}
+
+.onboarding-finish-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 10px;
+}
+
+@media (max-width: 600px) {
+  .onboarding-pin-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .onboarding-finish-actions {
+    width: 100%;
+    margin-left: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .onboarding-finish-actions
+  .onboarding-button {
+    width: 100%;
+  }
+}

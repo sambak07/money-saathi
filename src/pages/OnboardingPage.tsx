@@ -12,6 +12,11 @@ import {
   getPreferences,
   savePreferences,
 } from '../settings/preferences'
+import {
+  enableAppLock,
+  isAppLockEnabled,
+  isValidAppPin,
+} from '../security/appLock'
 
 import '../styles/onboarding.css'
 
@@ -86,8 +91,15 @@ function OnboardingPage() {
   const [name, setName] = useState('')
   const [situation, setSituation] = useState<MoneySituation | null>(null)
   const [goal, setGoal] = useState<MoneyGoal | null>(null)
+  const [newPin, setNewPin] = useState('')
+  const [confirmPin, setConfirmPin] = useState('')
+  const [securityError, setSecurityError] = useState('')
+  const [working, setWorking] = useState(false)
 
-  const totalSteps = 4
+  const lockAlreadyEnabled =
+    isAppLockEnabled()
+
+  const totalSteps = 5
 
   const progress = useMemo(
     () => `${(step / totalSteps) * 100}%`,
@@ -102,20 +114,12 @@ function OnboardingPage() {
 
   function goBack() {
     if (step > 1) {
+      setSecurityError('')
       setStep((current) => current - 1)
     }
   }
 
-  function goNext() {
-    if (!canContinue) {
-      return
-    }
-
-    if (step < totalSteps) {
-      setStep((current) => current + 1)
-      return
-    }
-
+  function finishOnboarding() {
     if (
       !situation ||
       !goal
@@ -149,6 +153,55 @@ function OnboardingPage() {
     })
 
     navigate('/app/start')
+  }
+
+  function goNext() {
+    if (!canContinue) {
+      return
+    }
+
+    if (step < totalSteps) {
+      setStep((current) => current + 1)
+    }
+  }
+
+  function cleanPin(
+    value: string,
+  ): string {
+    return value
+      .replace(/\D/g, '')
+      .slice(0, 6)
+  }
+
+  async function protectAndFinish() {
+    setSecurityError('')
+
+    if (!isValidAppPin(newPin)) {
+      setSecurityError(
+        'Enter a six-digit PIN.',
+      )
+      return
+    }
+
+    if (newPin !== confirmPin) {
+      setSecurityError(
+        'The two PIN entries do not match.',
+      )
+      return
+    }
+
+    setWorking(true)
+
+    try {
+      await enableAppLock(newPin)
+      finishOnboarding()
+    } catch {
+      setSecurityError(
+        'Money Saathi could not enable App Lock on this device. You can try again or skip for now.',
+      )
+    } finally {
+      setWorking(false)
+    }
   }
 
   return (
@@ -314,8 +367,7 @@ function OnboardingPage() {
               <h1>Your money should remain yours.</h1>
 
               <p className="step-description">
-                Money Saathi is being built as a local-first personal
-                finance tool.
+                Money Saathi is a local-first personal finance tool.
               </p>
 
               <div className="privacy-box">
@@ -330,14 +382,14 @@ function OnboardingPage() {
                   <li>
                     <span className="privacy-check">✓</span>
                     <span>
-                      Transactions will be entered and managed by you.
+                      Transactions are entered and managed by you.
                     </span>
                   </li>
 
                   <li>
                     <span className="privacy-check">✓</span>
                     <span>
-                      Core financial data will be stored locally on your
+                      Core financial data stays in this browser on your
                       device.
                     </span>
                   </li>
@@ -346,11 +398,120 @@ function OnboardingPage() {
                     <span className="privacy-check">✓</span>
                     <span>
                       Encrypted backup and restore are available when
-                      you want a portable copy of your local data.
+                      you want a portable copy.
                     </span>
                   </li>
                 </ul>
               </div>
+            </>
+          )}
+
+          {step === 5 && (
+            <>
+              <p className="step-kicker">
+                Protect this device
+              </p>
+
+              <h1>
+                {lockAlreadyEnabled
+                  ? 'App Lock is already enabled.'
+                  : 'Add a 6-digit PIN?'}
+              </h1>
+
+              <p className="step-description">
+                {lockAlreadyEnabled
+                  ? 'Your existing App Lock will continue protecting Money Saathi on this device.'
+                  : 'A PIN helps stop someone casually opening your financial information in this browser. You can skip this and enable it later.'}
+              </p>
+
+              {lockAlreadyEnabled ? (
+                <div className="onboarding-lock-status">
+                  <span
+                    className="onboarding-lock-status-mark"
+                    aria-hidden="true"
+                  >
+                    ✓
+                  </span>
+
+                  <div>
+                    <strong>
+                      This Money Saathi is protected
+                    </strong>
+
+                    <p>
+                      If the current session is locked, Money Saathi
+                      will ask for the existing PIN when you enter the
+                      app.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="onboarding-pin-box">
+                  <div className="onboarding-pin-fields">
+                    <div className="onboarding-pin-field">
+                      <label htmlFor="onboarding-app-pin">
+                        Create PIN
+                      </label>
+
+                      <input
+                        id="onboarding-app-pin"
+                        type="password"
+                        inputMode="numeric"
+                        autoComplete="new-password"
+                        maxLength={6}
+                        pattern="[0-9]{6}"
+                        placeholder="Six digits"
+                        value={newPin}
+                        autoFocus
+                        onChange={(event) => {
+                          setNewPin(
+                            cleanPin(event.target.value),
+                          )
+                          setSecurityError('')
+                        }}
+                      />
+                    </div>
+
+                    <div className="onboarding-pin-field">
+                      <label htmlFor="onboarding-confirm-pin">
+                        Confirm PIN
+                      </label>
+
+                      <input
+                        id="onboarding-confirm-pin"
+                        type="password"
+                        inputMode="numeric"
+                        autoComplete="new-password"
+                        maxLength={6}
+                        pattern="[0-9]{6}"
+                        placeholder="Repeat six digits"
+                        value={confirmPin}
+                        onChange={(event) => {
+                          setConfirmPin(
+                            cleanPin(event.target.value),
+                          )
+                          setSecurityError('')
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {securityError && (
+                    <div
+                      className="onboarding-security-error"
+                      role="alert"
+                    >
+                      {securityError}
+                    </div>
+                  )}
+
+                  <p className="onboarding-pin-note">
+                    App Lock is a local privacy barrier, not a bank
+                    login or online account. There is no email or OTP
+                    PIN recovery.
+                  </p>
+                </div>
+              )}
             </>
           )}
 
@@ -365,14 +526,49 @@ function OnboardingPage() {
               </button>
             )}
 
-            <button
-              type="button"
-              className="onboarding-button primary"
-              disabled={!canContinue}
-              onClick={goNext}
-            >
-              {step === totalSteps ? 'Enter Money Saathi' : 'Continue'}
-            </button>
+            {step < totalSteps ? (
+              <button
+                type="button"
+                className="onboarding-button primary"
+                disabled={!canContinue}
+                onClick={goNext}
+              >
+                Continue
+              </button>
+            ) : (
+              <div className="onboarding-finish-actions">
+                {!lockAlreadyEnabled && (
+                  <button
+                    type="button"
+                    className="onboarding-button secondary"
+                    disabled={working}
+                    onClick={finishOnboarding}
+                  >
+                    Skip for now
+                  </button>
+                )}
+
+                <button
+                  type="button"
+                  className="onboarding-button primary"
+                  disabled={working}
+                  onClick={() => {
+                    if (lockAlreadyEnabled) {
+                      finishOnboarding()
+                      return
+                    }
+
+                    void protectAndFinish()
+                  }}
+                >
+                  {working
+                    ? 'Protecting...'
+                    : lockAlreadyEnabled
+                      ? 'Enter Money Saathi'
+                      : 'Protect & continue'}
+                </button>
+              </div>
+            )}
           </div>
         </section>
       </main>
