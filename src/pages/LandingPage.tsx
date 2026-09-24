@@ -8,7 +8,7 @@ function LandingPage() {
         <Link to="/" className="brand-lockup" aria-label="Money Saathi home">
           <span className="brand-mark" aria-hidden="true">
             <img
-              src="/money-saathi-icon.svg"
+              src="/money-saathi-lockup.png"
               alt=""
             />
           </span>

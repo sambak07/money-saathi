@@ -171,7 +171,7 @@ function AppLockGate({
           aria-hidden="true"
         >
           <img
-            src="/money-saathi-icon.svg"
+            src="/money-saathi-emblem.png"
             alt=""
           />
         </div>

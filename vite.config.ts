@@ -8,7 +8,12 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'prompt',
-      includeAssets: ['money-saathi-icon.svg'],
+      includeAssets: [
+        'money-saathi-lockup.png',
+        'money-saathi-emblem.png',
+        'money-saathi-app-icon.png',
+        'money-saathi-maskable-icon.png',
+      ],
       manifest: {
         lang: 'en-BT',
         name: 'Money Saathi',
@@ -22,10 +27,16 @@ export default defineConfig({
         scope: '/',
         icons: [
           {
-            src: '/money-saathi-icon.svg',
-            sizes: 'any',
-            type: 'image/svg+xml',
-            purpose: 'any maskable',
+            src: '/money-saathi-app-icon.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'any',
+          },
+          {
+            src: '/money-saathi-maskable-icon.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable',
           },
         ],
       },

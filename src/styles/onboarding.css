@@ -654,3 +654,30 @@
   display: block;
   object-fit: contain;
 }
+
+/* === Money Saathi Brand Fidelity Repair === */
+
+.onboarding-brand-mark {
+  width: 170px;
+  height: auto;
+  flex: 0 0 auto;
+  border-radius: 0;
+  overflow: visible;
+}
+
+.onboarding-brand-mark img {
+  width: 170px;
+  height: auto;
+  object-fit: contain;
+}
+
+.onboarding-brand-mark + span {
+  display: none;
+}
+
+@media (max-width: 560px) {
+  .onboarding-brand-mark,
+  .onboarding-brand-mark img {
+    width: 150px;
+  }
+}

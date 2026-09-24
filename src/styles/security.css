@@ -392,3 +392,18 @@
   display: block;
   object-fit: contain;
 }
+
+/* === Money Saathi Brand Fidelity Repair === */
+
+.app-lock-mark {
+  width: 72px;
+  height: 72px;
+  border-radius: 0;
+  overflow: visible;
+}
+
+.app-lock-mark img {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+}

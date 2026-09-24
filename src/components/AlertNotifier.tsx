@@ -60,7 +60,7 @@ async function showNotification(
           {
             body,
             icon:
-              '/money-saathi-icon.svg',
+              '/money-saathi-app-icon.png',
             tag:
               'money-saathi-alerts',
           },
@@ -75,7 +75,7 @@ async function showNotification(
     {
       body,
       icon:
-        '/money-saathi-icon.svg',
+        '/money-saathi-app-icon.png',
       tag:
         'money-saathi-alerts',
     },

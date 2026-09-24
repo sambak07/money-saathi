@@ -109,10 +109,10 @@ function AppShell({ children }: AppShellProps) {
       </a>
 
       <aside className="app-sidebar">
-        <NavLink to="/" className="app-brand">
+        <NavLink to="/" className="app-brand" aria-label="Money Saathi home">
           <span className="app-brand-mark" aria-hidden="true">
             <img
-              src="/money-saathi-icon.svg"
+              src="/money-saathi-lockup.png"
               alt=""
             />
           </span>
