@@ -377,3 +377,18 @@
     padding: 24px;
   }
 }
+
+/* === UI/UX Repair 04: App Lock production mark === */
+
+.app-lock-mark {
+  overflow: hidden;
+  padding: 0;
+  background: transparent;
+}
+
+.app-lock-mark img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+}

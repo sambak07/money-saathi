@@ -931,3 +931,19 @@
       var(--color-bg);
   }
 }
+
+/* === UI/UX Repair 04: app-shell production mark === */
+
+.app-brand-mark {
+  overflow: hidden;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.app-brand-mark img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+}

@@ -6,7 +6,12 @@ function LandingPage() {
     <div className="landing">
       <header className="site-header">
         <Link to="/" className="brand-lockup" aria-label="Money Saathi home">
-          <span className="brand-mark" aria-hidden="true">M</span>
+          <span className="brand-mark" aria-hidden="true">
+            <img
+              src="/money-saathi-icon.svg"
+              alt=""
+            />
+          </span>
           <span>Money Saathi</span>
         </Link>
 

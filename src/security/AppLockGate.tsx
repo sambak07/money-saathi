@@ -166,8 +166,14 @@ function AppLockGate({
   return (
     <main className="app-lock-screen">
       <section className="app-lock-card">
-        <div className="app-lock-mark">
-          M
+        <div
+          className="app-lock-mark"
+          aria-hidden="true"
+        >
+          <img
+            src="/money-saathi-icon.svg"
+            alt=""
+          />
         </div>
 
         <p className="dashboard-eyebrow">

@@ -208,7 +208,15 @@ function OnboardingPage() {
     <div className="onboarding-page">
       <aside className="onboarding-side">
         <Link to="/" className="onboarding-brand">
-          <span className="onboarding-brand-mark">M</span>
+          <span
+            className="onboarding-brand-mark"
+            aria-hidden="true"
+          >
+            <img
+              src="/money-saathi-icon.svg"
+              alt=""
+            />
+          </span>
           <span>Money Saathi</span>
         </Link>
 

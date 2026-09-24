@@ -110,7 +110,12 @@ function AppShell({ children }: AppShellProps) {
 
       <aside className="app-sidebar">
         <NavLink to="/" className="app-brand">
-          <span className="app-brand-mark">M</span>
+          <span className="app-brand-mark" aria-hidden="true">
+            <img
+              src="/money-saathi-icon.svg"
+              alt=""
+            />
+          </span>
           <span>Money Saathi</span>
         </NavLink>
 
