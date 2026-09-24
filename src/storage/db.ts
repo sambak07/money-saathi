@@ -4,6 +4,8 @@
   SavingsAccount,
 } from '../types/asset'
 import type {
+  BusinessOpenItem,
+  BusinessParty,
   BusinessProfile,
   BusinessTransaction,
 } from '../types/business'
@@ -15,7 +17,7 @@ import type { RegularMoney } from '../types/regularMoney'
 import type { MoneyTransaction } from '../types/transaction'
 
 const DATABASE_NAME = 'money-saathi'
-const DATABASE_VERSION = 8
+const DATABASE_VERSION = 9
 
 const TRANSACTION_STORE = 'transactions'
 const BUDGET_STORE = 'budgets'
@@ -29,6 +31,8 @@ const LOAN_STORE = 'loans'
 const SCHEME_STORE = 'financial-schemes'
 const BUSINESS_PROFILE_STORE = 'business-profiles'
 const BUSINESS_TRANSACTION_STORE = 'business-transactions'
+const BUSINESS_PARTY_STORE = 'business-parties'
+const BUSINESS_OPEN_ITEM_STORE = 'business-open-items'
 
 function openDatabase(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -137,6 +141,50 @@ function openDatabase(): Promise<IDBDatabase> {
         store.createIndex(
           'date',
           'date',
+          { unique: false },
+        )
+      }
+
+      if (!database.objectStoreNames.contains(BUSINESS_PARTY_STORE)) {
+        const store = database.createObjectStore(
+          BUSINESS_PARTY_STORE,
+          { keyPath: 'id' },
+        )
+
+        store.createIndex(
+          'businessId',
+          'businessId',
+          { unique: false },
+        )
+
+        store.createIndex(
+          'role',
+          'role',
+          { unique: false },
+        )
+      }
+
+      if (!database.objectStoreNames.contains(BUSINESS_OPEN_ITEM_STORE)) {
+        const store = database.createObjectStore(
+          BUSINESS_OPEN_ITEM_STORE,
+          { keyPath: 'id' },
+        )
+
+        store.createIndex(
+          'businessId',
+          'businessId',
+          { unique: false },
+        )
+
+        store.createIndex(
+          'partyId',
+          'partyId',
+          { unique: false },
+        )
+
+        store.createIndex(
+          'dueDate',
+          'dueDate',
           { unique: false },
         )
       }
@@ -987,6 +1035,204 @@ export async function deleteBusinessTransaction(
   }
 }
 
+export async function getBusinessParties(
+  businessId: string,
+): Promise<BusinessParty[]> {
+  const database = await openDatabase()
+
+  try {
+    const transaction = database.transaction(
+      BUSINESS_PARTY_STORE,
+      'readonly',
+    )
+
+    const request = transaction
+      .objectStore(BUSINESS_PARTY_STORE)
+      .index('businessId')
+      .getAll(businessId)
+
+    const records =
+      await new Promise<BusinessParty[]>(
+        (resolve, reject) => {
+          request.onsuccess = () =>
+            resolve(
+              request.result as BusinessParty[],
+            )
+
+          request.onerror = () =>
+            reject(
+              request.error ??
+                new Error(
+                  'Could not read business parties',
+                ),
+            )
+        },
+      )
+
+    await waitForTransaction(transaction)
+
+    return records.sort(
+      (a, b) =>
+        a.name.localeCompare(
+          b.name,
+        ),
+    )
+  } finally {
+    database.close()
+  }
+}
+
+export async function upsertBusinessParty(
+  record: BusinessParty,
+): Promise<void> {
+  const database = await openDatabase()
+
+  try {
+    const transaction = database.transaction(
+      BUSINESS_PARTY_STORE,
+      'readwrite',
+    )
+
+    transaction
+      .objectStore(BUSINESS_PARTY_STORE)
+      .put(record)
+
+    await waitForTransaction(transaction)
+  } finally {
+    database.close()
+  }
+}
+
+export async function deleteBusinessParty(
+  id: string,
+): Promise<void> {
+  const database = await openDatabase()
+
+  try {
+    const transaction = database.transaction(
+      BUSINESS_PARTY_STORE,
+      'readwrite',
+    )
+
+    transaction
+      .objectStore(BUSINESS_PARTY_STORE)
+      .delete(id)
+
+    await waitForTransaction(transaction)
+  } finally {
+    database.close()
+  }
+}
+
+export async function getBusinessOpenItems(
+  businessId: string,
+): Promise<BusinessOpenItem[]> {
+  const database = await openDatabase()
+
+  try {
+    const transaction = database.transaction(
+      BUSINESS_OPEN_ITEM_STORE,
+      'readonly',
+    )
+
+    const request = transaction
+      .objectStore(BUSINESS_OPEN_ITEM_STORE)
+      .index('businessId')
+      .getAll(businessId)
+
+    const records =
+      await new Promise<BusinessOpenItem[]>(
+        (resolve, reject) => {
+          request.onsuccess = () =>
+            resolve(
+              request.result as BusinessOpenItem[],
+            )
+
+          request.onerror = () =>
+            reject(
+              request.error ??
+                new Error(
+                  'Could not read business receivables and payables',
+                ),
+            )
+        },
+      )
+
+    await waitForTransaction(transaction)
+
+    return records.sort(
+      (a, b) => {
+        const aDate =
+          a.dueDate ||
+          a.date
+
+        const bDate =
+          b.dueDate ||
+          b.date
+
+        const comparison =
+          aDate.localeCompare(
+            bDate,
+          )
+
+        if (
+          comparison !==
+          0
+        ) {
+          return comparison
+        }
+
+        return a.createdAt -
+          b.createdAt
+      },
+    )
+  } finally {
+    database.close()
+  }
+}
+
+export async function upsertBusinessOpenItem(
+  record: BusinessOpenItem,
+): Promise<void> {
+  const database = await openDatabase()
+
+  try {
+    const transaction = database.transaction(
+      BUSINESS_OPEN_ITEM_STORE,
+      'readwrite',
+    )
+
+    transaction
+      .objectStore(BUSINESS_OPEN_ITEM_STORE)
+      .put(record)
+
+    await waitForTransaction(transaction)
+  } finally {
+    database.close()
+  }
+}
+
+export async function deleteBusinessOpenItem(
+  id: string,
+): Promise<void> {
+  const database = await openDatabase()
+
+  try {
+    const transaction = database.transaction(
+      BUSINESS_OPEN_ITEM_STORE,
+      'readwrite',
+    )
+
+    transaction
+      .objectStore(BUSINESS_OPEN_ITEM_STORE)
+      .delete(id)
+
+    await waitForTransaction(transaction)
+  } finally {
+    database.close()
+  }
+}
+
 export async function deleteBusinessProfileWithTransactions(
   businessId: string,
 ): Promise<void> {
@@ -994,29 +1240,87 @@ export async function deleteBusinessProfileWithTransactions(
 
   try {
     const readTransaction = database.transaction(
-      BUSINESS_TRANSACTION_STORE,
+      [
+        BUSINESS_TRANSACTION_STORE,
+        BUSINESS_PARTY_STORE,
+        BUSINESS_OPEN_ITEM_STORE,
+      ],
       'readonly',
     )
 
-    const keysRequest = readTransaction
-      .objectStore(BUSINESS_TRANSACTION_STORE)
-      .index('businessId')
-      .getAllKeys(businessId)
+    const transactionKeysRequest =
+      readTransaction
+        .objectStore(BUSINESS_TRANSACTION_STORE)
+        .index('businessId')
+        .getAllKeys(businessId)
 
-    const keys = await new Promise<IDBValidKey[]>(
-      (resolve, reject) => {
-        keysRequest.onsuccess = () =>
-          resolve(keysRequest.result)
+    const partyKeysRequest =
+      readTransaction
+        .objectStore(BUSINESS_PARTY_STORE)
+        .index('businessId')
+        .getAllKeys(businessId)
 
-        keysRequest.onerror = () =>
-          reject(
-            keysRequest.error ??
-              new Error(
-                'Could not find business transactions',
-              ),
-          )
-      },
-    )
+    const openItemKeysRequest =
+      readTransaction
+        .objectStore(BUSINESS_OPEN_ITEM_STORE)
+        .index('businessId')
+        .getAllKeys(businessId)
+
+    const [
+      transactionKeys,
+      partyKeys,
+      openItemKeys,
+    ] =
+      await Promise.all([
+        new Promise<IDBValidKey[]>(
+          (resolve, reject) => {
+            transactionKeysRequest.onsuccess = () =>
+              resolve(
+                transactionKeysRequest.result,
+              )
+
+            transactionKeysRequest.onerror = () =>
+              reject(
+                transactionKeysRequest.error ??
+                  new Error(
+                    'Could not find business transactions',
+                  ),
+              )
+          },
+        ),
+        new Promise<IDBValidKey[]>(
+          (resolve, reject) => {
+            partyKeysRequest.onsuccess = () =>
+              resolve(
+                partyKeysRequest.result,
+              )
+
+            partyKeysRequest.onerror = () =>
+              reject(
+                partyKeysRequest.error ??
+                  new Error(
+                    'Could not find business parties',
+                  ),
+              )
+          },
+        ),
+        new Promise<IDBValidKey[]>(
+          (resolve, reject) => {
+            openItemKeysRequest.onsuccess = () =>
+              resolve(
+                openItemKeysRequest.result,
+              )
+
+            openItemKeysRequest.onerror = () =>
+              reject(
+                openItemKeysRequest.error ??
+                  new Error(
+                    'Could not find business open items',
+                  ),
+              )
+          },
+        ),
+      ])
 
     await waitForTransaction(readTransaction)
 
@@ -1024,6 +1328,8 @@ export async function deleteBusinessProfileWithTransactions(
       [
         BUSINESS_PROFILE_STORE,
         BUSINESS_TRANSACTION_STORE,
+        BUSINESS_PARTY_STORE,
+        BUSINESS_OPEN_ITEM_STORE,
       ],
       'readwrite',
     )
@@ -1037,8 +1343,38 @@ export async function deleteBusinessProfileWithTransactions(
         BUSINESS_TRANSACTION_STORE,
       )
 
-    for (const key of keys) {
-      transactionStore.delete(key)
+    for (
+      const key of transactionKeys
+    ) {
+      transactionStore.delete(
+        key,
+      )
+    }
+
+    const partyStore =
+      writeTransaction.objectStore(
+        BUSINESS_PARTY_STORE,
+      )
+
+    for (
+      const key of partyKeys
+    ) {
+      partyStore.delete(
+        key,
+      )
+    }
+
+    const openItemStore =
+      writeTransaction.objectStore(
+        BUSINESS_OPEN_ITEM_STORE,
+      )
+
+    for (
+      const key of openItemKeys
+    ) {
+      openItemStore.delete(
+        key,
+      )
     }
 
     await waitForTransaction(writeTransaction)
@@ -1059,6 +1395,8 @@ export interface MoneySaathiDatabaseSnapshot {
   financialSchemes: FinancialScheme[]
   businessProfiles: BusinessProfile[]
   businessTransactions: BusinessTransaction[]
+  businessParties: BusinessParty[]
+  businessOpenItems: BusinessOpenItem[]
 }
 
 export async function exportDatabaseSnapshot(): Promise<
@@ -1080,6 +1418,8 @@ export async function exportDatabaseSnapshot(): Promise<
       financialSchemes,
       businessProfiles,
       businessTransactions,
+      businessParties,
+      businessOpenItems,
     ] = await Promise.all([
 
       getAllFromStore<MoneyTransaction>(
@@ -1130,6 +1470,14 @@ export async function exportDatabaseSnapshot(): Promise<
         database,
         BUSINESS_TRANSACTION_STORE,
       ),
+      getAllFromStore<BusinessParty>(
+        database,
+        BUSINESS_PARTY_STORE,
+      ),
+      getAllFromStore<BusinessOpenItem>(
+        database,
+        BUSINESS_OPEN_ITEM_STORE,
+      ),
     ])
 
     return {
@@ -1145,6 +1493,8 @@ export async function exportDatabaseSnapshot(): Promise<
       financialSchemes,
       businessProfiles,
       businessTransactions,
+      businessParties,
+      businessOpenItems,
     }
   } finally {
     database.close()
@@ -1169,6 +1519,8 @@ export async function replaceDatabaseSnapshot(
     SCHEME_STORE,
     BUSINESS_PROFILE_STORE,
     BUSINESS_TRANSACTION_STORE,
+    BUSINESS_PARTY_STORE,
+    BUSINESS_OPEN_ITEM_STORE,
   ]
 
   try {
@@ -1200,6 +1552,14 @@ export async function replaceDatabaseSnapshot(
       [
         BUSINESS_TRANSACTION_STORE,
         snapshot.businessTransactions,
+      ],
+      [
+        BUSINESS_PARTY_STORE,
+        snapshot.businessParties,
+      ],
+      [
+        BUSINESS_OPEN_ITEM_STORE,
+        snapshot.businessOpenItems,
       ],
     ]
 
@@ -1233,6 +1593,8 @@ export async function clearAllFinancialData(): Promise<void> {
     SCHEME_STORE,
     BUSINESS_PROFILE_STORE,
     BUSINESS_TRANSACTION_STORE,
+    BUSINESS_PARTY_STORE,
+    BUSINESS_OPEN_ITEM_STORE,
   ]
 
   try {

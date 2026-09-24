@@ -26,6 +26,8 @@ const emptyData = {
   financialSchemes: [],
   businessProfiles: [],
   businessTransactions: [],
+  businessParties: [],
+  businessOpenItems: [],
 }
 
 const durableSettings = {

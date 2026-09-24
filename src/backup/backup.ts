@@ -53,6 +53,8 @@ export interface BackupSummary {
   financialSchemes: number
   businessProfiles: number
   businessTransactions: number
+  businessParties: number
+  businessOpenItems: number
 }
 
 function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {
@@ -745,6 +747,81 @@ function isValidBusinessTransaction(
   )
 }
 
+function isValidBusinessParty(
+  value: unknown,
+): boolean {
+  if (!isValidBackupRecord(value)) return false
+
+  return (
+    isNonEmptyText(
+      value.businessId,
+    ) &&
+    isNonEmptyText(
+      value.name,
+    ) &&
+    (
+      value.role === 'customer' ||
+      value.role === 'supplier' ||
+      value.role === 'both'
+    ) &&
+    isText(
+      value.phone,
+    ) &&
+    isText(
+      value.note,
+    ) &&
+    hasValidTimes(
+      value,
+    )
+  )
+}
+
+function isValidBusinessOpenItem(
+  value: unknown,
+): boolean {
+  if (!isValidBackupRecord(value)) return false
+
+  return (
+    isNonEmptyText(
+      value.businessId,
+    ) &&
+    isNonEmptyText(
+      value.partyId,
+    ) &&
+    (
+      value.direction === 'receivable' ||
+      value.direction === 'payable'
+    ) &&
+    isSafePositiveInteger(
+      value.originalAmountChetrum,
+    ) &&
+    isSafeNonNegativeInteger(
+      value.outstandingAmountChetrum,
+    ) &&
+    Number(
+      value.outstandingAmountChetrum,
+    ) <=
+      Number(
+        value.originalAmountChetrum,
+      ) &&
+    isRequiredDate(
+      value.date,
+    ) &&
+    isOptionalDate(
+      value.dueDate,
+    ) &&
+    isText(
+      value.reference,
+    ) &&
+    isText(
+      value.note,
+    ) &&
+    hasValidTimes(
+      value,
+    )
+  )
+}
+
 function isValidTypedCollection(
   value: unknown,
   validator: (
@@ -812,6 +889,14 @@ function hasSnapshotArrays(
     !isValidTypedCollection(
       value.businessTransactions,
       isValidBusinessTransaction,
+    ) ||
+    !isValidTypedCollection(
+      value.businessParties,
+      isValidBusinessParty,
+    ) ||
+    !isValidTypedCollection(
+      value.businessOpenItems,
+      isValidBusinessOpenItem,
     )
   ) {
     return false
@@ -849,6 +934,39 @@ function hasSnapshotArrays(
       (transaction) =>
         !businessIds.has(
           transaction.businessId,
+        ),
+    )
+  ) {
+    return false
+  }
+
+  if (
+    value.businessParties.some(
+      (party) =>
+        !businessIds.has(
+          party.businessId,
+        ),
+    )
+  ) {
+    return false
+  }
+
+  const partyIds =
+    new Set(
+      value.businessParties.map(
+        (party) =>
+          party.id,
+      ),
+    )
+
+  if (
+    value.businessOpenItems.some(
+      (item) =>
+        !businessIds.has(
+          item.businessId,
+        ) ||
+        !partyIds.has(
+          item.partyId,
         ),
     )
   ) {
@@ -897,7 +1015,7 @@ export function migrateBackupPayload(
   const data =
     value.data
 
-  const originalVersionOneKeys = [
+  const coreVersionOneKeys = [
     'transactions',
     'budgets',
     'regularMoney',
@@ -910,27 +1028,47 @@ export function migrateBackupPayload(
     'financialSchemes',
   ]
 
-  const originalVersionOne =
-    originalVersionOneKeys.every(
+  if (
+    !coreVersionOneKeys.every(
       (key) =>
         Array.isArray(
           data[key],
         ),
-    ) &&
-    data.businessProfiles === undefined &&
-    data.businessTransactions === undefined
+    )
+  ) {
+    return null
+  }
 
-  const candidate: unknown =
-    originalVersionOne
-      ? {
-          ...value,
-          data: {
-            ...data,
-            businessProfiles: [],
-            businessTransactions: [],
-          },
-        }
-      : value
+  const candidate: unknown = {
+    ...value,
+    data: {
+      ...data,
+      businessProfiles:
+        Array.isArray(
+          data.businessProfiles,
+        )
+          ? data.businessProfiles
+          : [],
+      businessTransactions:
+        Array.isArray(
+          data.businessTransactions,
+        )
+          ? data.businessTransactions
+          : [],
+      businessParties:
+        Array.isArray(
+          data.businessParties,
+        )
+          ? data.businessParties
+          : [],
+      businessOpenItems:
+        Array.isArray(
+          data.businessOpenItems,
+        )
+          ? data.businessOpenItems
+          : [],
+    },
+  }
 
   return isValidBackupPayload(
     candidate,
@@ -976,6 +1114,8 @@ export function buildBackupSummary(
     financialSchemes: data.financialSchemes.length,
     businessProfiles: data.businessProfiles.length,
     businessTransactions: data.businessTransactions.length,
+    businessParties: data.businessParties.length,
+    businessOpenItems: data.businessOpenItems.length,
   }
 
   return {
