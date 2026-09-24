@@ -807,8 +807,8 @@ function DashboardPage() {
               <h2>Money movement</h2>
             </div>
 
-            <Link to="/app/reports">
-              Open reports
+            <Link to="/app/month">
+              Open My Month
             </Link>
           </div>
 

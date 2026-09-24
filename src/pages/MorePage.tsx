@@ -19,6 +19,11 @@ const groups: MoreGroup[] = [
     title: 'Plan and understand',
     links: [
       {
+        to: '/app/month',
+        label: 'My Month',
+        description: 'See recorded money, commitments, Safe to Spend and the rest of this month together.',
+      },
+      {
         to: '/app/regular-money',
         label: 'Regular money',
         description: 'Track repeating income and expenses.',

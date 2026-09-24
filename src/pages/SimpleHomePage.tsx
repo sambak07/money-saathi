@@ -323,8 +323,8 @@ function SimpleHomePage() {
             Transactions
           </Link>
 
-          <Link to="/app/upcoming">
-            Upcoming
+          <Link to="/app/month">
+            My Month
           </Link>
 
           <Link to="/app/goals">
