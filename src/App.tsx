@@ -59,6 +59,7 @@ const DataExportPage = lazy(() => import('./pages/DataExportPage'))
 const MoneyCalendarPage = lazy(() => import('./pages/MoneyCalendarPage'))
 const AlertCentrePage = lazy(() => import('./pages/AlertCentrePage'))
 const LoanRemindersPage = lazy(() => import('./pages/LoanRemindersPage'))
+const VaultPage = lazy(() => import('./pages/VaultPage'))
 const MorePage = lazy(() => import('./pages/MorePage'))
 
 function App() {
@@ -124,6 +125,7 @@ function App() {
         <Route path="/app/calendar" element={<MoneyCalendarPage />} />
         <Route path="/app/alerts" element={<AlertCentrePage />} />
         <Route path="/app/loan-reminders" element={<LoanRemindersPage />} />
+        <Route path="/app/vault" element={<VaultPage />} />
         <Route path="/app/more" element={<MorePage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

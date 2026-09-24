@@ -74,6 +74,11 @@ const groups: MoreGroup[] = [
         description: 'Savings, deposits and tracked assets.',
       },
       {
+        to: '/app/vault',
+        label: 'Money Vault',
+        description: 'Keep important financial reference numbers encrypted on this device.',
+      },
+      {
         to: '/app/my-money/loans',
         label: 'Loans',
         description: 'Track outstanding loan commitments.',
