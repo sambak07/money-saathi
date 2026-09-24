@@ -8,6 +8,7 @@ export interface LoanDueReminder {
   nextDueDate: string
   frequency: LoanReminderFrequency
   enabled: boolean
+  monthlyAnchorDay?: number
   updatedAt: number
 }
 
@@ -89,6 +90,17 @@ export function sanitizeLoanDueReminder(
       value.frequency !== 'monthly'
     ) ||
     typeof value.enabled !== 'boolean' ||
+    (
+      value.monthlyAnchorDay !== undefined &&
+      (
+        typeof value.monthlyAnchorDay !== 'number' ||
+        !Number.isInteger(
+          value.monthlyAnchorDay,
+        ) ||
+        value.monthlyAnchorDay < 1 ||
+        value.monthlyAnchorDay > 31
+      )
+    ) ||
     !Number.isSafeInteger(
       value.updatedAt,
     ) ||
@@ -107,6 +119,14 @@ export function sanitizeLoanDueReminder(
     frequency:
       value.frequency,
     enabled: value.enabled,
+    ...(
+      value.monthlyAnchorDay === undefined
+        ? {}
+        : {
+            monthlyAnchorDay:
+              value.monthlyAnchorDay,
+          }
+    ),
     updatedAt: value.updatedAt,
   }
 }
@@ -180,8 +200,28 @@ export function saveLoanDueReminder(
   const existing =
     getLoanDueReminders()
 
+  const monthlyAnchorDay =
+    reminder.frequency === 'monthly'
+      ? (
+          reminder.monthlyAnchorDay ??
+          Number(
+            reminder.nextDueDate.slice(
+              8,
+              10,
+            ),
+          )
+        )
+      : undefined
+
   const next: LoanDueReminder = {
     ...reminder,
+    ...(
+      monthlyAnchorDay === undefined
+        ? {}
+        : {
+            monthlyAnchorDay,
+          }
+    ),
     updatedAt: Date.now(),
   }
 
@@ -228,8 +268,27 @@ export function removeLoanDueReminder(
   )
 }
 
+export function clearLoanDueReminders(): void {
+  localStorage.removeItem(
+    STORAGE_KEY,
+  )
+
+  window.dispatchEvent(
+    new Event(
+      'money-saathi-loan-reminders-change',
+    ),
+  )
+
+  window.dispatchEvent(
+    new Event(
+      'money-saathi-alerts-change',
+    ),
+  )
+}
+
 export function nextMonthlyDueDate(
   currentDueDate: string,
+  anchorDay?: number,
 ): string {
   if (!isIsoDate(currentDueDate)) {
     throw new Error(
@@ -244,6 +303,21 @@ export function nextMonthlyDueDate(
   ] = currentDueDate
     .split('-')
     .map(Number)
+
+  const intendedDay =
+    anchorDay ?? day
+
+  if (
+    !Number.isInteger(
+      intendedDay,
+    ) ||
+    intendedDay < 1 ||
+    intendedDay > 31
+  ) {
+    throw new Error(
+      'Monthly reminder anchor day must be between 1 and 31.',
+    )
+  }
 
   const nextMonthStart =
     new Date(
@@ -273,7 +347,7 @@ export function nextMonthlyDueDate(
 
   const safeDay =
     Math.min(
-      day,
+      intendedDay,
       lastDay,
     )
 
@@ -295,12 +369,23 @@ export function markLoanReminderPaid(
     reminder.frequency ===
     'monthly'
   ) {
+    const monthlyAnchorDay =
+      reminder.monthlyAnchorDay ??
+      Number(
+        reminder.nextDueDate.slice(
+          8,
+          10,
+        ),
+      )
+
     return {
       ...reminder,
       nextDueDate:
         nextMonthlyDueDate(
           reminder.nextDueDate,
+          monthlyAnchorDay,
         ),
+      monthlyAnchorDay,
       updatedAt: Date.now(),
     }
   }

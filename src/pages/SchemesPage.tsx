@@ -137,9 +137,12 @@ function SchemesPage() {
       current += scheme.currentValueChetrum
       protection += scheme.protectionCoverChetrum
       future += scheme.futureBenefitChetrum
-      annualCommitment += annualContributionChetrum(scheme)
 
       if (scheme.status === 'active') {
+        annualCommitment +=
+          annualContributionChetrum(
+            scheme,
+          )
         active += 1
       }
     }
@@ -371,7 +374,7 @@ function SchemesPage() {
           </article>
 
           <article className="scheme-summary-card">
-            <span>Annual scheduled contributions</span>
+            <span>Active annual scheduled contributions</span>
             <strong>
               {formatNu(summary.annualCommitment)}
             </strong>

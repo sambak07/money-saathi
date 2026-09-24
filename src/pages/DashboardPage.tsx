@@ -481,14 +481,19 @@ function DashboardPage() {
       )
 
     const annualSchemeCommitment =
-      data.schemes.reduce(
-        (sum, scheme) =>
-          sum +
-          annualContributionChetrum(
-            scheme,
-          ),
-        0,
-      )
+      data.schemes
+        .filter(
+          (scheme) =>
+            scheme.status === 'active',
+        )
+        .reduce(
+          (sum, scheme) =>
+            sum +
+            annualContributionChetrum(
+              scheme,
+            ),
+          0,
+        )
 
     const activeSchemes =
       data.schemes.filter(

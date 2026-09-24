@@ -288,6 +288,8 @@ export function restoreDurableSettingsBackup(
         reminder.frequency,
       enabled:
         reminder.enabled,
+      monthlyAnchorDay:
+        reminder.monthlyAnchorDay,
     })
   }
 

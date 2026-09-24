@@ -52,6 +52,37 @@ describe('verified loan alert integration', () => {
     ).toBe(120_000)
   })
 
+  it('keeps an unresolved loan reminder visible after more than 30 days overdue', () => {
+    const alerts =
+      buildMoneyAlerts({
+        today: '2026-09-22',
+        dueSoonDays: 7,
+        regularMoney: [],
+        transactions: [],
+        schemes: [],
+        recordedBalanceChetrum: 0,
+        safeToSpendChetrum: 0,
+        upcomingCommitmentsChetrum: 0,
+        loanReminders: [
+          {
+            loanId: 'loan-old',
+            loanName: 'Old loan',
+            amountChetrum: 120_000,
+            nextDueDate: '2026-08-01',
+            frequency: 'monthly',
+          },
+        ],
+      })
+
+    expect(
+      alerts.some(
+        (alert) =>
+          alert.source === 'loan' &&
+          alert.status === 'overdue',
+      ),
+    ).toBe(true)
+  })
+
   it('does not invent a loan alert when no verified reminder exists', () => {
     const alerts =
       buildMoneyAlerts({

@@ -304,8 +304,8 @@ function OnboardingPage() {
                   <li>
                     <span className="privacy-check">✓</span>
                     <span>
-                      We will add encrypted backup and restore before
-                      release.
+                      Encrypted backup and restore are available when
+                      you want a portable copy of your local data.
                     </span>
                   </li>
                 </ul>

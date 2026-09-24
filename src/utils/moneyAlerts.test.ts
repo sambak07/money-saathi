@@ -181,6 +181,37 @@ describe('Money Saathi alerts', () => {
     )
   })
 
+  it('keeps an old unresolved Regular Money occurrence visible without dropping it after 30 days', () => {
+    const alerts =
+      buildMoneyAlerts({
+        today: '2026-09-22',
+        dueSoonDays: 7,
+        regularMoney: [
+          regular({
+            id: 'old-rent',
+            startDate: '2026-07-01',
+          }),
+        ],
+        transactions: [],
+        schemes: [],
+        recordedBalanceChetrum:
+          1_000_000,
+        safeToSpendChetrum:
+          900_000,
+        upcomingCommitmentsChetrum:
+          100_000,
+      })
+
+    expect(
+      alerts.some(
+        (alert) =>
+          alert.source === 'regular-money' &&
+          alert.status === 'overdue' &&
+          alert.dueDate === '2026-07-01',
+      ),
+    ).toBe(true)
+  })
+
   it('adds a non-notification status alert when Safe to Spend reaches zero', () => {
     const alerts =
       buildMoneyAlerts({

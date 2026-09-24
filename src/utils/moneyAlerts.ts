@@ -366,19 +366,41 @@ export function buildMoneyAlerts(
     const dates =
       generateOccurrencesBetween(
         schedule,
-        rangeStart,
+        schedule.startDate,
         rangeEnd,
       )
 
-    for (const date of dates) {
-      if (
-        recordedKeys.has(
-          `${schedule.id}|${date}`,
-        )
-      ) {
-        continue
-      }
+    const unresolved =
+      dates.filter(
+        (date) =>
+          !recordedKeys.has(
+            `${schedule.id}|${date}`,
+          ),
+      )
 
+    const olderUnresolved =
+      unresolved.find(
+        (date) =>
+          date < rangeStart,
+      )
+
+    if (olderUnresolved) {
+      alerts.push(
+        regularAlert(
+          schedule,
+          olderUnresolved,
+          input.today,
+        ),
+      )
+    }
+
+    for (
+      const date of
+        unresolved.filter(
+          (item) =>
+            item >= rangeStart,
+        )
+    ) {
       alerts.push(
         regularAlert(
           schedule,
@@ -399,8 +421,6 @@ export function buildMoneyAlerts(
     }
 
     if (
-      scheme.nextContributionDate <
-        rangeStart ||
       scheme.nextContributionDate >
         rangeEnd
     ) {
@@ -420,8 +440,6 @@ export function buildMoneyAlerts(
       input.loanReminders ?? []
   ) {
     if (
-      reminder.nextDueDate <
-        rangeStart ||
       reminder.nextDueDate >
         rangeEnd
     ) {

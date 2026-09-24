@@ -4,6 +4,9 @@
 } from 'react'
 import { Link } from 'react-router-dom'
 
+import {
+  clearLoanDueReminders,
+} from '../alerts/loanDueReminders'
 import AppShell from '../components/AppShell'
 import {
   clearAllFinancialData,
@@ -88,9 +91,10 @@ function SettingsPage() {
 
     try {
       await clearAllFinancialData()
+      clearLoanDueReminders()
       setErasePhrase('')
       setMessage(
-        'All financial records were erased. App Lock and device preferences were kept.',
+        'All personal and business financial records, including verified loan reminders, were erased. App Lock and device preferences were kept.',
       )
     } catch {
       setError(

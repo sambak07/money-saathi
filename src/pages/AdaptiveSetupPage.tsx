@@ -237,7 +237,7 @@ function AdaptiveSetupPage() {
             <span>For business</span>
             <strong>Keep money separate</strong>
             <p>
-              Business cash flow will use its own workspace so
+              Business cash flow uses its own workspace so
               personal and business money are never silently
               mixed.
             </p>
@@ -254,9 +254,9 @@ function AdaptiveSetupPage() {
         </section>
 
         <div className="adaptive-next-note">
-          <strong>Next foundation:</strong>{' '}
-          Safe to Spend and Adaptive Home will use this setup to
-          show the right financial priorities without changing
+          <strong>Your setup:</strong>{' '}
+          Safe to Spend and Adaptive Home use these choices to
+          show relevant financial priorities without changing
           the underlying records.
           <Link to="/app">
             Return Home

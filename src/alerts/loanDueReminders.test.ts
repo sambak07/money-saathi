@@ -39,6 +39,40 @@ describe('verified loan reminders', () => {
     ).toBe('2028-02-29')
   })
 
+  it('keeps the intended monthly day after a shorter month', () => {
+    const january = {
+      loanId: 'l1',
+      amountChetrum: 100_000,
+      nextDueDate: '2027-01-31',
+      frequency: 'monthly' as const,
+      enabled: true,
+      monthlyAnchorDay: 31,
+      updatedAt: 1,
+    }
+
+    const february =
+      markLoanReminderPaid(
+        january,
+      )
+
+    expect(
+      february.nextDueDate,
+    ).toBe('2027-02-28')
+
+    expect(
+      february.monthlyAnchorDay,
+    ).toBe(31)
+
+    const march =
+      markLoanReminderPaid(
+        february,
+      )
+
+    expect(
+      march.nextDueDate,
+    ).toBe('2027-03-31')
+  })
+
   it('disables a one-time reminder after the user marks it paid', () => {
     const result =
       markLoanReminderPaid({

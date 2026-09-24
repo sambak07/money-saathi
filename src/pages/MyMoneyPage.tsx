@@ -36,6 +36,7 @@ import {
   formatNu,
   getLocalToday,
   parseNuToChetrum,
+  parseNuToChetrumAllowZero,
 } from '../utils/money'
 
 import '../styles/my-money.css'
@@ -256,7 +257,10 @@ function MyMoneyPage() {
     event.preventDefault()
     setError('')
 
-    const parsedBalance = parseNuToChetrum(savingsBalance)
+    const parsedBalance =
+      parseNuToChetrumAllowZero(
+        savingsBalance,
+      )
 
     if (savingsName.trim().length < 2) {
       setError('Give this savings account a clear name.')
@@ -265,7 +269,7 @@ function MyMoneyPage() {
 
     if (parsedBalance === null) {
       setError(
-        'Enter a balance greater than Nu. 0.00.',
+        'Enter a valid savings balance, including Nu. 0.00 for an empty account.',
       )
       return
     }

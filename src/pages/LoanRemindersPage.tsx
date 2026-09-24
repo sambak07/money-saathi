@@ -291,6 +291,8 @@ function LoanRemindersPage() {
         next.frequency,
       enabled:
         next.enabled,
+      monthlyAnchorDay:
+        next.monthlyAnchorDay,
     })
 
     refreshReminderState(
