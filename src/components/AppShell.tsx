@@ -127,12 +127,23 @@ function AppShell({ children }: AppShellProps) {
           <span>Ngultrum-first · Local-first</span>
         </div>
 
-        <p className="sidebar-label">Money</p>
-
         <nav
           className="sidebar-nav"
           aria-label="Money Saathi navigation"
         >
+          {showBusiness && (
+            <NavLink
+              to="/app/business"
+              className={({ isActive }) =>
+                isActive
+                  ? 'sidebar-item active'
+                  : 'sidebar-item'
+              }
+            >
+              Business
+            </NavLink>
+          )}
+
           <NavLink
             to="/app"
             end
@@ -199,19 +210,6 @@ function AppShell({ children }: AppShellProps) {
           >
             My Money
           </NavLink>
-
-          {showBusiness && (
-            <NavLink
-              to="/app/business"
-              className={({ isActive }) =>
-                isActive
-                  ? 'sidebar-item active'
-                  : 'sidebar-item'
-              }
-            >
-              Business
-            </NavLink>
-          )}
 
           <NavLink
             to="/app/reports"
