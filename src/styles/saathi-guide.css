@@ -233,3 +233,9 @@
   font-size: var(--font-size-small);
   font-weight: 750;
 }
+.saathi-guide-links {
+  margin-top: 5px;
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}

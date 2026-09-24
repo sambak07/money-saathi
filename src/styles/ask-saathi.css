@@ -1,0 +1,294 @@
+﻿.ask-saathi-page {
+  padding-bottom: 44px;
+}
+
+.ask-saathi-header {
+  max-width: 820px;
+}
+
+.ask-saathi-header h1 {
+  margin: 0;
+}
+
+.ask-saathi-header > p:last-of-type {
+  margin: 12px 0 0;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+.ask-saathi-header-links {
+  margin-top: 12px;
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.ask-saathi-header-links a {
+  color: var(--color-brand);
+  font-size: var(--font-size-small);
+  font-weight: 750;
+}
+
+.ask-saathi-trust {
+  margin-top: 20px;
+  padding: 15px 17px;
+  display: grid;
+  gap: 5px;
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--color-brand);
+  border-radius: 14px;
+  background: var(--color-brand-soft);
+}
+
+.ask-saathi-trust span {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  line-height: 1.5;
+}
+
+.ask-saathi-tools {
+  margin-top: 18px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ask-saathi-tools button {
+  min-height: 42px;
+  padding: 0 14px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  font-weight: 750;
+}
+
+.ask-saathi-tools button.active {
+  border-color: var(--color-brand);
+  background: var(--color-brand);
+  color: white;
+}
+
+.ask-saathi-panel,
+.ask-saathi-provenance,
+.ask-saathi-profile-note {
+  margin-top: 18px;
+  padding: 22px;
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.ask-saathi-panel h2 {
+  margin: 4px 0 0;
+  font-size: var(--font-size-section);
+}
+
+.ask-saathi-panel > div:first-child > p:last-child {
+  max-width: 760px;
+  margin: 8px 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  line-height: 1.55;
+}
+
+.ask-saathi-amount {
+  margin-top: 18px;
+  max-width: 360px;
+  display: grid;
+  gap: 8px;
+  color: var(--color-text);
+  font-size: var(--font-size-small);
+  font-weight: 700;
+}
+
+.ask-saathi-amount input {
+  min-height: 48px;
+  padding: 10px 13px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 12px;
+  background: white;
+  color: var(--color-text);
+  font: inherit;
+}
+
+.ask-saathi-affordability,
+.ask-saathi-month-grid,
+.ask-saathi-debt-grid {
+  margin-top: 18px;
+  display: grid;
+  gap: 12px;
+}
+
+.ask-saathi-affordability {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.ask-saathi-month-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.ask-saathi-debt-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.ask-saathi-affordability article,
+.ask-saathi-month-grid article,
+.ask-saathi-debt-grid article {
+  padding: 16px;
+  display: grid;
+  gap: 7px;
+  border-radius: 14px;
+  background: var(--color-surface-soft);
+}
+
+.ask-saathi-affordability span,
+.ask-saathi-month-grid span,
+.ask-saathi-debt-grid span {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+}
+
+.ask-saathi-affordability strong,
+.ask-saathi-month-grid strong,
+.ask-saathi-debt-grid strong {
+  font-size: 20px;
+}
+
+.ask-saathi-result,
+.ask-saathi-warning {
+  margin-top: 16px;
+  padding: 14px;
+  border-radius: 14px;
+}
+
+.ask-saathi-result {
+  border: 1px solid var(--color-border);
+}
+
+.ask-saathi-result.within {
+  background: var(--color-brand-soft);
+}
+
+.ask-saathi-result.above,
+.ask-saathi-result.none,
+.ask-saathi-warning {
+  background: rgba(181, 61, 61, 0.07);
+  border: 1px solid rgba(181, 61, 61, 0.22);
+}
+
+.ask-saathi-result p {
+  margin: 7px 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  line-height: 1.5;
+}
+
+.ask-saathi-warning {
+  color: var(--color-danger);
+  font-size: var(--font-size-small);
+}
+
+.ask-saathi-attention-list {
+  margin-top: 16px;
+  display: grid;
+  gap: 10px;
+}
+
+.ask-saathi-attention {
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background: #fffdf8;
+}
+
+.ask-saathi-attention > span {
+  color: var(--color-maroon);
+  font-size: var(--font-size-meta);
+  font-weight: 800;
+  text-transform: capitalize;
+}
+
+.ask-saathi-attention strong {
+  margin-top: 6px;
+  display: block;
+}
+
+.ask-saathi-attention p {
+  margin: 6px 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  line-height: 1.5;
+}
+
+.ask-saathi-month-detail {
+  margin-top: 14px;
+  display: grid;
+  gap: 8px;
+}
+
+.ask-saathi-month-detail > div {
+  padding: 12px 14px;
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  border-radius: 12px;
+  background: var(--color-surface-soft);
+}
+
+.ask-saathi-month-detail span {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+}
+
+.ask-saathi-provenance {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.ask-saathi-provenance > div {
+  padding: 14px;
+  border-radius: 14px;
+  background: var(--color-surface-soft);
+}
+
+.ask-saathi-provenance p,
+.ask-saathi-profile-note p {
+  margin: 6px 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  line-height: 1.5;
+}
+
+.ask-saathi-profile-note {
+  border-left: 4px solid var(--color-saffron);
+}
+
+@media (max-width: 900px) {
+  .ask-saathi-debt-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .ask-saathi-affordability,
+  .ask-saathi-month-grid,
+  .ask-saathi-debt-grid,
+  .ask-saathi-provenance {
+    grid-template-columns: 1fr;
+  }
+
+  .ask-saathi-panel,
+  .ask-saathi-provenance,
+  .ask-saathi-profile-note {
+    padding: 18px;
+  }
+
+  .ask-saathi-month-detail > div {
+    display: grid;
+    gap: 5px;
+  }
+}

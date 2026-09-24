@@ -311,12 +311,21 @@ function SaathiGuidePage() {
             background or financial situation.
           </span>
 
-          <Link
-            to="/app/saathi/privacy"
-            className="saathi-privacy-link"
-          >
-            Review future AI data permissions
-          </Link>
+          <div className="saathi-guide-links">
+            <Link
+              to="/app/saathi/ask"
+              className="saathi-privacy-link"
+            >
+              Ask Saathi with verified local tools
+            </Link>
+
+            <Link
+              to="/app/saathi/privacy"
+              className="saathi-privacy-link"
+            >
+              Review future AI data permissions
+            </Link>
+          </div>
         </section>
 
         <section className="saathi-facts">

@@ -49,6 +49,11 @@ const groups: MoreGroup[] = [
         description: 'Get plain-language financial guidance from your own local records.',
       },
       {
+        to: '/app/saathi/ask',
+        label: 'Ask Saathi',
+        description: 'Run verified local tools for affordability, spending, attention and debt.',
+      },
+      {
         to: '/app/explain',
         label: 'Explain my money',
         description: 'See how Money Saathi reached its figures.',

@@ -1,0 +1,803 @@
+﻿import {
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
+import {
+  Link,
+} from 'react-router-dom'
+
+import AppShell from '../components/AppShell'
+import {
+  getProfile,
+} from '../profile/userProfile'
+import {
+  buildAttentionItems,
+  buildDebtSnapshot,
+  compareRecordedMonths,
+  assessAffordability,
+} from '../saathi/saathiTools'
+import {
+  getLoans,
+  getRegularMoney,
+  getSavingsAccounts,
+  getTransactions,
+} from '../storage/db'
+import {
+  getPreferences,
+} from '../settings/preferences'
+import {
+  formatNu,
+  getLocalToday,
+} from '../utils/money'
+import {
+  calculateSafeToSpend,
+  parseNuInputToChetrum,
+} from '../utils/safeToSpend'
+import {
+  transactionBalanceChetrum,
+} from '../utils/simpleHome'
+import {
+  buildMoneyHealthSnapshot,
+} from '../utils/moneyHealth'
+import {
+  sumSafeChetrum,
+} from '../utils/explainMoney'
+
+import '../styles/ask-saathi.css'
+
+interface AskData {
+  transactions: Awaited<
+    ReturnType<typeof getTransactions>
+  >
+  regularMoney: Awaited<
+    ReturnType<typeof getRegularMoney>
+  >
+  savingsAccounts: Awaited<
+    ReturnType<typeof getSavingsAccounts>
+  >
+  loans: Awaited<
+    ReturnType<typeof getLoans>
+  >
+}
+
+function AskSaathiPage() {
+  const [today] =
+    useState(() => getLocalToday())
+
+  const [profile] =
+    useState(() => getProfile())
+
+  const [preferences] =
+    useState(() => getPreferences())
+
+  const [
+    data,
+    setData,
+  ] =
+    useState<AskData | null>(
+      null,
+    )
+
+  const [
+    loading,
+    setLoading,
+  ] =
+    useState(true)
+
+  const [
+    error,
+    setError,
+  ] =
+    useState('')
+
+  const [
+    amountText,
+    setAmountText,
+  ] =
+    useState('')
+
+  const [
+    activeTool,
+    setActiveTool,
+  ] =
+    useState<
+      'affordability' |
+      'attention' |
+      'month' |
+      'debt'
+    >('affordability')
+
+  useEffect(() => {
+    let active = true
+
+    async function load() {
+      try {
+        const [
+          transactions,
+          regularMoney,
+          savingsAccounts,
+          loans,
+        ] =
+          await Promise.all([
+            getTransactions(),
+            getRegularMoney(),
+            getSavingsAccounts(),
+            getLoans(),
+          ])
+
+        if (!active) {
+          return
+        }
+
+        setData({
+          transactions,
+          regularMoney,
+          savingsAccounts,
+          loans,
+        })
+      } catch {
+        if (active) {
+          setError(
+            'Ask Saathi could not read your local Money Saathi records.',
+          )
+        }
+      } finally {
+        if (active) {
+          setLoading(false)
+        }
+      }
+    }
+
+    void load()
+
+    return () => {
+      active = false
+    }
+  }, [])
+
+  const view =
+    useMemo(() => {
+      if (!data) {
+        return null
+      }
+
+      const recordedTransactions =
+        data.transactions.filter(
+          (transaction) =>
+            transaction.date <=
+            today,
+        )
+
+      const recordedBalanceChetrum =
+        transactionBalanceChetrum(
+          recordedTransactions,
+          today,
+        )
+
+      const safe =
+        calculateSafeToSpend(
+          today,
+          recordedBalanceChetrum,
+          data.regularMoney,
+          recordedTransactions,
+          preferences.safetyBufferChetrum,
+        )
+
+      const liquidSavingsChetrum =
+        sumSafeChetrum(
+          data.savingsAccounts.map(
+            (account) =>
+              account.balanceChetrum,
+          ),
+          'Savings balance',
+        )
+
+      const health =
+        buildMoneyHealthSnapshot(
+          today.slice(
+            0,
+            7,
+          ),
+          recordedTransactions,
+          liquidSavingsChetrum,
+        )
+
+      const debt =
+        buildDebtSnapshot(
+          data.loans,
+          data.savingsAccounts,
+        )
+
+      const attention =
+        buildAttentionItems({
+          safeToSpendChetrum:
+            safe.safeToSpendChetrum,
+          upcomingCommitmentsChetrum:
+            safe.upcomingCommitmentsChetrum,
+          safetyBufferChetrum:
+            safe.safetyBufferChetrum,
+          currentMonthIncomeChetrum:
+            health.currentMonth.incomeChetrum,
+          currentMonthExpenseChetrum:
+            health.currentMonth.expenseChetrum,
+          outstandingLoanChetrum:
+            debt.outstandingPrincipalChetrum,
+          transactionCount:
+            recordedTransactions.length,
+        })
+
+      const months =
+        compareRecordedMonths(
+          today.slice(
+            0,
+            7,
+          ),
+          recordedTransactions,
+        )
+
+      return {
+        recordedTransactions,
+        safe,
+        debt,
+        attention,
+        months,
+      }
+    }, [
+      data,
+      preferences.safetyBufferChetrum,
+      today,
+    ])
+
+  const amountChetrum =
+    parseNuInputToChetrum(
+      amountText,
+    )
+
+  const affordability =
+    view &&
+    amountChetrum !== null
+      ? assessAffordability(
+          amountChetrum,
+          view.safe
+            .safeToSpendChetrum,
+        )
+      : null
+
+  if (loading) {
+    return (
+      <AppShell>
+        <div className="dashboard-container">
+          <div className="dashboard2-loading">
+            Ask Saathi is reading your local records…
+          </div>
+        </div>
+      </AppShell>
+    )
+  }
+
+  if (
+    error ||
+    !view ||
+    !data
+  ) {
+    return (
+      <AppShell>
+        <div className="dashboard-container">
+          <div
+            className="dashboard2-error"
+            role="alert"
+          >
+            {error ||
+              'Ask Saathi could not prepare these local tools.'}
+          </div>
+        </div>
+      </AppShell>
+    )
+  }
+
+  return (
+    <AppShell>
+      <div className="dashboard-container ask-saathi-page">
+        <header className="ask-saathi-header">
+          <p className="dashboard-eyebrow">
+            Ask with verified calculations
+          </p>
+
+          <h1>Ask Saathi</h1>
+
+          <p>
+            These tools answer common money questions with
+            deterministic calculations from records on this device.
+            There is no generative AI call in this stage.
+          </p>
+
+          <div className="ask-saathi-header-links">
+            <Link to="/app/saathi">
+              Saathi guidance
+            </Link>
+
+            <Link to="/app/saathi/privacy">
+              Data permissions
+            </Link>
+          </div>
+        </header>
+
+        <section className="ask-saathi-trust">
+          <strong>
+            The calculation happens before the explanation.
+          </strong>
+
+          <span>
+            Saathi does not invent balances, income, debt or Safe to
+            Spend. Missing records can still make the real-world
+            picture incomplete.
+          </span>
+        </section>
+
+        <nav
+          className="ask-saathi-tools"
+          aria-label="Ask Saathi local tools"
+        >
+          <button
+            type="button"
+            className={
+              activeTool ===
+              'affordability'
+                ? 'active'
+                : ''
+            }
+            aria-pressed={
+              activeTool ===
+              'affordability'
+            }
+            onClick={() =>
+              setActiveTool(
+                'affordability',
+              )
+            }
+          >
+            Can I spend this?
+          </button>
+
+          <button
+            type="button"
+            className={
+              activeTool ===
+              'attention'
+                ? 'active'
+                : ''
+            }
+            aria-pressed={
+              activeTool ===
+              'attention'
+            }
+            onClick={() =>
+              setActiveTool(
+                'attention',
+              )
+            }
+          >
+            What needs attention?
+          </button>
+
+          <button
+            type="button"
+            className={
+              activeTool ===
+              'month'
+                ? 'active'
+                : ''
+            }
+            aria-pressed={
+              activeTool ===
+              'month'
+            }
+            onClick={() =>
+              setActiveTool(
+                'month',
+              )
+            }
+          >
+            What changed?
+          </button>
+
+          <button
+            type="button"
+            className={
+              activeTool ===
+              'debt'
+                ? 'active'
+                : ''
+            }
+            aria-pressed={
+              activeTool ===
+              'debt'
+            }
+            onClick={() =>
+              setActiveTool(
+                'debt',
+              )
+            }
+          >
+            Debt snapshot
+          </button>
+        </nav>
+
+        {activeTool ===
+          'affordability' && (
+          <section className="ask-saathi-panel">
+            <div>
+              <p className="dashboard-eyebrow">
+                Scenario tool
+              </p>
+
+              <h2>
+                Can I spend this amount?
+              </h2>
+
+              <p>
+                This compares the amount only with current Safe to
+                Spend. It does not assume future income or make a
+                purchase decision for you.
+              </p>
+            </div>
+
+            <label className="ask-saathi-amount">
+              Amount in Nu.
+
+              <input
+                type="text"
+                inputMode="decimal"
+                placeholder="5000"
+                value={amountText}
+                onChange={(event) =>
+                  setAmountText(
+                    event.target.value,
+                  )
+                }
+              />
+            </label>
+
+            <div className="ask-saathi-affordability">
+              <article>
+                <span>
+                  Current Safe to Spend
+                </span>
+
+                <strong>
+                  {formatNu(
+                    view.safe
+                      .safeToSpendChetrum,
+                  )}
+                </strong>
+              </article>
+
+              {affordability && (
+                <article>
+                  <span>
+                    After this scenario
+                  </span>
+
+                  <strong>
+                    {formatNu(
+                      affordability
+                        .remainingChetrum,
+                    )}
+                  </strong>
+                </article>
+              )}
+            </div>
+
+            {amountText &&
+            amountChetrum ===
+              null && (
+              <div
+                className="ask-saathi-warning"
+                role="alert"
+              >
+                Enter a non-negative amount with no more than two
+                decimal places.
+              </div>
+            )}
+
+            {affordability && (
+              <div
+                className={
+                  `ask-saathi-result ${affordability.status}`
+                }
+              >
+                <strong>
+                  {affordability.status ===
+                  'within'
+                    ? 'This amount fits inside the current recorded Safe to Spend.'
+                    : affordability.status ===
+                        'above'
+                      ? 'This amount is above the current recorded Safe to Spend.'
+                      : 'There is currently no positive recorded Safe to Spend.'}
+                </strong>
+
+                <p>
+                  This is a planning comparison, not a guarantee that
+                  the purchase is affordable in real life. Unrecorded
+                  expenses, cash needs or debt can change the answer.
+                </p>
+              </div>
+            )}
+          </section>
+        )}
+
+        {activeTool ===
+          'attention' && (
+          <section className="ask-saathi-panel">
+            <div>
+              <p className="dashboard-eyebrow">
+                Local signals
+              </p>
+
+              <h2>
+                What deserves attention?
+              </h2>
+
+              <p>
+                These signals are generated from the records currently
+                stored in Money Saathi. They are not a financial score.
+              </p>
+            </div>
+
+            <div className="ask-saathi-attention-list">
+              {view.attention.map(
+                (item) => (
+                  <article
+                    key={item.id}
+                    className={
+                      `ask-saathi-attention ${item.priority}`
+                    }
+                  >
+                    <span>
+                      {item.priority}
+                    </span>
+
+                    <strong>
+                      {item.title}
+                    </strong>
+
+                    <p>
+                      {item.explanation}
+                    </p>
+                  </article>
+                ),
+              )}
+            </div>
+          </section>
+        )}
+
+        {activeTool ===
+          'month' && (
+          <section className="ask-saathi-panel">
+            <div>
+              <p className="dashboard-eyebrow">
+                Recorded month comparison
+              </p>
+
+              <h2>
+                What changed?
+              </h2>
+
+              <p>
+                This compares recorded transactions in the current
+                calendar month with the previous calendar month.
+              </p>
+            </div>
+
+            <div className="ask-saathi-month-grid">
+              <article>
+                <span>
+                  Income change
+                </span>
+
+                <strong>
+                  {formatNu(
+                    view.months
+                      .incomeChangeChetrum,
+                  )}
+                </strong>
+              </article>
+
+              <article>
+                <span>
+                  Expense change
+                </span>
+
+                <strong>
+                  {formatNu(
+                    view.months
+                      .expenseChangeChetrum,
+                  )}
+                </strong>
+              </article>
+
+              <article>
+                <span>
+                  Net movement change
+                </span>
+
+                <strong>
+                  {formatNu(
+                    view.months
+                      .netChangeChetrum,
+                  )}
+                </strong>
+              </article>
+            </div>
+
+            <div className="ask-saathi-month-detail">
+              <div>
+                <strong>
+                  {view.months.current.month}
+                </strong>
+
+                <span>
+                  In{' '}
+                  {formatNu(
+                    view.months.current
+                      .incomeChetrum,
+                  )}
+                  {' · '}
+                  Out{' '}
+                  {formatNu(
+                    view.months.current
+                      .expenseChetrum,
+                  )}
+                </span>
+              </div>
+
+              <div>
+                <strong>
+                  {view.months.previous.month}
+                </strong>
+
+                <span>
+                  In{' '}
+                  {formatNu(
+                    view.months.previous
+                      .incomeChetrum,
+                  )}
+                  {' · '}
+                  Out{' '}
+                  {formatNu(
+                    view.months.previous
+                      .expenseChetrum,
+                  )}
+                </span>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {activeTool ===
+          'debt' && (
+          <section className="ask-saathi-panel">
+            <div>
+              <p className="dashboard-eyebrow">
+                Recorded loan position
+              </p>
+
+              <h2>
+                Debt snapshot
+              </h2>
+
+              <p>
+                This summarizes the outstanding loan values and Savings
+                Account balances you entered. It does not value all
+                assets and is not a recommendation to repay debt.
+              </p>
+            </div>
+
+            <div className="ask-saathi-debt-grid">
+              <article>
+                <span>
+                  Outstanding principal
+                </span>
+
+                <strong>
+                  {formatNu(
+                    view.debt
+                      .outstandingPrincipalChetrum,
+                  )}
+                </strong>
+              </article>
+
+              <article>
+                <span>
+                  Recorded monthly EMIs
+                </span>
+
+                <strong>
+                  {formatNu(
+                    view.debt
+                      .monthlyEmiChetrum,
+                  )}
+                </strong>
+              </article>
+
+              <article>
+                <span>
+                  Savings Account balances
+                </span>
+
+                <strong>
+                  {formatNu(
+                    view.debt
+                      .liquidSavingsChetrum,
+                  )}
+                </strong>
+              </article>
+
+              <article>
+                <span>
+                  Principal less liquid savings
+                </span>
+
+                <strong>
+                  {formatNu(
+                    view.debt
+                      .principalLessLiquidSavingsChetrum,
+                  )}
+                </strong>
+              </article>
+            </div>
+          </section>
+        )}
+
+        <section className="ask-saathi-provenance">
+          <div>
+            <strong>
+              Based on
+            </strong>
+
+            <p>
+              {view.recordedTransactions.length} recorded transaction
+              {view.recordedTransactions.length === 1 ? '' : 's'},
+              {' '}
+              {data.regularMoney.length} regular-money item
+              {data.regularMoney.length === 1 ? '' : 's'},
+              {' '}
+              {data.loans.length} loan
+              {data.loans.length === 1 ? '' : 's'},
+              {' '}
+              {data.savingsAccounts.length} Savings Account record
+              {data.savingsAccounts.length === 1 ? '' : 's'}.
+            </p>
+          </div>
+
+          <div>
+            <strong>
+              Not used
+            </strong>
+
+            <p>
+              Money Vault, bank APIs, internet searches, external AI models,
+              future unreceived income or information you did
+              not record.
+            </p>
+          </div>
+        </section>
+
+        <section className="ask-saathi-profile-note">
+          <strong>
+            Your selected setup
+          </strong>
+
+          <p>
+            {profile.needs.length > 0
+              ? profile.needs.join(' · ')
+              : 'General Money Saathi'}
+          </p>
+        </section>
+      </div>
+    </AppShell>
+  )
+}
+
+export default AskSaathiPage
