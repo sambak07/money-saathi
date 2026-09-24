@@ -1681,6 +1681,126 @@ export async function deleteBusinessTradeLine(
   }
 }
 
+export async function saveBusinessTradeEntryWithLines(
+  entry: BusinessTradeEntry,
+  lines: BusinessTradeLine[],
+): Promise<void> {
+  if (
+    lines.length ===
+    0
+  ) {
+    throw new Error(
+      'A business sale or purchase must contain at least one line.',
+    )
+  }
+
+  for (
+    const line of lines
+  ) {
+    if (
+      line.tradeEntryId !==
+        entry.id ||
+      line.businessId !==
+        entry.businessId ||
+      line.kind !==
+        entry.kind
+    ) {
+      throw new Error(
+        'Business trade lines must match their document.',
+      )
+    }
+  }
+
+  const database =
+    await openDatabase()
+
+  try {
+    const readTransaction =
+      database.transaction(
+        BUSINESS_TRADE_LINE_STORE,
+        'readonly',
+      )
+
+    const keysRequest =
+      readTransaction
+        .objectStore(
+          BUSINESS_TRADE_LINE_STORE,
+        )
+        .index(
+          'tradeEntryId',
+        )
+        .getAllKeys(
+          entry.id,
+        )
+
+    const existingLineKeys =
+      await new Promise<IDBValidKey[]>(
+        (resolve, reject) => {
+          keysRequest.onsuccess = () =>
+            resolve(
+              keysRequest.result,
+            )
+
+          keysRequest.onerror = () =>
+            reject(
+              keysRequest.error ??
+                new Error(
+                  'Could not find existing business trade lines',
+                ),
+            )
+        },
+      )
+
+    await waitForTransaction(
+      readTransaction,
+    )
+
+    const writeTransaction =
+      database.transaction(
+        [
+          BUSINESS_TRADE_ENTRY_STORE,
+          BUSINESS_TRADE_LINE_STORE,
+        ],
+        'readwrite',
+      )
+
+    writeTransaction
+      .objectStore(
+        BUSINESS_TRADE_ENTRY_STORE,
+      )
+      .put(
+        entry,
+      )
+
+    const lineStore =
+      writeTransaction.objectStore(
+        BUSINESS_TRADE_LINE_STORE,
+      )
+
+    for (
+      const key of existingLineKeys
+    ) {
+      lineStore.delete(
+        key,
+      )
+    }
+
+    for (
+      const line of lines
+    ) {
+      lineStore.put(
+        line,
+      )
+    }
+
+    await waitForTransaction(
+      writeTransaction,
+    )
+  } finally {
+    database.close()
+  }
+}
+
 export async function deleteBusinessProfileWithTransactions(
   businessId: string,
 ): Promise<void> {
