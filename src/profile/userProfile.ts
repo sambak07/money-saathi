@@ -1,4 +1,5 @@
 ﻿export type MoneyNeed =
+  | 'student'
   | 'daily-money'
   | 'salary'
   | 'small-business'
@@ -22,6 +23,12 @@ export const MONEY_NEEDS: Array<{
   title: string
   description: string
 }> = [
+  {
+    id: 'student',
+    title: 'Student / first money',
+    description:
+      'Learn daily money, saving, borrowing and digital-money safety without finance jargon.',
+  },
   {
     id: 'daily-money',
     title: 'Track daily money',

@@ -1,0 +1,228 @@
+﻿.saathi-guide-page {
+  padding-bottom: 44px;
+}
+
+.saathi-guide-header {
+  max-width: 820px;
+}
+
+.saathi-guide-header h1 {
+  margin: 0;
+}
+
+.saathi-guide-header > p:last-child {
+  margin: 12px 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-body);
+  line-height: 1.6;
+}
+
+.saathi-trust-strip {
+  margin-top: 20px;
+  padding: 14px 16px;
+  display: grid;
+  gap: 4px;
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--color-saffron);
+  border-radius: 14px;
+  background:
+    linear-gradient(
+      90deg,
+      var(--color-saffron-soft),
+      var(--color-surface)
+    );
+}
+
+.saathi-trust-strip span {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  line-height: 1.5;
+}
+
+.saathi-facts {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.saathi-facts article {
+  padding: 17px;
+  display: grid;
+  gap: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 15px;
+  background: var(--color-surface);
+}
+
+.saathi-facts span {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+}
+
+.saathi-facts strong {
+  font-size: 21px;
+}
+
+.saathi-guidance-section,
+.saathi-learning-section,
+.saathi-source-card,
+.saathi-limit-card {
+  margin-top: 18px;
+  padding: 22px;
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.saathi-section-heading h2 {
+  margin: 4px 0 0;
+  font-size: var(--font-size-section);
+}
+
+.saathi-filter-row {
+  margin-top: 18px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.saathi-filter-row button {
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  font-weight: 700;
+}
+
+.saathi-filter-row button.active {
+  border-color: var(--color-brand);
+  background: var(--color-brand-soft);
+  color: var(--color-brand);
+}
+
+.saathi-guidance-grid {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.saathi-guidance-card {
+  padding: 18px;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  background: #fffdf8;
+}
+
+.saathi-guidance-card > span {
+  color: var(--color-maroon);
+  font-size: var(--font-size-meta);
+  font-weight: 800;
+  text-transform: capitalize;
+}
+
+.saathi-guidance-card h3 {
+  margin: 8px 0 0;
+  font-size: 18px;
+}
+
+.saathi-guidance-card > p {
+  margin: 8px 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  line-height: 1.55;
+}
+
+.saathi-next-action {
+  margin-top: 14px;
+  padding: 12px;
+  display: grid;
+  gap: 4px;
+  border-radius: 12px;
+  background: var(--color-surface-soft);
+}
+
+.saathi-next-action strong {
+  color: var(--color-brand);
+  font-size: var(--font-size-meta);
+}
+
+.saathi-next-action span {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  line-height: 1.45;
+}
+
+.saathi-learning-grid {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.saathi-learning-grid article {
+  padding: 15px;
+  border-radius: 14px;
+  background: var(--color-surface-soft);
+}
+
+.saathi-learning-grid p {
+  margin: 6px 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  line-height: 1.5;
+}
+
+.saathi-source-card {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.saathi-source-card > div {
+  padding: 14px;
+  border-radius: 14px;
+  background: var(--color-surface-soft);
+}
+
+.saathi-source-card p,
+.saathi-limit-card p {
+  margin: 6px 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  line-height: 1.55;
+}
+
+.saathi-limit-card {
+  border-left: 4px solid var(--color-brand);
+}
+
+@media (max-width: 860px) {
+  .saathi-facts,
+  .saathi-guidance-grid,
+  .saathi-learning-grid,
+  .saathi-source-card {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  .saathi-facts,
+  .saathi-guidance-grid,
+  .saathi-learning-grid,
+  .saathi-source-card {
+    grid-template-columns: 1fr;
+  }
+
+  .saathi-guidance-section,
+  .saathi-learning-section,
+  .saathi-source-card,
+  .saathi-limit-card {
+    padding: 18px;
+  }
+}

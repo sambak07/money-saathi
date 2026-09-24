@@ -44,6 +44,11 @@ const groups: MoreGroup[] = [
         description: 'Understand the signals in your records.',
       },
       {
+        to: '/app/saathi',
+        label: 'Saathi',
+        description: 'Get plain-language financial guidance from your own local records.',
+      },
+      {
         to: '/app/explain',
         label: 'Explain my money',
         description: 'See how Money Saathi reached its figures.',

@@ -26,6 +26,7 @@ const sidebarMorePrefixes = [
   '/app/safety-buffer',
   '/app/business',
   '/app/vault',
+  '/app/saathi',
   '/app/upcoming',
   '/app/money-health',
   '/app/about',
