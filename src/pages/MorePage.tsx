@@ -29,6 +29,11 @@ const groups: MoreGroup[] = [
         description: 'Look 30, 60 and 90 days ahead using your recorded balance and Regular Money schedule.',
       },
       {
+        to: '/app/debt-goals',
+        label: 'Debt & goals',
+        description: 'Understand recorded debt, liquid savings and the funding pace of your goals.',
+      },
+      {
         to: '/app/regular-money',
         label: 'Regular money',
         description: 'Track repeating income and expenses.',

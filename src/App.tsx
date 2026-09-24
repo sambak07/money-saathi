@@ -37,6 +37,7 @@ const MoneyHealthPage = lazy(() => import('./pages/MoneyHealthPage'))
 const MoneyTimelinePage = lazy(() => import('./pages/MoneyTimelinePage'))
 const MyMonthPage = lazy(() => import('./pages/MyMonthPage'))
 const CashFlowForecastPage = lazy(() => import('./pages/CashFlowForecastPage'))
+const DebtGoalPlanPage = lazy(() => import('./pages/DebtGoalPlanPage'))
 const BusinessPage = lazy(() => import('./pages/BusinessPage'))
 const SafetyBufferPage = lazy(() => import('./pages/SafetyBufferPage'))
 const AdaptiveSetupPage = lazy(() => import('./pages/AdaptiveSetupPage'))
@@ -122,6 +123,7 @@ function App() {
         <Route path="/app/upcoming" element={<MoneyTimelinePage />} />
         <Route path="/app/month" element={<MyMonthPage />} />
         <Route path="/app/forecast" element={<CashFlowForecastPage />} />
+        <Route path="/app/debt-goals" element={<DebtGoalPlanPage />} />
         <Route path="/app/money-health" element={<MoneyHealthPage />} />
         <Route path="/app/about" element={<BhutanAboutPage />} />
         <Route path="/app/start" element={<GettingStartedPage />} />

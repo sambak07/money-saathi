@@ -1,0 +1,309 @@
+﻿.debt-goal-page {
+  padding-bottom: 40px;
+}
+
+.debt-goal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 22px;
+}
+
+.debt-goal-header h1 {
+  margin: 0;
+  font-size: clamp(34px, 5vw, 50px);
+  line-height: 1;
+  letter-spacing: -0.045em;
+}
+
+.debt-goal-header p:last-child {
+  max-width: 720px;
+  margin: 12px 0 0;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+.debt-goal-header-actions {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 12px;
+}
+
+.debt-goal-header-actions a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  color: var(--color-brand);
+  font-size: var(--font-size-ui);
+  font-weight: 800;
+}
+
+.debt-goal-summary-grid {
+  margin-top: 22px;
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.debt-goal-summary-grid article {
+  min-height: 174px;
+  padding: 19px;
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.debt-goal-summary-grid article.emphasized {
+  border-color: var(--color-brand);
+  background: var(--color-brand);
+  color: white;
+}
+
+.debt-goal-summary-grid span {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-small);
+  font-weight: 750;
+}
+
+.debt-goal-summary-grid article.emphasized span,
+.debt-goal-summary-grid article.emphasized p {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.debt-goal-summary-grid strong {
+  font-size: clamp(22px, 2.6vw, 30px);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.debt-goal-summary-grid p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  line-height: 1.5;
+}
+
+.debt-goal-debt-card,
+.debt-goal-goals-card,
+.debt-goal-boundary {
+  margin-top: 18px;
+  padding: 20px;
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.debt-goal-section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.debt-goal-section-heading h2,
+.debt-goal-boundary h2 {
+  margin: 4px 0 0;
+  font-size: var(--font-size-section);
+  letter-spacing: -0.025em;
+}
+
+.debt-goal-section-heading > a {
+  flex: 0 0 auto;
+  color: var(--color-brand);
+  font-size: var(--font-size-ui);
+  font-weight: 750;
+}
+
+.debt-goal-facts {
+  margin-top: 17px;
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.debt-goal-facts > div {
+  min-height: 98px;
+  padding: 14px;
+  display: grid;
+  align-content: center;
+  gap: 6px;
+  border-radius: 14px;
+  background: var(--color-bg);
+}
+
+.debt-goal-facts span {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-small);
+}
+
+.debt-goal-facts strong {
+  font-size: 17px;
+}
+
+.debt-goal-rate-note {
+  margin-top: 14px;
+  padding: 16px;
+  display: grid;
+  gap: 5px;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background: var(--color-surface-soft);
+}
+
+.debt-goal-rate-note strong {
+  font-size: var(--font-size-ui);
+}
+
+.debt-goal-rate-note span,
+.debt-goal-rate-note p {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  line-height: 1.5;
+}
+
+.debt-goal-rate-note p {
+  margin: 4px 0 0;
+}
+
+.debt-goal-empty {
+  margin-top: 14px;
+  padding: 22px;
+  border: 1px dashed var(--color-border-strong);
+  border-radius: 13px;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  text-align: center;
+}
+
+.debt-goal-goal-list {
+  margin-top: 14px;
+  display: grid;
+  gap: 8px;
+}
+
+.debt-goal-goal-row {
+  min-height: 78px;
+  padding: 13px 14px;
+  display: grid;
+  grid-template-columns:
+    minmax(150px, 1.5fr)
+    repeat(3, minmax(115px, 1fr));
+  align-items: center;
+  gap: 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 13px;
+}
+
+.debt-goal-goal-row.overdue {
+  border-color: rgba(154, 103, 0, 0.34);
+  background: var(--color-surface-soft);
+}
+
+.debt-goal-goal-row > div {
+  display: grid;
+  gap: 4px;
+}
+
+.debt-goal-goal-row span {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-meta);
+}
+
+.debt-goal-goal-row strong {
+  font-size: var(--font-size-small);
+}
+
+.debt-goal-goal-notes {
+  margin-top: 13px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+}
+
+.debt-goal-boundary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  background: var(--color-brand-soft);
+}
+
+.debt-goal-boundary > div {
+  max-width: 800px;
+}
+
+.debt-goal-boundary p:last-child {
+  margin: 9px 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  line-height: 1.6;
+}
+
+.debt-goal-boundary > a {
+  flex: 0 0 auto;
+  min-height: 44px;
+  padding: 0 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+  border-radius: 11px;
+  background: white;
+  color: var(--color-brand);
+  font-size: var(--font-size-ui);
+  font-weight: 750;
+}
+
+@media (max-width: 1050px) {
+  .debt-goal-summary-grid,
+  .debt-goal-facts {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .debt-goal-header,
+  .debt-goal-section-heading,
+  .debt-goal-boundary {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .debt-goal-header-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .debt-goal-goal-row {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .debt-goal-summary-grid,
+  .debt-goal-facts,
+  .debt-goal-goal-row {
+    grid-template-columns: 1fr;
+  }
+
+  .debt-goal-header-actions {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .debt-goal-boundary > a {
+    width: 100%;
+  }
+}
