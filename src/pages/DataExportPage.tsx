@@ -13,12 +13,26 @@ import {
   safeExportFileName,
 } from '../export/csvExport'
 import {
+  buildBusinessPortableJson,
+  safeBusinessJsonFileName,
+} from '../export/businessPortableExport'
+import {
+  getBusinessInventoryItems,
+  getBusinessOpenItems,
+  getBusinessParties,
   getBusinessProfiles,
+  getBusinessTradeEntries,
+  getBusinessTradeLines,
   getBusinessTransactions,
   getTransactions,
 } from '../storage/db'
 import type {
+  BusinessInventoryItem,
+  BusinessOpenItem,
+  BusinessParty,
   BusinessProfile,
+  BusinessTradeEntry,
+  BusinessTradeLine,
   BusinessTransaction,
 } from '../types/business'
 import type {
@@ -33,6 +47,11 @@ import '../styles/data-export.css'
 interface BusinessExportData {
   business: BusinessProfile
   transactions: BusinessTransaction[]
+  parties: BusinessParty[]
+  openItems: BusinessOpenItem[]
+  tradeEntries: BusinessTradeEntry[]
+  tradeLines: BusinessTradeLine[]
+  inventoryItems: BusinessInventoryItem[]
 }
 
 interface ExportData {
@@ -49,6 +68,32 @@ function downloadCsv(
       [csv],
       {
         type: 'text/csv;charset=utf-8',
+      },
+    )
+
+  const objectUrl =
+    URL.createObjectURL(blob)
+
+  const anchor =
+    document.createElement('a')
+
+  anchor.href = objectUrl
+  anchor.download = fileName
+  anchor.rel = 'noopener'
+  anchor.click()
+
+  URL.revokeObjectURL(objectUrl)
+}
+
+function downloadJson(
+  json: string,
+  fileName: string,
+): void {
+  const blob =
+    new Blob(
+      [json],
+      {
+        type: 'application/json;charset=utf-8',
       },
     )
 
@@ -98,13 +143,46 @@ function DataExportPage() {
         const businesses =
           await Promise.all(
             businessProfiles.map(
-              async (business) => ({
-                business,
-                transactions:
-                  await getBusinessTransactions(
-                    business.id,
-                  ),
-              }),
+              async (business) => {
+                const [
+                  transactions,
+                  parties,
+                  openItems,
+                  tradeEntries,
+                  tradeLines,
+                  inventoryItems,
+                ] =
+                  await Promise.all([
+                    getBusinessTransactions(
+                      business.id,
+                    ),
+                    getBusinessParties(
+                      business.id,
+                    ),
+                    getBusinessOpenItems(
+                      business.id,
+                    ),
+                    getBusinessTradeEntries(
+                      business.id,
+                    ),
+                    getBusinessTradeLines(
+                      business.id,
+                    ),
+                    getBusinessInventoryItems(
+                      business.id,
+                    ),
+                  ])
+
+                return {
+                  business,
+                  transactions,
+                  parties,
+                  openItems,
+                  tradeEntries,
+                  tradeLines,
+                  inventoryItems,
+                }
+              },
             ),
           )
 
@@ -174,6 +252,43 @@ function DataExportPage() {
 
     setMessage(
       `${item.business.name} CSV prepared on this device.`,
+    )
+  }
+
+  function exportBusinessStructured(
+    item: BusinessExportData,
+  ) {
+    const json =
+      buildBusinessPortableJson(
+        {
+          business:
+            item.business,
+          cashTransactions:
+            item.transactions,
+          parties:
+            item.parties,
+          openItems:
+            item.openItems,
+          tradeEntries:
+            item.tradeEntries,
+          tradeLines:
+            item.tradeLines,
+          inventoryItems:
+            item.inventoryItems,
+        },
+        today,
+      )
+
+    downloadJson(
+      json,
+      safeBusinessJsonFileName(
+        item.business.name,
+        today,
+      ),
+    )
+
+    setMessage(
+      `${item.business.name} structured JSON prepared on this device.`,
     )
   }
 
@@ -293,6 +408,13 @@ function DataExportPage() {
               <h2>
                 Business exports
               </h2>
+
+              <p>
+                Cash CSV stays spreadsheet-friendly. Structured JSON
+                includes the complete business workspace: cash,
+                customers and suppliers, dues, sales and purchases,
+                item lines and inventory.
+              </p>
             </div>
 
             <Link to="/app/business">
@@ -324,17 +446,30 @@ function DataExportPage() {
                       </span>
                     </div>
 
-                    <button
-                      type="button"
-                      disabled={
-                        item.transactions.length === 0
-                      }
-                      onClick={() =>
-                        exportBusiness(item)
-                      }
-                    >
-                      Export CSV
-                    </button>
+                    <div>
+                      <button
+                        type="button"
+                        disabled={
+                          item.transactions.length === 0
+                        }
+                        onClick={() =>
+                          exportBusiness(item)
+                        }
+                      >
+                        Cash CSV
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          exportBusinessStructured(
+                            item,
+                          )
+                        }
+                      >
+                        Complete JSON
+                      </button>
+                    </div>
                   </article>
                 ),
               )}
@@ -385,9 +520,11 @@ function DataExportPage() {
             </strong>
 
             <p>
-              CSV is designed for portability and review. Use the
-              encrypted Money Saathi backup when you want to
-              preserve and later restore the app’s structured data.
+              CSV and JSON are designed for portability and review.
+              They are plain readable files and are not used as a
+              restore path. Use the encrypted Money Saathi backup
+              when you want to preserve and later restore the app’s
+              structured data safely.
             </p>
           </div>
 
