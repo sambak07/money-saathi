@@ -1,5 +1,5 @@
-﻿import AlertNotifier from './AlertNotifier'
-import BhutanMark from './BhutanMark'
+﻿import AlertBadge from './AlertBadge'
+import AlertNotifier from './AlertNotifier'
 import '../styles/accessibility.css'
 import type { ReactNode } from 'react'
 import {
@@ -118,6 +118,11 @@ function AppShell({ children }: AppShellProps) {
           </span>
           <span>Money Saathi</span>
         </NavLink>
+
+        <div className="sidebar-origin">
+          <strong>Made in Bhutan</strong>
+          <span>Ngultrum-first · Local-first</span>
+        </div>
 
         <p className="sidebar-label">Money</p>
 
@@ -239,7 +244,9 @@ function AppShell({ children }: AppShellProps) {
         className="app-main"
       >
         <AlertNotifier />
-        <BhutanMark />
+        <div className="app-utility-row">
+                  <AlertBadge />
+                </div>
         {children}
       </main>
 

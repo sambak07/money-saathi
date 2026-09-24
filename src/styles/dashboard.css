@@ -967,3 +967,44 @@
 .app-brand-mark + span {
   display: none;
 }
+
+/* === Money Saathi App Header Simplification === */
+
+.sidebar-origin {
+  margin: -12px 10px 12px;
+  display: grid;
+  gap: 2px;
+}
+
+.sidebar-origin strong {
+  color: var(--color-text);
+  font-size: var(--font-size-small);
+  font-weight: 760;
+}
+
+.sidebar-origin span {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-meta);
+  line-height: 1.35;
+}
+
+.app-utility-row {
+  min-height: 32px;
+  margin: 0 auto 4px;
+  width: min(100%, 1120px);
+
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.app-utility-row a,
+.app-utility-row button {
+  min-height: 32px;
+}
+
+@media (max-width: 850px) {
+  .app-utility-row {
+    margin-bottom: 2px;
+  }
+}
