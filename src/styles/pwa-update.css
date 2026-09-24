@@ -1,0 +1,65 @@
+﻿.pwa-update-banner {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 1000;
+  width: min(calc(100% - 36px), 420px);
+  padding: 15px;
+  display: grid;
+  gap: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 15px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-md);
+}
+
+.pwa-update-banner > div:first-child {
+  display: grid;
+  gap: 5px;
+}
+
+.pwa-update-banner strong {
+  font-size: 12px;
+}
+
+.pwa-update-banner span {
+  color: var(--color-text-secondary);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.pwa-update-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pwa-update-actions button {
+  min-height: 42px;
+  padding: 0 13px;
+  border: 1px solid var(--color-brand);
+  border-radius: 10px;
+  background: var(--color-brand);
+  color: white;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.pwa-update-actions button.secondary {
+  border-color: var(--color-border);
+  background: white;
+  color: var(--color-text);
+}
+
+@media (max-width: 480px) {
+  .pwa-update-banner {
+    right: 12px;
+    bottom: 12px;
+    width: calc(100% - 24px);
+  }
+
+  .pwa-update-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}

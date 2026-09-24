@@ -106,6 +106,7 @@
 
 .business-create-form input,
 .business-selector select,
+.business-rename-form input,
 .business-transaction-form input,
 .business-transaction-form select {
   min-height: 46px;
@@ -131,6 +132,40 @@
 .business-selector select {
   width: 100%;
   margin-top: 8px;
+}
+
+.business-rename-form {
+  margin-top: 12px;
+  display: grid;
+  gap: 7px;
+}
+
+.business-rename-form > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.business-rename-form label {
+  color: var(--color-text);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.business-rename-form button,
+.business-cancel-edit {
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: white;
+  color: var(--color-text);
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.business-cancel-edit {
+  margin-top: 10px;
 }
 
 .business-summary-grid {
@@ -308,7 +343,8 @@
     grid-template-columns: 1fr;
   }
 
-  .business-create-form > div {
+  .business-create-form > div,
+  .business-rename-form > div {
     grid-template-columns: 1fr;
   }
 

@@ -1,6 +1,7 @@
 ﻿import { lazy, Suspense } from 'react'
 import './styles/route-loading.css'
 import AdaptiveHomeRoute from './components/AdaptiveHomeRoute'
+import PwaUpdatePrompt from './components/PwaUpdatePrompt'
 
 
 
@@ -61,6 +62,7 @@ const LoanRemindersPage = lazy(() => import('./pages/LoanRemindersPage'))
 function App() {
   return (
     <BrowserRouter>
+      <PwaUpdatePrompt />
       <AppLockGate>
         <Suspense
         fallback={

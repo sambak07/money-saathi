@@ -15,6 +15,7 @@ import {
   deleteBusinessTransaction,
   getBusinessProfiles,
   getBusinessTransactions,
+  updateBusinessTransaction,
   upsertBusinessProfile,
 } from '../storage/db'
 import type {
@@ -23,6 +24,7 @@ import type {
   BusinessTransactionKind,
 } from '../types/business'
 import {
+  formatChetrumForInput,
   formatNu,
   getLocalToday,
 } from '../utils/money'
@@ -58,6 +60,12 @@ function BusinessPage() {
 
   const [businessName, setBusinessName] =
     useState('')
+
+  const [renameBusinessName, setRenameBusinessName] =
+    useState('')
+
+  const [editingTransaction, setEditingTransaction] =
+    useState<BusinessTransaction | null>(null)
 
   const [kind, setKind] =
     useState<BusinessTransactionKind>('income')
@@ -95,6 +103,15 @@ function BusinessPage() {
           : records[0]?.id ?? ''
 
     setSelectedBusinessId(nextId)
+
+    setRenameBusinessName(
+      records.find(
+        (item) =>
+          item.id === nextId,
+      )?.name ?? '',
+    )
+
+    setEditingTransaction(null)
   }
 
   useEffect(() => {
@@ -108,8 +125,16 @@ function BusinessPage() {
         if (!active) return
 
         setBusinesses(records)
+
+        const firstBusiness =
+          records[0] ?? null
+
         setSelectedBusinessId(
-          records[0]?.id ?? '',
+          firstBusiness?.id ?? '',
+        )
+
+        setRenameBusinessName(
+          firstBusiness?.name ?? '',
         )
       } catch {
         if (active) {
@@ -168,6 +193,7 @@ function BusinessPage() {
         item.id === selectedBusinessId,
     ) ?? null
 
+
   const summary = useMemo(
     () =>
       summarizeBusinessTransactions(
@@ -213,6 +239,87 @@ function BusinessPage() {
     }
   }
 
+  async function renameBusiness(
+    event: FormEvent<HTMLFormElement>,
+  ) {
+    event.preventDefault()
+    setMessage('')
+    setError('')
+
+    if (!selectedBusiness) {
+      return
+    }
+
+    const name =
+      renameBusinessName.trim()
+
+    if (name.length < 2) {
+      setError(
+        'Give this business a clear name.',
+      )
+      return
+    }
+
+    try {
+      await upsertBusinessProfile({
+        ...selectedBusiness,
+        name,
+        updatedAt:
+          Date.now(),
+      })
+
+      await loadBusinesses(
+        selectedBusiness.id,
+      )
+
+      setMessage(
+        'Business name updated.',
+      )
+    } catch {
+      setError(
+        'Money Saathi could not rename this business.',
+      )
+    }
+  }
+
+  function resetTransactionForm() {
+    setEditingTransaction(null)
+    setKind('income')
+    setAmount('')
+    setCategory('Sales')
+    setNote('')
+    setDate(
+      getLocalToday(),
+    )
+  }
+
+  function editTransaction(
+    transaction: BusinessTransaction,
+  ) {
+    setEditingTransaction(
+      transaction,
+    )
+    setKind(
+      transaction.kind,
+    )
+    setAmount(
+      formatChetrumForInput(
+        transaction.amountChetrum,
+      ),
+    )
+    setCategory(
+      transaction.category,
+    )
+    setNote(
+      transaction.note,
+    )
+    setDate(
+      transaction.date,
+    )
+    setMessage('')
+    setError('')
+  }
+
   async function addTransaction(
     event: FormEvent<HTMLFormElement>,
   ) {
@@ -243,22 +350,37 @@ function BusinessPage() {
     const now = Date.now()
 
     const record: BusinessTransaction = {
-      id: crypto.randomUUID(),
-      businessId: selectedBusiness.id,
+      id:
+        editingTransaction?.id ??
+        crypto.randomUUID(),
+      businessId:
+        selectedBusiness.id,
       kind,
       amountChetrum,
       category,
       note: note.trim(),
       date,
-      createdAt: now,
+      createdAt:
+        editingTransaction?.createdAt ??
+        now,
       updatedAt: now,
     }
 
     try {
-      await addBusinessTransaction(record)
+      const wasEditing =
+        editingTransaction !== null
 
-      setAmount('')
-      setNote('')
+      if (wasEditing) {
+        await updateBusinessTransaction(
+          record,
+        )
+      } else {
+        await addBusinessTransaction(
+          record,
+        )
+      }
+
+      resetTransactionForm()
 
       setTransactions(
         await getBusinessTransactions(
@@ -267,7 +389,9 @@ function BusinessPage() {
       )
 
       setMessage(
-        'Business transaction recorded.',
+        wasEditing
+          ? 'Business transaction updated.'
+          : 'Business transaction recorded.',
       )
     } catch {
       setError(
@@ -426,11 +550,25 @@ function BusinessPage() {
               <select
                 id="business-select"
                 value={selectedBusinessId}
-                onChange={(event) =>
+                onChange={(event) => {
+                  const nextId =
+                    event.target.value
+
                   setSelectedBusinessId(
-                    event.target.value,
+                    nextId,
                   )
-                }
+
+                  setRenameBusinessName(
+                    businesses.find(
+                      (business) =>
+                        business.id === nextId,
+                    )?.name ?? '',
+                  )
+
+                  setEditingTransaction(
+                    null,
+                  )
+                }}
               >
                 {businesses.map(
                   (business) => (
@@ -443,6 +581,33 @@ function BusinessPage() {
                   ),
                 )}
               </select>
+
+              <form
+                className="business-rename-form"
+                onSubmit={renameBusiness}
+              >
+                <label htmlFor="business-rename">
+                  Rename current business
+                </label>
+
+                <div>
+                  <input
+                    id="business-rename"
+                    type="text"
+                    maxLength={120}
+                    value={renameBusinessName}
+                    onChange={(event) =>
+                      setRenameBusinessName(
+                        event.target.value,
+                      )
+                    }
+                  />
+
+                  <button type="submit">
+                    Rename
+                  </button>
+                </div>
+              </form>
             </div>
           )}
         </section>
@@ -504,7 +669,21 @@ function BusinessPage() {
                   Record business money
                 </p>
 
-                <h2>Add transaction</h2>
+                <h2>
+                  {editingTransaction
+                    ? 'Edit transaction'
+                    : 'Add transaction'}
+                </h2>
+
+                {editingTransaction && (
+                  <button
+                    type="button"
+                    className="business-cancel-edit"
+                    onClick={resetTransactionForm}
+                  >
+                    Cancel edit
+                  </button>
+                )}
 
                 <form
                   className="business-transaction-form"
@@ -616,7 +795,9 @@ function BusinessPage() {
                   </label>
 
                   <button type="submit">
-                    Save business transaction
+                    {editingTransaction
+                      ? 'Update business transaction'
+                      : 'Save business transaction'}
                   </button>
                 </form>
               </article>
@@ -684,6 +865,18 @@ function BusinessPage() {
                                 transaction.amountChetrum,
                               )}
                             </strong>
+
+                            <button
+                              type="button"
+                              aria-label={`Edit ${transaction.category} transaction`}
+                              onClick={() =>
+                                editTransaction(
+                                  transaction,
+                                )
+                              }
+                            >
+                              Edit
+                            </button>
 
                             <button
                               type="button"

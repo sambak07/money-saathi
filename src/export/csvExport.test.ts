@@ -98,6 +98,15 @@ describe('CSV data export', () => {
     ).toBe(
       "'@command",
     )
+
+    expect(
+      escapeCsvCell(
+        '\t=SUM(A1:A2)',
+        true,
+      ),
+    ).toBe(
+      "'\t=SUM(A1:A2)",
+    )
   })
 
   it('exports personal transactions with a UTF-8 BOM', () => {

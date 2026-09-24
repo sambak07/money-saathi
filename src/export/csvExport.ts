@@ -43,7 +43,24 @@ export function chetrumToNuText(
 function protectSpreadsheetText(
   value: string,
 ): string {
-  if (/^[=+\-@]/.test(value)) {
+  let index = 0
+
+  while (
+    index < value.length &&
+    value.charCodeAt(index) <= 0x20
+  ) {
+    index += 1
+  }
+
+  const firstVisible =
+    value[index] ?? ''
+
+  if (
+    firstVisible === '=' ||
+    firstVisible === '+' ||
+    firstVisible === '-' ||
+    firstVisible === '@'
+  ) {
     return `'${value}`
   }
 

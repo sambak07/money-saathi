@@ -945,6 +945,27 @@ export async function addBusinessTransaction(
   }
 }
 
+export async function updateBusinessTransaction(
+  record: BusinessTransaction,
+): Promise<void> {
+  const database = await openDatabase()
+
+  try {
+    const transaction = database.transaction(
+      BUSINESS_TRANSACTION_STORE,
+      'readwrite',
+    )
+
+    transaction
+      .objectStore(BUSINESS_TRANSACTION_STORE)
+      .put(record)
+
+    await waitForTransaction(transaction)
+  } finally {
+    database.close()
+  }
+}
+
 export async function deleteBusinessTransaction(
   id: string,
 ): Promise<void> {
