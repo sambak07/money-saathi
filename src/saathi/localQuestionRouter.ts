@@ -3,6 +3,9 @@
   | 'attention'
   | 'month-change'
   | 'debt'
+  | 'saving-guidance'
+  | 'spending-control'
+  | 'salary-plan'
   | 'learn'
   | 'unknown'
 
@@ -206,10 +209,65 @@ export function routeLocalSaathiQuestion(
     /\bloan burden\b/i.test(question) ||
     /\boutstanding loan\b/i.test(question) ||
     /\bhow much.*loan\b/i.test(question) ||
-    /\bemi burden\b/i.test(question)
+    /\bemi burden\b/i.test(question) ||
+    /\breduce.*debt\b/i.test(question) ||
+    /\bpay off.*loan\b/i.test(question) ||
+    /\brepay.*loan\b/i.test(question)
   ) {
     return {
       intent: 'debt',
+      amountNu: null,
+      learningTopic: null,
+      confidence: 'high',
+    }
+  }
+
+  if (
+    /\bhow.*sav(?:e|ing)\b/i.test(question) ||
+    /\bhelp me save\b/i.test(question) ||
+    /\bstart saving\b/i.test(question) ||
+    /\bsave more\b/i.test(question) ||
+    /\bgood saving\b/i.test(question) ||
+    /\bmake.*saving\b/i.test(question) ||
+    /\bhow much.*save\b/i.test(question) ||
+    /\bi want to save\b/i.test(question)
+  ) {
+    return {
+      intent: 'saving-guidance',
+      amountNu: null,
+      learningTopic: null,
+      confidence: 'high',
+    }
+  }
+
+  if (
+    /\bcontrol.*spend/i.test(question) ||
+    /\breduce.*spend/i.test(question) ||
+    /\bspend less\b/i.test(question) ||
+    /\bexpenses?.*high\b/i.test(question) ||
+    /\bhigh.*expenses?\b/i.test(question) ||
+    /\bno money left\b/i.test(question) ||
+    /\bmoney.*finish/i.test(question) ||
+    /\bcut.*expenses?\b/i.test(question)
+  ) {
+    return {
+      intent: 'spending-control',
+      amountNu: null,
+      learningTopic: null,
+      confidence: 'high',
+    }
+  }
+
+  if (
+    /\bmanage.*salary\b/i.test(question) ||
+    /\bsalary.*manage\b/i.test(question) ||
+    /\bplan.*salary\b/i.test(question) ||
+    /\bsalary.*plan\b/i.test(question) ||
+    /\bsalary.*finish/i.test(question) ||
+    /\bsalary.*not enough\b/i.test(question)
+  ) {
+    return {
+      intent: 'salary-plan',
       amountNu: null,
       learningTopic: null,
       confidence: 'high',

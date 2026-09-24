@@ -74,6 +74,8 @@ interface FloatingMessage {
 
 interface FloatingView {
   safeToSpendChetrum: number
+  safetyBufferChetrum: number
+  transactionCount: number
   attention: ReturnType<
     typeof buildAttentionItems
   >
@@ -311,6 +313,10 @@ function SaathiFloatingAssistant() {
         return {
           safeToSpendChetrum:
             safe.safeToSpendChetrum,
+          safetyBufferChetrum:
+            safe.safetyBufferChetrum,
+          transactionCount:
+            recordedTransactions.length,
           attention:
             buildAttentionItems({
               safeToSpendChetrum:
@@ -523,6 +529,78 @@ function SaathiFloatingAssistant() {
       addMessage(
         'saathi',
         `You have ${view.debt.loanCount} recorded loan${view.debt.loanCount === 1 ? '' : 's'}. Outstanding principal is ${formatNu(view.debt.outstandingPrincipalChetrum)} and recorded monthly EMIs total ${formatNu(view.debt.monthlyEmiChetrum)}. Savings Account balances recorded in Money Saathi total ${formatNu(view.debt.liquidSavingsChetrum)}. This is not full net worth.`,
+      )
+
+      return
+    }
+
+    if (
+      routed.intent ===
+      'saving-guidance'
+    ) {
+      if (
+        view.transactionCount ===
+        0
+      ) {
+        addMessage(
+          'saathi',
+          'A good first step is to record your real income and expenses. Once Money Saathi has some activity, I can show what is coming out, what is safe to use and what saving amount may be realistic. Start small and protect essentials first rather than forcing a fixed percentage.',
+        )
+
+        return
+      }
+
+      addMessage(
+        'saathi',
+        `This month you have recorded ${formatNu(view.months.current.incomeChetrum)} coming in and ${formatNu(view.months.current.expenseChetrum)} going out. Current Safe to Spend is ${formatNu(view.safeToSpendChetrum)} and recorded Savings Account balances are ${formatNu(view.debt.liquidSavingsChetrum)}. Protect essentials, known commitments and your safety buffer first; then choose a saving amount you can repeat consistently.`,
+      )
+
+      return
+    }
+
+    if (
+      routed.intent ===
+      'spending-control'
+    ) {
+      if (
+        view.transactionCount ===
+        0
+      ) {
+        addMessage(
+          'saathi',
+          'Start by recording actual expenses for a few days. Without real transactions, I should not guess where your money is going. Once you have records, review repeated flexible spending before cutting essentials.',
+        )
+
+        return
+      }
+
+      addMessage(
+        'saathi',
+        `This month you have recorded ${formatNu(view.months.current.expenseChetrum)} of expenses against ${formatNu(view.months.current.incomeChetrum)} of income. Review repeated flexible spending first, while protecting essentials and known commitments. I will not assume every expense can or should be reduced.`,
+      )
+
+      return
+    }
+
+    if (
+      routed.intent ===
+      'salary-plan'
+    ) {
+      if (
+        view.months.current.incomeChetrum ===
+        0
+      ) {
+        addMessage(
+          'saathi',
+          'Record your salary as income and add your regular commitments first. Then I can separate what is already committed from what may be safe to use. I will not build a plan from an assumed salary amount.',
+        )
+
+        return
+      }
+
+      addMessage(
+        'saathi',
+        `Recorded income this month is ${formatNu(view.months.current.incomeChetrum)}, recorded expenses are ${formatNu(view.months.current.expenseChetrum)}, and current Safe to Spend is ${formatNu(view.safeToSpendChetrum)}. A practical order is essentials, known commitments, safety buffer, then flexible spending and repeatable saving.`,
       )
 
       return

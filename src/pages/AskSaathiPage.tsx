@@ -133,6 +133,12 @@ function AskSaathiPage() {
       null,
     )
 
+  const [
+    localGuidance,
+    setLocalGuidance,
+  ] =
+    useState('')
+
   useEffect(() => {
     let active = true
 
@@ -281,6 +287,7 @@ function AskSaathiPage() {
       )
 
     setLearningTopic(null)
+    setLocalGuidance('')
 
     if (
       routed.intent ===
@@ -350,6 +357,79 @@ function AskSaathiPage() {
       setLocalMessage(
         'I understood this as a debt question and opened the recorded debt snapshot.',
       )
+
+      return
+    }
+
+    if (
+      routed.intent ===
+      'saving-guidance'
+    ) {
+      setLocalMessage(
+        'I understood this as a saving question.',
+      )
+
+      if (
+        !view ||
+        !data ||
+        view.recordedTransactions.length === 0
+      ) {
+        setLocalGuidance(
+          'A good first step is to record your real income and expenses. Once Money Saathi has some activity, Saathi can show what is coming out, what is safe to use and what saving amount may be realistic. Start small and protect essentials first rather than forcing a fixed percentage.',
+        )
+      } else {
+        setLocalGuidance(
+          `This month you have recorded ${formatNu(view.months.current.incomeChetrum)} coming in and ${formatNu(view.months.current.expenseChetrum)} going out. Current Safe to Spend is ${formatNu(view.safe.safeToSpendChetrum)} and recorded Savings Account balances are ${formatNu(view.debt.liquidSavingsChetrum)}. Protect essentials, known commitments and your safety buffer first; then choose a saving amount you can repeat consistently.`,
+        )
+      }
+
+      return
+    }
+
+    if (
+      routed.intent ===
+      'spending-control'
+    ) {
+      setLocalMessage(
+        'I understood this as a spending-control question.',
+      )
+
+      if (
+        !view ||
+        view.recordedTransactions.length === 0
+      ) {
+        setLocalGuidance(
+          'Start by recording actual expenses for a few days. Without real transactions, Saathi should not guess where your money is going. Once you have records, review repeated flexible spending before cutting essentials.',
+        )
+      } else {
+        setLocalGuidance(
+          `This month you have recorded ${formatNu(view.months.current.expenseChetrum)} of expenses against ${formatNu(view.months.current.incomeChetrum)} of income. Review repeated flexible spending first, while protecting essentials and commitments. Money Saathi will not assume every expense can or should be reduced.`,
+        )
+      }
+
+      return
+    }
+
+    if (
+      routed.intent ===
+      'salary-plan'
+    ) {
+      setLocalMessage(
+        'I understood this as a salary-management question.',
+      )
+
+      if (
+        !view ||
+        view.months.current.incomeChetrum === 0
+      ) {
+        setLocalGuidance(
+          'Record your salary as income and add your regular commitments first. Then Money Saathi can separate what is already committed from what may be safe to use. Avoid building a plan from an assumed salary amount.',
+        )
+      } else {
+        setLocalGuidance(
+          `Recorded income this month is ${formatNu(view.months.current.incomeChetrum)}, recorded expenses are ${formatNu(view.months.current.expenseChetrum)}, and current Safe to Spend is ${formatNu(view.safe.safeToSpendChetrum)}. A practical order is essentials, known commitments, safety buffer, then flexible spending and repeatable saving.`,
+        )
+      }
 
       return
     }
@@ -489,6 +569,7 @@ function AskSaathiPage() {
                 )
                 setLocalMessage('')
                 setLearningTopic(null)
+                setLocalGuidance('')
               }}
               onKeyDown={(event) => {
                 if (
@@ -570,6 +651,18 @@ function AskSaathiPage() {
                     learningTopic
                   ].answer
                 }
+              </p>
+            </div>
+          )}
+
+          {localGuidance && (
+            <div className="ask-saathi-learning-answer">
+              <strong>
+                Saathi
+              </strong>
+
+              <p>
+                {localGuidance}
               </p>
             </div>
           )}
