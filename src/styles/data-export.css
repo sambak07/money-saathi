@@ -94,6 +94,13 @@
   font-size: var(--font-size-meta);
 }
 
+.data-export-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
 .data-export-primary button,
 .data-export-businesses button {
   min-height: 42px;
@@ -232,6 +239,15 @@
   .data-export-backup {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .data-export-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .data-export-actions button {
+    min-height: 44px;
   }
 
   .data-export-explainer {

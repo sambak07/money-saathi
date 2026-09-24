@@ -17,6 +17,11 @@ import {
   safeBusinessJsonFileName,
 } from '../export/businessPortableExport'
 import {
+  buildPersonalPortableJson,
+  safePersonalJsonFileName,
+} from '../export/personalPortableExport'
+import {
+  exportDatabaseSnapshot,
   getBusinessInventoryItems,
   getBusinessOpenItems,
   getBusinessParties,
@@ -25,6 +30,7 @@ import {
   getBusinessTradeLines,
   getBusinessTransactions,
   getTransactions,
+  type MoneySaathiDatabaseSnapshot,
 } from '../storage/db'
 import type {
   BusinessInventoryItem,
@@ -56,6 +62,7 @@ interface BusinessExportData {
 
 interface ExportData {
   personalTransactions: MoneyTransaction[]
+  personalSnapshot: MoneySaathiDatabaseSnapshot
   businesses: BusinessExportData[]
 }
 
@@ -135,9 +142,11 @@ function DataExportPage() {
         const [
           personalTransactions,
           businessProfiles,
+          personalSnapshot,
         ] = await Promise.all([
           getTransactions(),
           getBusinessProfiles(),
+          exportDatabaseSnapshot(),
         ])
 
         const businesses =
@@ -190,6 +199,7 @@ function DataExportPage() {
 
         setData({
           personalTransactions,
+          personalSnapshot,
           businesses,
         })
       } catch {
@@ -230,6 +240,27 @@ function DataExportPage() {
 
     setMessage(
       'Personal transaction CSV prepared on this device.',
+    )
+  }
+
+  function exportPersonalStructured() {
+    if (!data) return
+
+    const json =
+      buildPersonalPortableJson(
+        data.personalSnapshot,
+        today,
+      )
+
+    downloadJson(
+      json,
+      safePersonalJsonFileName(
+        today,
+      ),
+    )
+
+    setMessage(
+      'Complete personal JSON prepared on this device.',
     )
   }
 
@@ -358,9 +389,9 @@ function DataExportPage() {
           </strong>
 
           <span>
-            They are useful for your own spreadsheet, review or
-            accountant, but they are not encrypted like a
-            Money Saathi backup. Store and share them carefully.
+            CSV and JSON exports are useful for your own review,
+            spreadsheet or accountant, but they are not encrypted
+            like a Money Saathi backup. Store and share them carefully.
           </span>
         </section>
 
@@ -375,8 +406,10 @@ function DataExportPage() {
             </h2>
 
             <p>
-              Exports date, income/expense type, exact Nu. amount,
-              category, note and recurring-record references.
+              CSV exports transaction history for spreadsheets.
+              Complete personal JSON also includes budgets, regular
+              money, goals, savings, deposits, loans and financial
+              schemes.
             </p>
 
             <span>
@@ -387,15 +420,26 @@ function DataExportPage() {
             </span>
           </div>
 
-          <button
-            type="button"
-            onClick={exportPersonal}
-            disabled={
-              data.personalTransactions.length === 0
-            }
-          >
-            Export personal CSV
-          </button>
+          <div className="data-export-actions">
+            <button
+              type="button"
+              onClick={exportPersonal}
+              disabled={
+                data.personalTransactions.length === 0
+              }
+            >
+              Transactions CSV
+            </button>
+
+            <button
+              type="button"
+              onClick={
+                exportPersonalStructured
+              }
+            >
+              Complete personal JSON
+            </button>
+          </div>
         </section>
 
         <section className="data-export-section">
