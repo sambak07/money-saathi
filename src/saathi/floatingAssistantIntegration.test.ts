@@ -43,11 +43,11 @@ describe('persistent Saathi assistant integration', () => {
 
   it('is explicitly local-only and excludes Money Vault from its answers', () => {
     expect(assistant).toContain(
-      'Everything here runs locally.',
+      'Everything stays on this device.',
     )
 
     expect(assistant).toContain(
-      'Money Vault stays private',
+      'Local only · Vault stays private',
     )
 
     expect(assistant).not.toContain(
@@ -83,13 +83,13 @@ describe('persistent Saathi assistant integration', () => {
     )
 
     expect(css).toContain(
-      'bottom: 154px;',
+      'bottom: 96px;',
     )
   })
 
   it('has accessible open, close and keyboard escape controls', () => {
     expect(assistant).toContain(
-      'aria-expanded={open}',
+      'aria-expanded={false}',
     )
 
     expect(assistant).toContain(

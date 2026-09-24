@@ -131,7 +131,7 @@ function SaathiFloatingAssistant() {
           id: 1,
           role: 'saathi',
           text:
-            'Ask me about spending, what needs attention, month-to-month changes, debt or a money concept. Everything here runs locally.',
+            'Ask about spending, debt, monthly changes or money basics. Everything stays on this device.',
         },
       ],
     )
@@ -672,7 +672,7 @@ function SaathiFloatingAssistant() {
 
           <footer className="saathi-floating-footer">
             <span>
-              Local only · Money Vault stays private
+              Local only · Vault stays private
             </span>
 
             <Link to="/app/saathi/ask">
@@ -682,48 +682,37 @@ function SaathiFloatingAssistant() {
         </section>
       )}
 
-      <button
-        type="button"
-        className={
-          open
-            ? 'saathi-floating-launcher open'
-            : 'saathi-floating-launcher'
-        }
-        aria-expanded={open}
-        aria-controls="saathi-floating-panel"
-        aria-label={
-          open
-            ? 'Hide Saathi'
-            : 'Ask Saathi'
-        }
-        onClick={() => {
-          if (open) {
-            setOpen(false)
-            return
-          }
-
-          setLoading(true)
-          setLoadError('')
-          setOpen(true)
-        }}
-      >
-        <span
-          className="saathi-floating-mark"
-          aria-hidden="true"
+      {!open && (
+        <button
+          type="button"
+          className="saathi-floating-launcher"
+          aria-expanded={false}
+          aria-controls="saathi-floating-panel"
+          aria-label="Ask Saathi"
+          onClick={() => {
+            setLoading(true)
+            setLoadError('')
+            setOpen(true)
+          }}
         >
-          S
-        </span>
+          <span
+            className="saathi-floating-mark"
+            aria-hidden="true"
+          >
+            S
+          </span>
 
-        <span className="saathi-floating-label">
-          <strong>
-            Saathi
-          </strong>
+          <span className="saathi-floating-label">
+            <strong>
+              Saathi
+            </strong>
 
-          <small>
-            Ask
-          </small>
-        </span>
-      </button>
+            <small>
+              Ask
+            </small>
+          </span>
+        </button>
+      )}
     </>
   )
 }
