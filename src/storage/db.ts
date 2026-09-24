@@ -1109,16 +1109,73 @@ export async function deleteBusinessParty(
   const database = await openDatabase()
 
   try {
-    const transaction = database.transaction(
-      BUSINESS_PARTY_STORE,
-      'readwrite',
+    const readTransaction =
+      database.transaction(
+        BUSINESS_OPEN_ITEM_STORE,
+        'readonly',
+      )
+
+    const keysRequest =
+      readTransaction
+        .objectStore(
+          BUSINESS_OPEN_ITEM_STORE,
+        )
+        .index('partyId')
+        .getAllKeys(id)
+
+    const openItemKeys =
+      await new Promise<IDBValidKey[]>(
+        (resolve, reject) => {
+          keysRequest.onsuccess = () =>
+            resolve(
+              keysRequest.result,
+            )
+
+          keysRequest.onerror = () =>
+            reject(
+              keysRequest.error ??
+                new Error(
+                  'Could not find business party credit records',
+                ),
+            )
+        },
+      )
+
+    await waitForTransaction(
+      readTransaction,
     )
 
-    transaction
-      .objectStore(BUSINESS_PARTY_STORE)
+    const writeTransaction =
+      database.transaction(
+        [
+          BUSINESS_PARTY_STORE,
+          BUSINESS_OPEN_ITEM_STORE,
+        ],
+        'readwrite',
+      )
+
+    writeTransaction
+      .objectStore(
+        BUSINESS_PARTY_STORE,
+      )
       .delete(id)
 
-    await waitForTransaction(transaction)
+    const openItemStore =
+      writeTransaction.objectStore(
+        BUSINESS_OPEN_ITEM_STORE,
+      )
+
+    for (
+      const key of openItemKeys
+    ) {
+      openItemStore.delete(
+        key,
+      )
+    }
+
+    await waitForTransaction(
+      writeTransaction,
+    )
   } finally {
     database.close()
   }

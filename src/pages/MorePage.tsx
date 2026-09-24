@@ -123,6 +123,11 @@ const groups: MoreGroup[] = [
         label: 'Business',
         description: 'Keep business money separate from personal money.',
       },
+      {
+        to: '/app/business/credit',
+        label: 'Customers & dues',
+        description: 'Track customers, suppliers, receivables and payables for a business.',
+      },
     ],
   },
   {

@@ -480,9 +480,15 @@ function BusinessPage() {
             </p>
           </div>
 
-          <Link to="/app">
-            Personal Home
-          </Link>
+          <div className="business-header-actions">
+            <Link to="/app/business/credit">
+              Customers & dues
+            </Link>
+
+            <Link to="/app">
+              Personal Home
+            </Link>
+          </div>
         </header>
 
         {message && (
