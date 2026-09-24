@@ -529,6 +529,10 @@ function SimpleBusinessHomePage() {
                   This is not net profit. Rent, wages, transport,
                   utilities and other business expenses are separate.
                 </small>
+
+                <Link to="/app/business/reports">
+                  View monthly report
+                </Link>
               </article>
 
               <article className="simple-business-stock-card">
