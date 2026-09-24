@@ -17,12 +17,17 @@ import {
   type LocalLearningTopic,
 } from '../saathi/localQuestionRouter'
 import {
+  answerSaathiPlanningQuestion,
+} from '../saathi/planningAnswers'
+import {
   buildAttentionItems,
   buildDebtSnapshot,
   compareRecordedMonths,
   assessAffordability,
 } from '../saathi/saathiTools'
 import {
+  getGoalContributions,
+  getGoals,
   getLoans,
   getRegularMoney,
   getSavingsAccounts,
@@ -63,6 +68,12 @@ interface AskData {
   >
   loans: Awaited<
     ReturnType<typeof getLoans>
+  >
+  goals: Awaited<
+    ReturnType<typeof getGoals>
+  >
+  goalContributions: Awaited<
+    ReturnType<typeof getGoalContributions>
   >
 }
 
@@ -149,12 +160,16 @@ function AskSaathiPage() {
           regularMoney,
           savingsAccounts,
           loans,
+          goals,
+          goalContributions,
         ] =
           await Promise.all([
             getTransactions(),
             getRegularMoney(),
             getSavingsAccounts(),
             getLoans(),
+            getGoals(),
+            getGoalContributions(),
           ])
 
         if (!active) {
@@ -166,6 +181,8 @@ function AskSaathiPage() {
           regularMoney,
           savingsAccounts,
           loans,
+          goals,
+          goalContributions,
         })
       } catch {
         if (active) {
@@ -362,6 +379,54 @@ function AskSaathiPage() {
     }
 
     if (
+      (
+        routed.intent ===
+          'month-plan' ||
+        routed.intent ===
+          'cash-flow-forecast' ||
+        routed.intent ===
+          'goal-plan'
+      ) &&
+      data
+    ) {
+      setLocalMessage(
+        routed.intent ===
+          'month-plan'
+          ? 'I understood this as a monthly planning question.'
+          : routed.intent ===
+              'cash-flow-forecast'
+            ? 'I understood this as a forward cash-flow question.'
+            : 'I understood this as a goal-progress question.',
+      )
+
+      setLocalGuidance(
+        answerSaathiPlanningQuestion(
+          routed.intent,
+          question,
+          {
+            today,
+            safetyBufferChetrum:
+              preferences.safetyBufferChetrum,
+            transactions:
+              data.transactions,
+            regularMoney:
+              data.regularMoney,
+            savingsAccounts:
+              data.savingsAccounts,
+            loans:
+              data.loans,
+            goals:
+              data.goals,
+            goalContributions:
+              data.goalContributions,
+          },
+        ),
+      )
+
+      return
+    }
+
+    if (
       routed.intent ===
       'saving-guidance'
     ) {
@@ -451,7 +516,7 @@ function AskSaathiPage() {
     }
 
     setLocalMessage(
-      'I could not safely match that question yet. Try asking about spending an amount, what needs attention, what changed this month, debt, EMI, interest, budget, safety buffer, FD, insurance or digital-money safety.',
+      'I could not safely match that question yet. Try asking about spending an amount, how this month looks, a 30/60/90-day forecast, goal progress, what needs attention, what changed this month, debt, EMI, interest, budget, safety buffer, FD, insurance or digital-money safety.',
     )
   }
 
@@ -612,6 +677,28 @@ function AskSaathiPage() {
               }
             >
               Why did I spend more?
+            </button>
+
+            <button
+              type="button"
+              onClick={() =>
+                setQuestion(
+                  'How is my month looking?',
+                )
+              }
+            >
+              How is my month looking?
+            </button>
+
+            <button
+              type="button"
+              onClick={() =>
+                setQuestion(
+                  'What does my next 90 days look like?',
+                )
+              }
+            >
+              Next 90 days
             </button>
 
             <button

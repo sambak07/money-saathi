@@ -23,6 +23,69 @@ export function getSaathiSuggestions(
 ): SaathiSuggestion[] {
   if (
     pathname.startsWith(
+      '/app/month',
+    )
+  ) {
+    return [
+      {
+        label: 'How is my month looking?',
+        question: 'How is my month looking?',
+      },
+      {
+        label: 'What does my next 90 days look like?',
+        question: 'What does my next 90 days look like?',
+      },
+      {
+        label: 'What needs attention?',
+        question: 'What needs attention?',
+      },
+    ]
+  }
+
+  if (
+    pathname.startsWith(
+      '/app/forecast',
+    )
+  ) {
+    return [
+      {
+        label: 'Next 30 days',
+        question: 'What does my next 30 days look like?',
+      },
+      {
+        label: 'Next 60 days',
+        question: 'What does my next 60 days look like?',
+      },
+      {
+        label: 'Next 90 days',
+        question: 'What does my next 90 days look like?',
+      },
+    ]
+  }
+
+  if (
+    pathname.startsWith(
+      '/app/debt-goals',
+    )
+  ) {
+    return [
+      {
+        label: 'Am I on track for my goals?',
+        question: 'Am I on track for my goals?',
+      },
+      {
+        label: 'How much debt do I have?',
+        question: 'How much outstanding loan do I have?',
+      },
+      {
+        label: 'How is my month looking?',
+        question: 'How is my month looking?',
+      },
+    ]
+  }
+
+  if (
+    pathname.startsWith(
       '/app/transactions',
     )
   ) {

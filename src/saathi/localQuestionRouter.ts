@@ -2,6 +2,9 @@
   | 'affordability'
   | 'attention'
   | 'month-change'
+  | 'month-plan'
+  | 'cash-flow-forecast'
+  | 'goal-plan'
   | 'debt'
   | 'saving-guidance'
   | 'spending-control'
@@ -198,6 +201,51 @@ export function routeLocalSaathiQuestion(
   ) {
     return {
       intent: 'month-change',
+      amountNu: null,
+      learningTopic: null,
+      confidence: 'high',
+    }
+  }
+
+  if (
+    /\bcash[- ]?flow forecast\b/i.test(question) ||
+    /\bforecast\b/i.test(question) ||
+    /\bnext (?:30|60|90) days\b/i.test(question) ||
+    /\b(?:30|60|90)[- ]day\b/i.test(question) ||
+    /\bwhat.*next (?:30|60|90) days\b/i.test(question)
+  ) {
+    return {
+      intent: 'cash-flow-forecast',
+      amountNu: null,
+      learningTopic: null,
+      confidence: 'high',
+    }
+  }
+
+  if (
+    /\bhow is my month\b/i.test(question) ||
+    /\bhow does my month look\b/i.test(question) ||
+    /\bmonth plan\b/i.test(question) ||
+    /\bmonthly plan\b/i.test(question) ||
+    /\bmonth looking\b/i.test(question)
+  ) {
+    return {
+      intent: 'month-plan',
+      amountNu: null,
+      learningTopic: null,
+      confidence: 'high',
+    }
+  }
+
+  if (
+    /\bgoals?\s+progress\b/i.test(question) ||
+    /\bgoals?.*on track\b/i.test(question) ||
+    /\bon track.*goals?\b/i.test(question) ||
+    /\bhow much.*goals?.*month\b/i.test(question) ||
+    /\bmonthly.*goals?\b/i.test(question)
+  ) {
+    return {
+      intent: 'goal-plan',
       amountNu: null,
       learningTopic: null,
       confidence: 'high',

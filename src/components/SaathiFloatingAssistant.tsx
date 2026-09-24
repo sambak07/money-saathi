@@ -14,6 +14,9 @@ import {
   routeLocalSaathiQuestion,
 } from '../saathi/localQuestionRouter'
 import {
+  answerSaathiPlanningQuestion,
+} from '../saathi/planningAnswers'
+import {
   getSaathiSuggestions,
 } from '../saathi/contextualSuggestions'
 import {
@@ -23,6 +26,8 @@ import {
   compareRecordedMonths,
 } from '../saathi/saathiTools'
 import {
+  getGoalContributions,
+  getGoals,
   getLoans,
   getRegularMoney,
   getSavingsAccounts,
@@ -63,6 +68,12 @@ interface FloatingData {
   >
   loans: Awaited<
     ReturnType<typeof getLoans>
+  >
+  goals: Awaited<
+    ReturnType<typeof getGoals>
+  >
+  goalContributions: Awaited<
+    ReturnType<typeof getGoalContributions>
   >
 }
 
@@ -169,12 +180,16 @@ function SaathiFloatingAssistant() {
           regularMoney,
           savingsAccounts,
           loans,
+          goals,
+          goalContributions,
         ] =
           await Promise.all([
             getTransactions(),
             getRegularMoney(),
             getSavingsAccounts(),
             getLoans(),
+            getGoals(),
+            getGoalContributions(),
           ])
 
         if (!active) {
@@ -186,6 +201,8 @@ function SaathiFloatingAssistant() {
           regularMoney,
           savingsAccounts,
           loans,
+          goals,
+          goalContributions,
         })
 
         setLoadError('')
@@ -410,12 +427,51 @@ function SaathiFloatingAssistant() {
 
     if (
       loading ||
-      !view
+      !view ||
+      !data
     ) {
       addMessage(
         'saathi',
         loadError ||
           'I am still reading the local records needed for that question. Try again in a moment.',
+      )
+
+      return
+    }
+
+    if (
+      routed.intent ===
+        'month-plan' ||
+      routed.intent ===
+        'cash-flow-forecast' ||
+      routed.intent ===
+        'goal-plan'
+    ) {
+      addMessage(
+        'saathi',
+        answerSaathiPlanningQuestion(
+          routed.intent,
+          trimmed,
+          {
+            today:
+              getLocalToday(),
+            safetyBufferChetrum:
+              getPreferences()
+                .safetyBufferChetrum,
+            transactions:
+              data.transactions,
+            regularMoney:
+              data.regularMoney,
+            savingsAccounts:
+              data.savingsAccounts,
+            loans:
+              data.loans,
+            goals:
+              data.goals,
+            goalContributions:
+              data.goalContributions,
+          },
+        ),
       )
 
       return
@@ -608,7 +664,7 @@ function SaathiFloatingAssistant() {
 
     addMessage(
       'saathi',
-      'I could not safely match that question yet. Try asking about spending an amount, what needs attention, what changed this month, debt, EMI, interest, budget, safety buffer, fixed deposits, insurance or digital-money safety.',
+      'I could not safely match that question yet. Try asking about spending an amount, how this month looks, a 30/60/90-day forecast, goal progress, what needs attention, what changed this month, debt, EMI, interest, budget, safety buffer, fixed deposits, insurance or digital-money safety.',
     )
   }
 
