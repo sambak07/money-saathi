@@ -201,7 +201,7 @@ function SimpleHomePage() {
 
   return (
     <AppShell>
-      <div className="dashboard-container simple-home">
+      <div className="dashboard-container simple-home simple-home-focused">
         <header className="simple-home-header">
           <div>
             <p className="dashboard-eyebrow">
@@ -215,8 +215,8 @@ function SimpleHomePage() {
             </h1>
 
             <p>
-              See what you can use, what came in and what went
-              out. Nothing complicated.
+              See what is safe to use, how this month is going
+              and what happened recently.
             </p>
           </div>
 
@@ -235,17 +235,15 @@ function SimpleHomePage() {
           </strong>
 
           <p>
-            This is your recorded balance after upcoming
-            commitments and the safety buffer you chose.
+            Your recorded balance after upcoming commitments
+            and the safety buffer you chose.
           </p>
 
           <div className="simple-safe-facts">
             <span>
-              Recorded balance{' '}
+              Recorded{' '}
               <strong>
-                {formatNu(
-                  view.balance,
-                )}
+                {formatNu(view.balance)}
               </strong>
             </span>
 
@@ -277,7 +275,7 @@ function SimpleHomePage() {
 
         <section className="simple-month-grid">
           <article>
-            <span>Came in this month</span>
+            <span>Came in</span>
             <strong className="income-text">
               {formatNu(
                 view.monthSummary.incomeChetrum,
@@ -286,7 +284,7 @@ function SimpleHomePage() {
           </article>
 
           <article>
-            <span>Went out this month</span>
+            <span>Went out</span>
             <strong>
               {formatNu(
                 view.monthSummary.expenseChetrum,
@@ -310,7 +308,10 @@ function SimpleHomePage() {
           </article>
         </section>
 
-        <section className="simple-actions">
+        <nav
+          className="simple-actions"
+          aria-label="Simple Home actions"
+        >
           <Link
             to="/app/transactions/new"
             className="simple-primary-action"
@@ -318,39 +319,22 @@ function SimpleHomePage() {
             + Add money
           </Link>
 
+          <Link to="/app/transactions">
+            Transactions
+          </Link>
+
           <Link to="/app/upcoming">
-            What is coming?
-          </Link>
-          <Link to="/app/calendar">
-            Money calendar
-          </Link>
-          <Link to="/app/alerts">
-            Alerts
-          </Link>
-          <Link to="/app/loan-reminders">
-            Loan reminders
-          </Link>
-          <Link to="/app/financial-safety">
-            My safety
-          </Link>
-          <Link to="/app/irregular-income">
-            Income rhythm
-          </Link>
-          <Link to="/app/explain">
-            Explain my money
-          </Link>
-          <Link to="/app/data-export">
-            Export data
+            Upcoming
           </Link>
 
           <Link to="/app/goals">
-            My goals
+            Goals
           </Link>
 
-          <Link to="/app/transactions">
-            All activity
+          <Link to="/app/more">
+            More
           </Link>
-        </section>
+        </nav>
 
         {view.firstGoal && (
           <section className="simple-goal-card">
@@ -364,19 +348,13 @@ function SimpleHomePage() {
               </h2>
 
               <p>
-                You have recorded{' '}
-                <strong>
-                  {formatNu(
-                    view.firstGoalSaved,
-                  )}
-                </strong>
-                {' '}toward a target of{' '}
-                <strong>
-                  {formatNu(
-                    view.firstGoal.targetChetrum,
-                  )}
-                </strong>
-                .
+                {formatNu(
+                  view.firstGoalSaved,
+                )}{' '}
+                saved toward{' '}
+                {formatNu(
+                  view.firstGoal.targetChetrum,
+                )}.
               </p>
             </div>
 
@@ -449,18 +427,17 @@ function SimpleHomePage() {
         <section className="simple-home-footer">
           <div>
             <strong>
-              Want more detail?
+              Need another tool?
             </strong>
 
             <p>
-              Full Home includes budgets, loans, assets,
-              schemes, reports and more. Your data is the same
-              in both views.
+              Budget, Regular Money, My Money, reports, privacy
+              and data tools are kept under More.
             </p>
           </div>
 
-          <Link to="/app/setup">
-            Choose Full Home
+          <Link to="/app/more">
+            Open More
           </Link>
         </section>
       </div>

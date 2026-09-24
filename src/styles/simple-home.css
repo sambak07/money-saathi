@@ -273,3 +273,68 @@
   }
 }
 
+/* === UI/UX Repair 02: focused Simple Home === */
+
+.simple-home-focused {
+  max-width: 980px;
+}
+
+.simple-home-focused .simple-home-header > a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--font-size-ui);
+}
+
+.simple-home-focused .simple-safe-card {
+  margin-top: 22px;
+}
+
+.simple-home-focused .simple-safe-card > strong {
+  font-size: clamp(32px, 6vw, 48px);
+}
+
+.simple-home-focused .simple-safe-card > p,
+.simple-home-focused .simple-safe-facts span,
+.simple-home-focused .simple-safe-card > a,
+.simple-home-focused .simple-month-grid span,
+.simple-home-focused .simple-actions a,
+.simple-home-focused .simple-goal-card p:last-child,
+.simple-home-focused .simple-goal-card > a,
+.simple-home-focused .simple-section-heading > a,
+.simple-home-focused .simple-recent-row span,
+.simple-home-focused .simple-empty,
+.simple-home-focused .simple-home-footer p,
+.simple-home-focused .simple-home-footer > a {
+  font-size: var(--font-size-small);
+}
+
+.simple-home-focused .simple-actions {
+  grid-template-columns:
+    repeat(5, minmax(0, 1fr));
+}
+
+.simple-home-focused .simple-actions a {
+  min-height: 48px;
+}
+
+@media (max-width: 760px) {
+  .simple-home-focused .simple-actions {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .simple-home-focused .simple-primary-action {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 380px) {
+  .simple-home-focused .simple-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .simple-home-focused .simple-primary-action {
+    grid-column: auto;
+  }
+}

@@ -18,10 +18,7 @@ import {
   getSavingsAccounts,
   getTransactions,
 } from '../storage/db'
-import {
-  MONEY_NEEDS,
-  getProfile,
-} from '../profile/userProfile'
+
 import { getPreferences } from '../settings/preferences'
 import type { Budget } from '../types/budget'
 import type { FinancialScheme } from '../types/scheme'
@@ -82,9 +79,7 @@ function DashboardPage() {
   const [preferences] = useState(
     () => getPreferences(),
   )
-  const [profile] = useState(
-    () => getProfile(),
-  )
+
   const currentMonth = today.slice(0, 7)
 
   const [data, setData] =
@@ -671,31 +666,53 @@ function DashboardPage() {
       ? 'Your recorded inflow is ahead of outflow this month.'
       : 'Your recorded outflow is ahead of inflow this month.'
 
+  const nextMoneyMessage =
+    dashboard.regularDueCount > 0
+      ? `${dashboard.regularDueCount} ${
+          dashboard.regularDueCount === 1
+            ? 'regular money item needs'
+            : 'regular money items need'
+        } to be recorded.`
+      : dashboard.safeToSpend.nextExpectedIncomeDate
+        ? `Next scheduled income: ${formatScheduleDate(
+            dashboard.safeToSpend.nextExpectedIncomeDate,
+          )}.`
+        : `Planning through ${formatScheduleDate(
+            dashboard.safeToSpend.horizonDate,
+          )}.`
+
+  const hasAttention =
+    dashboard.regularDueCount > 0 ||
+    dashboard.overBudgetCategories > 0
+
   return (
     <AppShell>
-      <div className="dashboard-container dashboard2">
-        <section className="dashboard2-hero">
+      <div className="dashboard-container dashboard2 dashboard2-focused">
+        <header className="dashboard2-home-header">
           <div>
             <p className="dashboard-eyebrow">
-              Your money, in one view
+              Your money today
             </p>
 
-            <h1>Home</h1>
-
-            <p className="dashboard2-intro">
+            <h1>
               {preferences.displayName
-                ? `Welcome, ${preferences.displayName}. `
-                : ''}
-              Understand what came in, what went out,
-              what you own, what you owe and what you
-              are building toward.
+                ? `Hi, ${preferences.displayName}`
+                : 'Home'}
+            </h1>
+
+            <p>
+              Start with what you have, what is safe to use and
+              what needs attention next.
             </p>
           </div>
+        </header>
 
-          <div className="dashboard2-hero-balance">
-            <span>
-              Transaction balance
-            </span>
+        <section
+          className="dashboard2-core-grid"
+          aria-label="Your main money picture"
+        >
+          <article className="dashboard2-core-card">
+            <span>Recorded balance</span>
 
             <strong>
               {formatNu(
@@ -703,163 +720,16 @@ function DashboardPage() {
               )}
             </strong>
 
-            <small>
-              Income minus expenses recorded in Money Saathi.
-            </small>
-          </div>
-        </section>
-
-        <div className="dashboard2-quick-actions">
-          <Link
-            to="/app/transactions/new"
-            className="dashboard2-primary-action"
-          >
-            + Add transaction
-          </Link>
-
-          <Link
-            to="/app/budget"
-          >
-            Budget
-          </Link>
-
-          <Link
-            to="/app/regular-money"
-          >
-            Regular money
-          </Link>
-          <Link
-            to="/app/upcoming"
-          >
-            Upcoming
-          </Link>
-          <Link
-            to="/app/calendar"
-          >
-            Money calendar
-          </Link>
-          <Link
-            to="/app/alerts"
-          >
-            Alerts
-          </Link>
-          <Link
-            to="/app/loan-reminders"
-          >
-            Loan reminders
-          </Link>
-
-          <Link
-            to="/app/goals"
-          >
-            Goals
-          </Link>
-
-          <Link
-            to="/app/my-money"
-          >
-            My Money
-          </Link>
-
-          <Link
-            to="/app/reports"
-          >
-            Reports
-          </Link>
-          <Link
-            to="/app/money-health"
-          >
-            Money health
-          </Link>
-          <Link
-            to="/app/explain"
-          >
-            Explain my money
-          </Link>
-          <Link
-            to="/app/data-export"
-          >
-            Export data
-          </Link>
-          <Link
-            to="/app/financial-safety"
-          >
-            Financial safety
-          </Link>
-          <Link
-            to="/app/irregular-income"
-          >
-            Income rhythm
-          </Link>
-          <Link
-            to="/app/security"
-          >
-            App Lock
-          </Link>
-          <Link
-            to="/app/backup"
-          >
-            Backup
-          </Link>
-          <Link
-            to="/app/settings"
-          >
-            Settings
-          </Link>
-          <Link
-            to="/app/setup"
-          >
-            My setup
-          </Link>
-        </div>
-
-        <section className="dashboard2-adaptive-strip">
-          <div>
-            <p className="dashboard-eyebrow">
-              Your Money Saathi
+            <p>
+              Income minus expenses you have actually recorded.
             </p>
 
-            <strong>
-              {profile.needs.length === 0
-                ? 'General money view'
-                : profile.needs
-                    .map(
-                      (need) =>
-                        MONEY_NEEDS.find(
-                          (item) =>
-                            item.id === need,
-                        )?.title,
-                    )
-                    .filter(Boolean)
-                    .join(' · ')}
-            </strong>
+            <Link to="/app/transactions">
+              View activity
+            </Link>
+          </article>
 
-            <span>
-              {profile.needs.includes('small-business')
-                ? 'Current Home remains one personal ledger. Business money is not silently mixed into these totals.'
-                : profile.needs.includes('irregular-income')
-                  ? 'Conservative mode: unreceived income is never added to Safe to Spend.'
-                  : profile.needs.includes('retirement')
-                    ? 'Focus on available cash, recurring income and commitments without treating protection cover as cash.'
-                    : profile.needs.includes('salary')
-                      ? 'Use Regular Money for salary and commitments so the planning horizon stays useful.'
-                      : profile.needs.includes('savings-goals')
-                        ? 'Goal progress stays separate from spendable cash to avoid double-counting.'
-                        : 'Start with what came in, what went out and what remains.'}
-            </span>
-          </div>
-
-          <Link to="/app/setup">
-            Adjust my setup
-          </Link>
-        </section>
-
-        <section className="dashboard2-safe-to-spend">
-          <div className="dashboard2-safe-main">
-            <p className="dashboard-eyebrow">
-              Decision support
-            </p>
-
+          <article className="dashboard2-core-card safe">
             <span>Safe to Spend</span>
 
             <strong>
@@ -868,609 +738,187 @@ function DashboardPage() {
               )}
             </strong>
 
-            <small>
-              Based on recorded transactions only. Future income
-              is never added before it is actually recorded.
-            </small>
-          </div>
-
-          <div className="dashboard2-safe-breakdown">
-            <div>
-              <span>Recorded balance</span>
-              <strong>
-                {formatNu(
-                  dashboard.safeToSpend.recordedBalanceChetrum,
-                )}
-              </strong>
-            </div>
-
-            <div>
-              <span>Upcoming commitments</span>
-              <strong>
-                −{formatNu(
-                  dashboard.safeToSpend.upcomingCommitmentsChetrum,
-                )}
-              </strong>
-            </div>
-
-            <div>
-              <span>Protected buffer</span>
-              <strong>
-                −{formatNu(
-                  dashboard.safeToSpend.safetyBufferChetrum,
-                )}
-              </strong>
-            </div>
-          </div>
-
-          <div className="dashboard2-safe-footer">
-            <span>
-              {dashboard.safeToSpend.nextExpectedIncomeDate
-                ? `Planning through ${formatScheduleDate(
-                    dashboard.safeToSpend.horizonDate,
-                  )}, the next scheduled income date.`
-                : `No scheduled income found. Planning through ${formatScheduleDate(
-                    dashboard.safeToSpend.horizonDate,
-                  )}.`}
-            </span>
+            <p>
+              After unrecorded commitments and your protected
+              safety buffer.
+            </p>
 
             <Link to="/app/safety-buffer">
               {dashboard.safeToSpend.safetyBufferChetrum > 0
-                ? 'Adjust buffer'
-                : 'Set a safety buffer'}
+                ? 'Adjust protected amount'
+                : 'Protect some money'}
             </Link>
-          </div>
-        </section>
-
-        {profile.needs.length > 0 && (
-          <section className="dashboard2-focus-grid">
-            {profile.needs.includes('daily-money') && (
-              <article>
-                <span>Daily money</span>
-                <strong>
-                  {formatNu(
-                    dashboard.monthlyNet,
-                  )}
-                </strong>
-                <p>
-                  Recorded net cash flow this month.
-                </p>
-              </article>
-            )}
-
-            {profile.needs.includes('salary') && (
-              <article>
-                <span>Salary & commitments</span>
-                <strong>
-                  {dashboard.safeToSpend.nextExpectedIncomeDate
-                    ? formatScheduleDate(
-                        dashboard.safeToSpend.nextExpectedIncomeDate,
-                      )
-                    : 'Not scheduled'}
-                </strong>
-                <p>
-                  Next unrecorded recurring income date.
-                </p>
-              </article>
-            )}
-
-            {profile.needs.includes('irregular-income') && (
-              <article>
-                <span>Irregular income</span>
-                <strong>
-                  {formatNu(
-                    dashboard.safeToSpend.safeToSpendChetrum,
-                  )}
-                </strong>
-                <p>
-                  Unreceived income is not assumed.
-                </p>
-              </article>
-            )}
-
-            {profile.needs.includes('savings-goals') && (
-              <article>
-                <span>Savings goals</span>
-                <strong>
-                  {formatNu(
-                    dashboard.goalSaved,
-                  )}
-                </strong>
-                <p>
-                  Recorded contributions toward goals.
-                </p>
-              </article>
-            )}
-
-            {profile.needs.includes('retirement') && (
-              <article>
-                <span>Liquid savings</span>
-                <strong>
-                  {formatNu(
-                    dashboard.savingsAssets,
-                  )}
-                </strong>
-                <p>
-                  Savings-account balances only; FD and RD are
-                  not presented here as everyday cash.
-                </p>
-              </article>
-            )}
-
-            {profile.needs.includes('small-business') && (
-              <article>
-                <span>Small business</span>
-                <strong>Separate workspace</strong>
-                <p>
-                  Business money stays outside your personal
-                  balance and Safe to Spend.
-                </p>
-                <Link to="/app/business">
-                  Open business
-                </Link>
-              </article>
-            )}
-          </section>
-        )}
-
-        <section className="dashboard2-month-grid">
-          <article className="dashboard2-stat-card">
-            <span>Money in this month</span>
-            <strong className="income-text">
-              {formatNu(
-                dashboard.monthlyIncome,
-              )}
-            </strong>
           </article>
 
-          <article className="dashboard2-stat-card">
-            <span>Money out this month</span>
+          <article className="dashboard2-core-card next">
+            <span>Coming next</span>
+
             <strong>
-              {formatNu(
-                dashboard.monthlyExpense,
-              )}
+              {dashboard.regularDueCount > 0
+                ? `${dashboard.regularDueCount} due`
+                : 'On track'}
             </strong>
-          </article>
 
-          <article className="dashboard2-stat-card">
-            <span>Net cash flow</span>
-            <strong
-              className={
-                dashboard.monthlyNet >= 0
-                  ? 'income-text'
-                  : ''
-              }
-            >
-              {formatNu(
-                dashboard.monthlyNet,
-              )}
-            </strong>
-          </article>
+            <p>
+              {nextMoneyMessage}
+            </p>
 
-          <article className="dashboard2-stat-card">
-            <span>Due to record</span>
-            <strong>
-              {dashboard.regularDueCount}
-            </strong>
-            <small>
-              Outstanding Regular Money occurrences.
-            </small>
+            <Link to="/app/upcoming">
+              View upcoming
+            </Link>
           </article>
         </section>
 
-        <div className="dashboard2-fact-strip">
-          {monthlyDirection}
-          {' '}
-          {dashboard.monthlyNet !== 0 && (
-            <strong>
-              Difference:{' '}
-              {formatNu(
-                Math.abs(
-                  dashboard.monthlyNet,
-                ),
-              )}
-            </strong>
-          )}
-        </div>
+        <nav
+          className="dashboard2-core-actions"
+          aria-label="Everyday money actions"
+        >
+          <Link
+            to="/app/transactions/new"
+            className="dashboard2-primary-action"
+          >
+            + Add transaction
+          </Link>
 
-        <section className="dashboard2-two-column">
-          <article className="dashboard2-panel">
-            <div className="dashboard2-panel-heading">
-              <div>
-                <p className="dashboard-eyebrow">
-                  Spending plan
-                </p>
-                <h2>This month's budget</h2>
-              </div>
+          <Link to="/app/transactions">
+            Transactions
+          </Link>
 
-              <Link to="/app/budget">
-                View budget
-              </Link>
-            </div>
+          <Link to="/app/budget">
+            Budget
+          </Link>
 
-            {data.budgets.length === 0 ? (
-              <div className="dashboard2-empty">
-                No category budgets set for this month.
-              </div>
-            ) : (
-              <>
-                <div className="dashboard2-budget-numbers">
-                  <div>
-                    <span>Planned</span>
-                    <strong>
-                      {formatNu(
-                        dashboard.budgetPlanned,
-                      )}
-                    </strong>
-                  </div>
+          <Link to="/app/goals">
+            Goals
+          </Link>
 
-                  <div>
-                    <span>Spent against plan</span>
-                    <strong>
-                      {formatNu(
-                        dashboard.budgetSpent,
-                      )}
-                    </strong>
-                  </div>
+          <Link to="/app/more">
+            More
+          </Link>
+        </nav>
 
-                  <div>
-                    <span>
-                      {dashboard.budgetRemaining >= 0
-                        ? 'Remaining'
-                        : 'Over plan'}
-                    </span>
-                    <strong>
-                      {formatNu(
-                        Math.abs(
-                          dashboard.budgetRemaining,
-                        ),
-                      )}
-                    </strong>
-                  </div>
-                </div>
-
-                <div className="dashboard2-progress-track">
-                  <div
-                    className={
-                      dashboard.budgetRemaining < 0
-                        ? 'dashboard2-progress-fill over'
-                        : 'dashboard2-progress-fill'
-                    }
-                    style={{
-                      width:
-                        dashboard.budgetPlanned > 0
-                          ? `${Math.min(
-                              (
-                                dashboard.budgetSpent /
-                                dashboard.budgetPlanned
-                              ) * 100,
-                              100,
-                            )}%`
-                          : '0%',
-                    }}
-                  />
-                </div>
-
-                <p className="dashboard2-panel-note">
-                  {dashboard.overBudgetCategories > 0
-                    ? `${dashboard.overBudgetCategories} ${
-                        dashboard.overBudgetCategories === 1
-                          ? 'category is'
-                          : 'categories are'
-                      } over budget.`
-                    : 'No budgeted category is currently over its limit.'}
-                </p>
-              </>
-            )}
-          </article>
-
-          <article className="dashboard2-panel">
-            <div className="dashboard2-panel-heading">
-              <div>
-                <p className="dashboard-eyebrow">
-                  Repeating money
-                </p>
-                <h2>Regular Money</h2>
-              </div>
-
-              <Link to="/app/regular-money">
-                View schedules
-              </Link>
-            </div>
-
-            <div className="dashboard2-budget-numbers">
-              <div>
-                <span>Expected in</span>
-                <strong className="income-text">
-                  {formatNu(
-                    dashboard.regularExpectedIncome,
-                  )}
-                </strong>
-              </div>
-
-              <div>
-                <span>Expected out</span>
-                <strong>
-                  {formatNu(
-                    dashboard.regularExpectedExpense,
-                  )}
-                </strong>
-              </div>
-
-              <div>
-                <span>Due to record</span>
-                <strong>
-                  {dashboard.regularDueCount}
-                </strong>
-              </div>
-            </div>
-
-            {dashboard.regularPreview.length === 0 ? (
-              <div className="dashboard2-empty compact">
-                No upcoming recurring money.
-              </div>
-            ) : (
-              <div className="dashboard2-mini-list">
-                {dashboard.regularPreview.map(
-                  ({
-                    item,
-                    dueDate,
-                    next,
-                  }) => (
-                    <div
-                      className="dashboard2-mini-row"
-                      key={item.id}
-                    >
-                      <div>
-                        <strong>
-                          {item.name}
-                        </strong>
-
-                        <span>
-                          {dueDate
-                            ? `Due ${formatScheduleDate(
-                                dueDate,
-                              )}`
-                            : next
-                              ? `Next ${formatScheduleDate(
-                                  next,
-                                )}`
-                              : ''}
-                        </span>
-                      </div>
-
-                      <strong
-                        className={
-                          item.kind === 'income'
-                            ? 'income-text'
-                            : ''
-                        }
-                      >
-                        {item.kind === 'income'
-                          ? '+'
-                          : '−'}
-                        {formatNu(
-                          item.amountChetrum,
-                        )}
-                      </strong>
-                    </div>
-                  ),
-                )}
-              </div>
-            )}
-          </article>
-        </section>
-
-        <section className="dashboard2-financial-position">
-          <div className="dashboard2-panel-heading light">
+        <section className="dashboard2-month-summary">
+          <div className="dashboard2-section-heading">
             <div>
               <p className="dashboard-eyebrow">
-                Financial position
+                This month
               </p>
-              <h2>What you own and owe</h2>
+
+              <h2>Money movement</h2>
             </div>
 
-            <Link to="/app/my-money">
-              Open My Money
+            <Link to="/app/reports">
+              Open reports
             </Link>
           </div>
 
-          <div className="dashboard2-position-grid">
+          <div className="dashboard2-month-compact-grid">
             <div>
-              <span>Tracked assets</span>
-              <strong>
+              <span>Money in</span>
+              <strong className="income-text">
                 {formatNu(
-                  dashboard.trackedAssets,
+                  dashboard.monthlyIncome,
                 )}
               </strong>
-              <small>
-                Savings + FD principal + RD contributions.
-              </small>
             </div>
 
             <div>
-              <span>Outstanding debt</span>
+              <span>Money out</span>
               <strong>
                 {formatNu(
-                  dashboard.outstandingDebt,
+                  dashboard.monthlyExpense,
                 )}
               </strong>
-              <small>
-                Across {dashboard.activeLoans}{' '}
-                active{' '}
-                {dashboard.activeLoans === 1
-                  ? 'loan'
-                  : 'loans'}.
-              </small>
             </div>
 
-            <div className="dashboard2-position-main">
-              <span>Net tracked position</span>
-              <strong>
+            <div>
+              <span>Difference</span>
+              <strong
+                className={
+                  dashboard.monthlyNet >= 0
+                    ? 'income-text'
+                    : ''
+                }
+              >
                 {formatNu(
-                  dashboard.netTrackedPosition,
+                  dashboard.monthlyNet,
                 )}
               </strong>
-              <small>
-                Tracked assets minus outstanding loan principal.
-              </small>
             </div>
           </div>
 
-          <p className="dashboard2-position-note">
-            This is not your complete net worth. It only reflects
-            assets and liabilities you have entered into Money Saathi.
-            Scheme values are shown separately to avoid accidental
-            double-counting.
+          <p className="dashboard2-month-note">
+            {monthlyDirection}
           </p>
         </section>
 
-        <section className="dashboard2-two-column">
-          <article className="dashboard2-panel">
-            <div className="dashboard2-panel-heading">
-              <div>
-                <p className="dashboard-eyebrow">
-                  Goals
-                </p>
-                <h2>What you are building toward</h2>
-              </div>
-
-              <Link to="/app/goals">
-                View goals
-              </Link>
-            </div>
-
-            {data.goals.length === 0 ? (
-              <div className="dashboard2-empty">
-                No financial goals yet.
-              </div>
-            ) : (
-              <>
-                <div className="dashboard2-goal-hero">
-                  <span>Saved toward goals</span>
-                  <strong>
-                    {formatNu(
-                      dashboard.goalSaved,
-                    )}
-                  </strong>
-                  <small>
-                    of{' '}
-                    {formatNu(
-                      dashboard.goalTarget,
-                    )}
-                    {' '}targeted
-                  </small>
-                </div>
-
-                <div className="dashboard2-progress-track">
-                  <div
-                    className="dashboard2-progress-fill"
-                    style={{
-                      width:
-                        dashboard.goalTarget > 0
-                          ? `${Math.min(
-                              (
-                                dashboard.goalSaved /
-                                dashboard.goalTarget
-                              ) * 100,
-                              100,
-                            )}%`
-                          : '0%',
-                    }}
-                  />
-                </div>
-
-                <div className="dashboard2-inline-facts">
-                  <span>
-                    Remaining{' '}
-                    <strong>
-                      {formatNu(
-                        dashboard.goalRemaining,
-                      )}
-                    </strong>
-                  </span>
-
-                  <span>
-                    Reached{' '}
-                    <strong>
-                      {dashboard.goalsReached}
-                    </strong>
-                  </span>
-                </div>
-              </>
-            )}
-          </article>
-
-          <article className="dashboard2-panel">
-            <div className="dashboard2-panel-heading">
-              <div>
-                <p className="dashboard-eyebrow">
-                  Schemes & protection
-                </p>
-                <h2>Long-term commitments</h2>
-              </div>
-
-              <Link to="/app/my-money/schemes">
-                View schemes
-              </Link>
-            </div>
-
-            {data.schemes.length === 0 ? (
-              <div className="dashboard2-empty">
-                No long-term schemes recorded yet.
-              </div>
-            ) : (
-              <div className="dashboard2-scheme-grid">
-                <div>
-                  <span>Current recorded value</span>
-                  <strong>
-                    {formatNu(
-                      dashboard.schemeCurrentValue,
-                    )}
-                  </strong>
-                </div>
-
-                <div>
-                  <span>Protection cover</span>
-                  <strong>
-                    {formatNu(
-                      dashboard.protectionCover,
-                    )}
-                  </strong>
-                </div>
-
-                <div>
-                  <span>Annual scheduled contribution</span>
-                  <strong>
-                    {formatNu(
-                      dashboard.annualSchemeCommitment,
-                    )}
-                  </strong>
-                </div>
-
-                <div>
-                  <span>Active schemes</span>
-                  <strong>
-                    {dashboard.activeSchemes}
-                  </strong>
-                </div>
-              </div>
-            )}
-
-            <p className="dashboard2-panel-note">
-              Protection cover and future benefits are not counted
-              as today's assets.
+        <section
+          className={
+            hasAttention
+              ? 'dashboard2-attention needs-attention'
+              : 'dashboard2-attention'
+          }
+        >
+          <div>
+            <p className="dashboard-eyebrow">
+              What needs attention
             </p>
-          </article>
+
+            <h2>
+              {hasAttention
+                ? 'There are a few things to review.'
+                : 'Nothing urgent from your recorded money.'}
+            </h2>
+
+            <div className="dashboard2-attention-list">
+              {dashboard.regularDueCount > 0 && (
+                <span>
+                  {dashboard.regularDueCount}{' '}
+                  {dashboard.regularDueCount === 1
+                    ? 'Regular Money item is'
+                    : 'Regular Money items are'}{' '}
+                  due to be recorded.
+                </span>
+              )}
+
+              {dashboard.overBudgetCategories > 0 && (
+                <span>
+                  {dashboard.overBudgetCategories}{' '}
+                  {dashboard.overBudgetCategories === 1
+                    ? 'budget category is'
+                    : 'budget categories are'}{' '}
+                  over plan.
+                </span>
+              )}
+
+              {!hasAttention && (
+                <span>
+                  Money Saathi will surface recorded commitments
+                  and budget pressure here.
+                </span>
+              )}
+            </div>
+          </div>
+
+          <div className="dashboard2-attention-actions">
+            <Link to="/app/upcoming">
+              Upcoming
+            </Link>
+
+            <Link to="/app/alerts">
+              Alerts
+            </Link>
+          </div>
         </section>
 
         <section className="dashboard2-panel dashboard2-recent">
           <div className="dashboard2-panel-heading">
             <div>
               <p className="dashboard-eyebrow">
-                Activity
+                Latest
               </p>
-              <h2>Recent transactions</h2>
+
+              <h2>Recent money</h2>
             </div>
 
             <Link to="/app/transactions">
@@ -1480,7 +928,8 @@ function DashboardPage() {
 
           {dashboard.recentTransactions.length === 0 ? (
             <div className="dashboard2-empty">
-              No transactions recorded yet.
+              No money recorded yet. Start with one income or
+              expense.
             </div>
           ) : (
             <div className="dashboard2-transaction-list">
@@ -1504,14 +953,12 @@ function DashboardPage() {
                     <div>
                       <strong
                         className={
-                          transaction.kind ===
-                          'income'
+                          transaction.kind === 'income'
                             ? 'income-text'
                             : ''
                         }
                       >
-                        {transaction.kind ===
-                        'income'
+                        {transaction.kind === 'income'
                           ? '+'
                           : '−'}
                         {formatNu(
@@ -1529,10 +976,42 @@ function DashboardPage() {
             </div>
           )}
         </section>
+
+        <section className="dashboard2-explore">
+          <div>
+            <p className="dashboard-eyebrow">
+              Go deeper when useful
+            </p>
+
+            <h2>Your other money tools</h2>
+
+            <p>
+              Assets, loans, regular money and detailed analysis
+              stay available without crowding your Home screen.
+            </p>
+          </div>
+
+          <div className="dashboard2-explore-links">
+            <Link to="/app/my-money">
+              My Money
+            </Link>
+
+            <Link to="/app/regular-money">
+              Regular money
+            </Link>
+
+            <Link to="/app/reports">
+              Reports
+            </Link>
+
+            <Link to="/app/more">
+              All tools
+            </Link>
+          </div>
+        </section>
       </div>
     </AppShell>
-  )
-}
+  )}
 
 export default DashboardPage
 

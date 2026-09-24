@@ -145,37 +145,49 @@ function GettingStartedPage() {
 
   return (
     <AppShell>
-      <div className="dashboard-container getting-started-page">
+      <div className="dashboard-container getting-started-page getting-started-focused">
         <header className="getting-started-hero">
           <div>
             <p className="dashboard-eyebrow">
-              Start small. Grow naturally.
+              Start small
             </p>
 
-            <h1>
-              Your first few minutes with Money Saathi
-            </h1>
+            <h1>Start with the basics</h1>
 
             <p>
-              Whether you are managing pocket money, salary,
-              irregular income, a small business or retirement
-              income, you do not need to set up everything at
-              once.
+              You do not need to set up everything. Complete the
+              next useful step and return to Home whenever you
+              are ready.
             </p>
           </div>
 
-          <div className="getting-started-progress">
-            <span>Progress</span>
+          <div
+            className="getting-started-progress"
+            aria-label={`${journey.completedCount} of ${journey.totalCount} steps ready`}
+          >
+            <div>
+              <span>Progress</span>
+              <strong>
+                {journey.completedCount}
+                /
+                {journey.totalCount}
+              </strong>
+            </div>
 
-            <strong>
-              {journey.completedCount}
-              /
-              {journey.totalCount}
-            </strong>
-
-            <small>
-              Based on what you have actually set up.
-            </small>
+            <div
+              className="getting-started-progress-track"
+              aria-hidden="true"
+            >
+              <span
+                style={{
+                  width:
+                    `${(
+                      journey.completedCount /
+                      journey.totalCount
+                    ) * 100}%`,
+                }}
+              />
+            </div>
           </div>
         </header>
 
@@ -186,13 +198,10 @@ function GettingStartedPage() {
                 Ready
               </p>
 
-              <h2>
-                Your foundation is in place.
-              </h2>
+              <h2>Your foundation is in place.</h2>
 
               <p>
-                Keep using Money Saathi at your own pace. You can
-                add deeper features only when they become useful.
+                Keep using Money Saathi at your own pace.
               </p>
             </div>
 
@@ -204,7 +213,7 @@ function GettingStartedPage() {
           <section className="getting-started-next">
             <div>
               <p className="dashboard-eyebrow">
-                Best next step
+                Next step
               </p>
 
               <h2>
@@ -217,9 +226,7 @@ function GettingStartedPage() {
             </div>
 
             {journey.nextStep && (
-              <Link
-                to={journey.nextStep.href}
-              >
+              <Link to={journey.nextStep.href}>
                 {journey.nextStep.action}
               </Link>
             )}
@@ -250,12 +257,6 @@ function GettingStartedPage() {
                 </div>
 
                 <div className="getting-started-step-copy">
-                  <span>
-                    {step.complete
-                      ? 'Ready'
-                      : 'Next when useful'}
-                  </span>
-
                   <strong>
                     {step.title}
                   </strong>
@@ -275,43 +276,16 @@ function GettingStartedPage() {
           )}
         </section>
 
-        <section className="getting-started-bhutan">
-          <div>
-            <strong>
-              Made for real money life in Bhutan
-            </strong>
+        <footer className="getting-started-footer">
+          <span>
+            Your real activity completes these steps. There are
+            no artificial checkboxes.
+          </span>
 
-            <p>
-              Start with Nu. 50 or Nu. 50,000. Money Saathi
-              should remain useful without making anyone feel
-              their amount is too small to matter.
-            </p>
-          </div>
-
-          <div>
-            <strong>
-              No pressure to become a finance expert
-            </strong>
-
-            <p>
-              Simple Home stays simple. Full Home is there when
-              you want budgets, assets, loans, schemes and deeper
-              reports.
-            </p>
-          </div>
-
-          <div>
-            <strong>
-              Your real activity completes the journey
-            </strong>
-
-            <p>
-              There are no artificial checkboxes. A step becomes
-              ready when you actually create the corresponding
-              financial record.
-            </p>
-          </div>
-        </section>
+          <Link to="/app">
+            Back to Home
+          </Link>
+        </footer>
       </div>
     </AppShell>
   )

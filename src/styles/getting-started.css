@@ -241,3 +241,186 @@
     justify-content: space-between;
   }
 }
+
+/* === UI/UX Repair 02: compact Start Here === */
+
+.getting-started-focused {
+  max-width: 940px;
+}
+
+.getting-started-focused .getting-started-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 220px;
+  gap: 16px;
+}
+
+.getting-started-focused
+.getting-started-hero > div:first-child {
+  padding: 24px;
+}
+
+.getting-started-focused
+.getting-started-hero h1 {
+  max-width: 620px;
+  font-size: var(--font-size-page);
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+}
+
+.getting-started-focused
+.getting-started-hero p:last-child {
+  max-width: 620px;
+  font-size: var(--font-size-body);
+  line-height: 1.55;
+}
+
+.getting-started-focused
+.getting-started-progress {
+  min-height: 0;
+  padding: 20px;
+  align-content: center;
+  gap: 14px;
+}
+
+.getting-started-focused
+.getting-started-progress > div:first-child {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.getting-started-focused
+.getting-started-progress > div:first-child span {
+  color: rgba(255, 255, 255, 0.78);
+  font-size: var(--font-size-small);
+}
+
+.getting-started-focused
+.getting-started-progress > div:first-child strong {
+  font-size: 28px;
+}
+
+.getting-started-progress-track {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.getting-started-progress-track > span {
+  height: 100%;
+  display: block;
+  border-radius: inherit;
+  background: white;
+}
+
+.getting-started-focused
+.getting-started-next,
+.getting-started-focused
+.getting-started-complete {
+  padding: 18px 20px;
+}
+
+.getting-started-focused
+.getting-started-next p:last-child,
+.getting-started-focused
+.getting-started-complete p:last-child {
+  font-size: var(--font-size-small);
+}
+
+.getting-started-focused
+.getting-started-next > a,
+.getting-started-focused
+.getting-started-complete > a {
+  min-height: 44px;
+  padding: 0 14px;
+  font-size: var(--font-size-ui);
+}
+
+.getting-started-focused
+.getting-started-steps {
+  gap: 8px;
+}
+
+.getting-started-focused
+.getting-started-step {
+  min-height: 76px;
+  padding: 12px 14px;
+}
+
+.getting-started-focused
+.getting-started-step-copy {
+  gap: 3px;
+}
+
+.getting-started-focused
+.getting-started-step-copy > strong {
+  font-size: var(--font-size-ui);
+}
+
+.getting-started-focused
+.getting-started-step-copy > p {
+  font-size: var(--font-size-small);
+  line-height: 1.45;
+}
+
+.getting-started-focused
+.getting-started-step > a {
+  min-height: 44px;
+  padding: 0 12px;
+  font-size: var(--font-size-ui);
+}
+
+.getting-started-footer {
+  margin-top: 14px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+}
+
+.getting-started-footer > a {
+  flex: 0 0 auto;
+  color: var(--color-brand);
+  font-size: var(--font-size-ui);
+  font-weight: 750;
+}
+
+@media (max-width: 760px) {
+  .getting-started-focused
+  .getting-started-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .getting-started-focused
+  .getting-started-progress {
+    min-height: 104px;
+  }
+}
+
+@media (max-width: 560px) {
+  .getting-started-focused
+  .getting-started-hero > div:first-child {
+    padding: 20px;
+  }
+
+  .getting-started-focused
+  .getting-started-step {
+    grid-template-columns: 36px minmax(0, 1fr);
+  }
+
+  .getting-started-focused
+  .getting-started-step > a {
+    grid-column: 2;
+  }
+
+  .getting-started-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
