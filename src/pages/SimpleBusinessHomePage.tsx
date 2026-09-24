@@ -425,9 +425,9 @@ function SimpleBusinessHomePage() {
 
               <Link
                 className="simple-business-primary-action"
-                to="/app/business/trade"
+                to="/app/business/add"
               >
-                Add sale or purchase
+                Add
               </Link>
             </section>
 
@@ -570,33 +570,23 @@ function SimpleBusinessHomePage() {
               </div>
 
               <div className="simple-business-action-grid">
-                <Link to="/app/business/trade">
+                <Link to="/app/business/add">
                   <strong>
-                    Sale or purchase
+                    Add
                   </strong>
 
                   <span>
-                    Items, quantity, payment-at-entry and COGS.
-                  </span>
-                </Link>
-
-                <Link to="/app/business/cash">
-                  <strong>
-                    Money in or out
-                  </strong>
-
-                  <span>
-                    Record actual business cash movement.
+                    Sale, purchase, expense or a payment.
                   </span>
                 </Link>
 
                 <Link to="/app/business/credit">
                   <strong>
-                    Customer or supplier due
+                    Dues
                   </strong>
 
                   <span>
-                    Track money to collect or pay.
+                    See who owes you and whom you owe.
                   </span>
                 </Link>
 
@@ -606,7 +596,17 @@ function SimpleBusinessHomePage() {
                   </strong>
 
                   <span>
-                    Add items or check low stock.
+                    Check quantity and low-stock items.
+                  </span>
+                </Link>
+
+                <Link to="/app/business/cash">
+                  <strong>
+                    Cash
+                  </strong>
+
+                  <span>
+                    Review recorded money in and money out.
                   </span>
                 </Link>
               </div>
