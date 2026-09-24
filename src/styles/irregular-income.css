@@ -27,7 +27,7 @@
 .irregular-income-header > a {
   flex: 0 0 auto;
   color: var(--color-brand);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   font-weight: 800;
 }
 
@@ -36,7 +36,7 @@
   margin-top: 14px;
   padding: 12px 14px;
   border-radius: 12px;
-  font-size: 9px;
+  font-size: var(--font-size-small);
 }
 
 .irregular-income-message {
@@ -71,7 +71,7 @@
 
 .irregular-income-core span {
   color: var(--color-text-muted);
-  font-size: 8px;
+  font-size: var(--font-size-meta);
 }
 
 .irregular-income-core > article > strong {
@@ -81,7 +81,7 @@
 .irregular-income-core p {
   margin: 0;
   color: var(--color-text-secondary);
-  font-size: 8px;
+  font-size: var(--font-size-meta);
   line-height: 1.5;
 }
 
@@ -105,7 +105,7 @@
   max-width: 720px;
   margin: 8px 0 0;
   color: var(--color-text-secondary);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   line-height: 1.55;
 }
 
@@ -116,7 +116,7 @@
 }
 
 .irregular-floor-card label {
-  font-size: 9px;
+  font-size: var(--font-size-small);
   font-weight: 800;
 }
 
@@ -142,13 +142,13 @@
   border-radius: 10px;
   background: var(--color-brand);
   color: white;
-  font-size: 9px;
+  font-size: var(--font-size-small);
   font-weight: 800;
 }
 
 .irregular-floor-card small {
   color: var(--color-text-muted);
-  font-size: 8px;
+  font-size: var(--font-size-meta);
 }
 
 .irregular-floor-result {
@@ -171,7 +171,7 @@
 
 .irregular-floor-result span {
   color: var(--color-text-muted);
-  font-size: 8px;
+  font-size: var(--font-size-meta);
 }
 
 .irregular-floor-result strong {
@@ -201,7 +201,7 @@
 
 .irregular-history-heading > span {
   color: var(--color-brand);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   font-weight: 800;
 }
 
@@ -221,7 +221,7 @@
 }
 
 .irregular-history-grid article > strong {
-  font-size: 10px;
+  font-size: var(--font-size-small);
 }
 
 .irregular-history-grid article > div {
@@ -233,11 +233,11 @@
 
 .irregular-history-grid span {
   color: var(--color-text-muted);
-  font-size: 8px;
+  font-size: var(--font-size-meta);
 }
 
 .irregular-history-grid article > div strong {
-  font-size: 10px;
+  font-size: var(--font-size-small);
 }
 
 .irregular-income-actions {
@@ -257,7 +257,7 @@
   border-radius: 11px;
   background: var(--color-surface);
   color: var(--color-text);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   font-weight: 800;
   text-align: center;
 }
@@ -283,13 +283,13 @@
 }
 
 .irregular-income-guardrails strong {
-  font-size: 10px;
+  font-size: var(--font-size-small);
 }
 
 .irregular-income-guardrails p {
   margin: 6px 0 0;
   color: var(--color-text-secondary);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   line-height: 1.55;
 }
 

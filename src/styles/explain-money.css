@@ -27,7 +27,7 @@
 .explain-money-header > a {
   flex: 0 0 auto;
   color: var(--color-brand);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   font-weight: 800;
 }
 
@@ -41,12 +41,12 @@
 }
 
 .explain-money-trust strong {
-  font-size: 10px;
+  font-size: var(--font-size-small);
 }
 
 .explain-money-trust span {
   color: var(--color-text-secondary);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   line-height: 1.5;
 }
 
@@ -70,7 +70,7 @@
 
 .explain-money-facts span {
   color: var(--color-text-muted);
-  font-size: 8px;
+  font-size: var(--font-size-meta);
 }
 
 .explain-money-facts strong {
@@ -79,7 +79,7 @@
 
 .explain-money-facts small {
   color: var(--color-text-secondary);
-  font-size: 8px;
+  font-size: var(--font-size-meta);
   line-height: 1.45;
 }
 
@@ -106,7 +106,7 @@
 
 .explain-money-section-heading > span {
   color: var(--color-brand);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   font-weight: 800;
 }
 
@@ -129,20 +129,20 @@
 
 .explain-money-signals span {
   color: var(--color-brand);
-  font-size: 8px;
+  font-size: var(--font-size-meta);
   font-weight: 800;
   text-transform: capitalize;
 }
 
 .explain-money-signals strong {
-  font-size: 11px;
+  font-size: var(--font-size-small);
   line-height: 1.4;
 }
 
 .explain-money-signals p {
   margin: 0;
   color: var(--color-text-secondary);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   line-height: 1.55;
 }
 
@@ -172,12 +172,12 @@
   border-radius: 50%;
   background: var(--color-brand-soft);
   color: var(--color-brand);
-  font-size: 8px;
+  font-size: var(--font-size-meta);
   font-weight: 900;
 }
 
 .explain-money-questions strong {
-  font-size: 10px;
+  font-size: var(--font-size-small);
 }
 
 .explain-money-actions {
@@ -197,7 +197,7 @@
   border-radius: 11px;
   background: var(--color-surface);
   color: var(--color-text);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   font-weight: 800;
   text-align: center;
 }
@@ -223,13 +223,13 @@
 }
 
 .explain-money-limitations strong {
-  font-size: 10px;
+  font-size: var(--font-size-small);
 }
 
 .explain-money-limitations p {
   margin: 6px 0 0;
   color: var(--color-text-secondary);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   line-height: 1.55;
 }
 

@@ -27,7 +27,7 @@
 .money-health-header > a {
   flex: 0 0 auto;
   color: var(--color-brand);
-  font-size: 10px;
+  font-size: var(--font-size-small);
   font-weight: 800;
 }
 
@@ -41,12 +41,12 @@
 }
 
 .money-health-principle strong {
-  font-size: 11px;
+  font-size: var(--font-size-small);
 }
 
 .money-health-principle span {
   color: var(--color-text-secondary);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   line-height: 1.55;
 }
 
@@ -71,7 +71,7 @@
 
 .money-health-card > span {
   color: var(--color-text-muted);
-  font-size: 9px;
+  font-size: var(--font-size-small);
 }
 
 .money-health-card > strong {
@@ -82,13 +82,13 @@
 .money-health-card > p {
   margin: 0;
   color: var(--color-text-secondary);
-  font-size: 10px;
+  font-size: var(--font-size-small);
   line-height: 1.55;
 }
 
 .money-health-card > small {
   color: var(--color-text-muted);
-  font-size: 8px;
+  font-size: var(--font-size-meta);
   line-height: 1.45;
 }
 
@@ -103,7 +103,7 @@
 
 .money-health-detail span {
   color: var(--color-text-secondary);
-  font-size: 8px;
+  font-size: var(--font-size-meta);
 }
 
 .money-health-history {
@@ -129,7 +129,7 @@
 
 .money-health-section-heading a {
   color: var(--color-brand);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   font-weight: 800;
 }
 
@@ -150,7 +150,7 @@
 
 .money-health-months article > span {
   color: var(--color-text-muted);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   font-weight: 800;
 }
 
@@ -161,7 +161,7 @@
 
 .money-health-months small {
   color: var(--color-text-muted);
-  font-size: 8px;
+  font-size: var(--font-size-meta);
 }
 
 .money-health-months strong {
@@ -183,13 +183,13 @@
 }
 
 .money-health-explainer strong {
-  font-size: 10px;
+  font-size: var(--font-size-small);
 }
 
 .money-health-explainer p {
   margin: 6px 0 0;
   color: var(--color-text-secondary);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   line-height: 1.55;
 }
 

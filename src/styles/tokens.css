@@ -26,5 +26,19 @@
   --radius-lg: 24px;
   --radius-xl: 32px;
 
+  /*
+   * Readability foundation.
+   * Ordinary interface copy must remain comfortable at 100% zoom.
+   */
+  --font-size-meta: 12px;
+  --font-size-small: 13px;
+  --font-size-ui: 14px;
+  --font-size-body: 16px;
+  --font-size-card: 17px;
+  --font-size-section: 22px;
+  --font-size-page: clamp(32px, 3.5vw, 40px);
+
+  --control-min-height: 44px;
+
   --container: 1180px;
 }

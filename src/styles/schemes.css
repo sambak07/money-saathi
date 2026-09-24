@@ -65,7 +65,7 @@
 
 .scheme-summary-card small {
   color: var(--color-text-muted);
-  font-size: 10px;
+  font-size: var(--font-size-small);
   line-height: 1.45;
 }
 
@@ -191,7 +191,7 @@
 .scheme-card-top p {
   margin: 6px 0 0;
   color: var(--color-text-muted);
-  font-size: 11px;
+  font-size: var(--font-size-small);
 }
 
 .scheme-status {
@@ -199,7 +199,7 @@
   border-radius: 999px;
   background: var(--color-brand-soft);
   color: var(--color-brand);
-  font-size: 10px;
+  font-size: var(--font-size-small);
   font-weight: 750;
 }
 
@@ -234,7 +234,7 @@
 .scheme-money-grid span,
 .scheme-date-grid span {
   color: var(--color-text-muted);
-  font-size: 10px;
+  font-size: var(--font-size-small);
 }
 
 .scheme-money-grid strong {
@@ -243,7 +243,7 @@
 
 .scheme-money-grid small {
   color: var(--color-text-muted);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   line-height: 1.35;
 }
 
@@ -257,13 +257,13 @@
 }
 
 .scheme-date-grid strong {
-  font-size: 11px;
+  font-size: var(--font-size-small);
 }
 
 .scheme-note {
   margin: 14px 0 0;
   color: var(--color-text-secondary);
-  font-size: 11px;
+  font-size: var(--font-size-small);
   line-height: 1.5;
 }
 
@@ -278,7 +278,7 @@
   border: 0;
   background: transparent;
   color: var(--color-brand);
-  font-size: 11px;
+  font-size: var(--font-size-small);
   font-weight: 700;
 }
 
@@ -354,7 +354,7 @@
 
 .scheme-field > small {
   color: var(--color-text-muted);
-  font-size: 10px;
+  font-size: var(--font-size-small);
   line-height: 1.45;
 }
 

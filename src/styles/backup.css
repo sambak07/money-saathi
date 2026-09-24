@@ -23,7 +23,7 @@
   margin-top: 16px;
   padding: 13px 15px;
   border-radius: 12px;
-  font-size: 11px;
+  font-size: var(--font-size-small);
   line-height: 1.55;
 }
 
@@ -76,7 +76,7 @@
 .backup-panel-heading > p:last-child {
   margin: 8px 0 0;
   color: var(--color-text-secondary);
-  font-size: 11px;
+  font-size: var(--font-size-small);
   line-height: 1.55;
 }
 
@@ -94,7 +94,7 @@
 .backup-field label,
 .backup-danger-zone label {
   color: var(--color-text);
-  font-size: 11px;
+  font-size: var(--font-size-small);
   font-weight: 700;
 }
 
@@ -123,7 +123,7 @@
 
 .backup-field small {
   color: var(--color-text-muted);
-  font-size: 9px;
+  font-size: var(--font-size-small);
 }
 
 .backup-primary-button,
@@ -132,7 +132,7 @@
   min-height: 48px;
   padding: 0 15px;
   border-radius: 12px;
-  font-size: 11px;
+  font-size: var(--font-size-small);
   font-weight: 800;
 }
 
@@ -166,14 +166,14 @@
 
 .backup-facts span {
   color: var(--color-text-muted);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   font-weight: 750;
 }
 
 .backup-facts p {
   margin: 0;
   color: var(--color-text-secondary);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   line-height: 1.5;
 }
 
@@ -190,7 +190,7 @@
 
 .backup-verified-heading > span {
   color: var(--color-text-muted);
-  font-size: 9px;
+  font-size: var(--font-size-small);
 }
 
 .backup-summary-grid {
@@ -213,7 +213,7 @@
 
 .backup-summary-grid span {
   color: var(--color-text-muted);
-  font-size: 9px;
+  font-size: var(--font-size-small);
 }
 
 .backup-summary-grid strong {
@@ -238,7 +238,7 @@
 .backup-danger-zone p {
   margin: 0;
   color: var(--color-text-secondary);
-  font-size: 10px;
+  font-size: var(--font-size-small);
   line-height: 1.55;
 }
 

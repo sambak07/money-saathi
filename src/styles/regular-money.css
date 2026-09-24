@@ -185,7 +185,7 @@
 
 .regular-row-amount span {
   color: var(--color-text-muted);
-  font-size: 11px;
+  font-size: var(--font-size-small);
 }
 
 .regular-row-amount .regular-due {
@@ -213,7 +213,7 @@
   border: 0;
   background: transparent;
   color: var(--color-brand);
-  font-size: 11px;
+  font-size: var(--font-size-small);
   font-weight: 700;
 }
 
@@ -232,7 +232,7 @@
   border-radius: 10px;
   background: var(--color-brand);
   color: white;
-  font-size: 11px;
+  font-size: var(--font-size-small);
   font-weight: 750;
 }
 
@@ -249,7 +249,7 @@
   grid-column: 1 / -1;
   margin: -5px 0 0;
   color: var(--color-text-muted);
-  font-size: 11px;
+  font-size: var(--font-size-small);
   line-height: 1.5;
 }
 
@@ -350,9 +350,11 @@
 }
 
 .regular-amount-input span {
+  flex: 0 0 auto;
   color: var(--color-text-secondary);
   font-size: 14px;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .regular-amount-input input {

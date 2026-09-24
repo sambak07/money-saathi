@@ -27,7 +27,7 @@
 .business-header > a {
   flex: 0 0 auto;
   color: var(--color-brand);
-  font-size: 10px;
+  font-size: var(--font-size-small);
   font-weight: 800;
 }
 
@@ -36,7 +36,7 @@
   margin-top: 16px;
   padding: 13px 15px;
   border-radius: 12px;
-  font-size: 11px;
+  font-size: var(--font-size-small);
   line-height: 1.55;
 }
 
@@ -63,12 +63,12 @@
 }
 
 .business-separation-note strong {
-  font-size: 11px;
+  font-size: var(--font-size-small);
 }
 
 .business-separation-note span {
   color: var(--color-text-secondary);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   line-height: 1.5;
 }
 
@@ -93,7 +93,7 @@
   display: grid;
   gap: 7px;
   color: var(--color-text);
-  font-size: 10px;
+  font-size: var(--font-size-small);
   font-weight: 800;
 }
 
@@ -125,7 +125,7 @@
   border-radius: 11px;
   background: var(--color-brand);
   color: white;
-  font-size: 10px;
+  font-size: var(--font-size-small);
   font-weight: 800;
 }
 
@@ -148,7 +148,7 @@
 
 .business-rename-form label {
   color: var(--color-text);
-  font-size: 10px;
+  font-size: var(--font-size-small);
   font-weight: 800;
 }
 
@@ -160,7 +160,7 @@
   border-radius: 10px;
   background: white;
   color: var(--color-text);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   font-weight: 800;
 }
 
@@ -188,7 +188,7 @@
 
 .business-summary-grid span {
   color: var(--color-text-muted);
-  font-size: 9px;
+  font-size: var(--font-size-small);
 }
 
 .business-summary-grid strong {
@@ -197,7 +197,7 @@
 
 .business-summary-grid small {
   color: var(--color-text-secondary);
-  font-size: 8px;
+  font-size: var(--font-size-meta);
   line-height: 1.45;
 }
 
@@ -239,7 +239,7 @@
   border-radius: 11px;
   background: white;
   color: var(--color-text-secondary);
-  font-size: 10px;
+  font-size: var(--font-size-small);
   font-weight: 800;
 }
 
@@ -264,7 +264,7 @@
   border-radius: 9px;
   background: transparent;
   color: var(--color-danger);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   font-weight: 800;
 }
 
@@ -292,7 +292,7 @@
 
 .business-transaction-row span {
   color: var(--color-text-secondary);
-  font-size: 9px;
+  font-size: var(--font-size-small);
 }
 
 .business-transaction-amount {
@@ -323,7 +323,7 @@
 .business-empty p {
   margin: 7px 0 0;
   color: var(--color-text-secondary);
-  font-size: 10px;
+  font-size: var(--font-size-small);
   line-height: 1.5;
 }
 

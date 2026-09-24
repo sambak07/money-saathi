@@ -64,7 +64,7 @@
 }
 
 .loan-summary-card small {
-  font-size: 10px;
+  font-size: var(--font-size-small);
   line-height: 1.45;
 }
 
@@ -190,7 +190,7 @@
 .loan-card-top p {
   margin: 6px 0 0;
   color: var(--color-text-muted);
-  font-size: 11px;
+  font-size: var(--font-size-small);
 }
 
 .loan-status {
@@ -198,7 +198,7 @@
   border-radius: 999px;
   background: rgba(196, 54, 46, 0.08);
   color: var(--color-danger);
-  font-size: 10px;
+  font-size: var(--font-size-small);
   font-weight: 750;
 }
 
@@ -235,7 +235,7 @@
 
 .loan-money-grid span {
   color: var(--color-text-muted);
-  font-size: 10px;
+  font-size: var(--font-size-small);
 }
 
 .loan-money-grid strong {
@@ -248,13 +248,13 @@
   flex-wrap: wrap;
   gap: 8px 14px;
   color: var(--color-text-muted);
-  font-size: 10px;
+  font-size: var(--font-size-small);
 }
 
 .loan-note {
   margin: 12px 0 0;
   color: var(--color-text-secondary);
-  font-size: 11px;
+  font-size: var(--font-size-small);
   line-height: 1.5;
 }
 
@@ -271,7 +271,7 @@
   border: 0;
   background: transparent;
   color: var(--color-brand);
-  font-size: 11px;
+  font-size: var(--font-size-small);
   font-weight: 700;
 }
 

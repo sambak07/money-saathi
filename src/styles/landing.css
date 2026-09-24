@@ -199,7 +199,7 @@
   background: var(--color-brand-soft);
   color: var(--color-brand);
 
-  font-size: 11px;
+  font-size: var(--font-size-small);
   font-weight: 900;
 }
 

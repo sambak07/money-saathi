@@ -9,6 +9,7 @@
   position: sticky;
   top: 0;
   height: 100vh;
+  overflow: hidden;
 
   padding: 28px 18px;
 
@@ -48,7 +49,7 @@
   margin: 18px 10px 9px;
 
   color: var(--color-text-muted);
-  font-size: 11px;
+  font-size: var(--font-size-small);
   font-weight: 750;
 
   letter-spacing: 0.08em;
@@ -56,8 +57,17 @@
 }
 
 .sidebar-nav {
+  min-height: 0;
+  padding-right: 4px;
+
   display: grid;
+  flex: 1 1 auto;
+  align-content: start;
   gap: 4px;
+
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
 }
 
 .sidebar-item {
@@ -95,9 +105,10 @@
 .sidebar-footer {
   margin-top: auto;
   padding: 20px 10px 0;
+  flex: 0 0 auto;
 
   color: var(--color-text-muted);
-  font-size: 11px;
+  font-size: var(--font-size-small);
   line-height: 1.55;
 }
 
@@ -131,9 +142,19 @@
 .form-header h1 {
   margin: 0;
 
-  font-size: clamp(32px, 4vw, 46px);
-  line-height: 1.05;
-  letter-spacing: -0.045em;
+  font-size: var(--font-size-page);
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+}
+
+/*
+ * App page headings share one readable scale even when older
+ * page-specific styles still contain larger display values.
+ */
+.app-layout .app-main h1 {
+  font-size: var(--font-size-page);
+  line-height: 1.08;
+  letter-spacing: -0.035em;
 }
 
 .add-money-button,
@@ -385,7 +406,7 @@
   background: transparent;
 
   color: var(--color-text-muted);
-  font-size: 11px;
+  font-size: var(--font-size-small);
   font-weight: 650;
 }
 
@@ -552,9 +573,11 @@
 }
 
 .amount-input-wrap span {
+  flex: 0 0 auto;
   color: var(--color-text-secondary);
   font-size: 16px;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .amount-input-wrap input {
@@ -640,7 +663,7 @@
 @media (max-width: 850px) {
   .app-layout {
     display: block;
-    padding-bottom: 84px;
+    padding-bottom: 96px;
   }
 
   .app-sidebar {
@@ -667,11 +690,11 @@
     right: 12px;
     bottom: 12px;
 
-    min-height: 64px;
+    min-height: 72px;
     padding: 7px;
 
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(5, minmax(0, 1fr));
 
     border: 1px solid var(--color-border);
     border-radius: 18px;
@@ -685,6 +708,10 @@
   }
 
   .mobile-nav-item {
+    min-width: 0;
+    min-height: 48px;
+    padding: 4px 6px;
+
     display: grid;
     place-items: center;
 
@@ -694,13 +721,25 @@
     background: transparent;
     color: var(--color-text-muted);
 
-    font-size: 10px;
+    font-size: var(--font-size-ui);
     font-weight: 700;
+    line-height: 1.15;
+    text-align: center;
   }
 
   .mobile-nav-item.active {
     background: var(--color-brand-soft);
     color: var(--color-brand);
+  }
+
+  .mobile-nav-item.mobile-nav-add {
+    background: var(--color-brand);
+    color: white;
+  }
+
+  .mobile-nav-item.mobile-nav-add.active {
+    background: var(--color-brand-hover);
+    color: white;
   }
 }
 
@@ -709,8 +748,9 @@
     align-items: center;
   }
 
+  .app-layout .app-main h1,
   .dashboard-header h1 {
-    font-size: 31px;
+    font-size: clamp(28px, 8vw, 32px);
   }
 
   .add-money-button {

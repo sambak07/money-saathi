@@ -4,7 +4,7 @@
   display: grid;
   place-items: center;
   color: var(--color-text-secondary);
-  font-size: 11px;
+  font-size: var(--font-size-small);
   font-weight: 700;
   text-align: center;
 }

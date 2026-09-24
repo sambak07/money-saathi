@@ -39,8 +39,8 @@
   max-width: 100%;
 }
 
-:where(p, li, td, th, label, span, strong) {
-  overflow-wrap: anywhere;
+:where(p, li, td, th, label) {
+  overflow-wrap: break-word;
 }
 
 @media (max-width: 520px) {

@@ -27,7 +27,7 @@
 .loan-reminders-header > a {
   flex: 0 0 auto;
   color: var(--color-brand);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   font-weight: 800;
 }
 
@@ -36,7 +36,7 @@
   margin-top: 14px;
   padding: 12px 14px;
   border-radius: 12px;
-  font-size: 9px;
+  font-size: var(--font-size-small);
 }
 
 .loan-reminders-message {
@@ -61,12 +61,12 @@
 }
 
 .loan-reminders-trust strong {
-  font-size: 10px;
+  font-size: var(--font-size-small);
 }
 
 .loan-reminders-trust span {
   color: var(--color-text-secondary);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   line-height: 1.5;
 }
 
@@ -93,7 +93,7 @@
 
 .loan-reminder-card-heading span {
   color: var(--color-text-muted);
-  font-size: 8px;
+  font-size: var(--font-size-meta);
 }
 
 .loan-reminder-card-heading h2 {
@@ -123,7 +123,7 @@
 .loan-reminder-card label {
   display: grid;
   gap: 7px;
-  font-size: 9px;
+  font-size: var(--font-size-small);
   font-weight: 800;
 }
 
@@ -145,7 +145,7 @@
   border-radius: 10px;
   background: var(--color-brand);
   color: white;
-  font-size: 9px;
+  font-size: var(--font-size-small);
   font-weight: 800;
 }
 
@@ -182,14 +182,14 @@
   max-width: 520px;
   margin: 0;
   color: var(--color-text-secondary);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   line-height: 1.5;
 }
 
 .loan-reminders-empty a {
   margin-top: 4px;
   color: var(--color-brand);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   font-weight: 800;
 }
 
@@ -208,13 +208,13 @@
 }
 
 .loan-reminders-guardrails strong {
-  font-size: 10px;
+  font-size: var(--font-size-small);
 }
 
 .loan-reminders-guardrails p {
   margin: 6px 0 0;
   color: var(--color-text-secondary);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   line-height: 1.55;
 }
 

@@ -24,7 +24,7 @@
 
 .pwa-update-banner span {
   color: var(--color-text-secondary);
-  font-size: 10px;
+  font-size: var(--font-size-small);
   line-height: 1.5;
 }
 
@@ -41,7 +41,7 @@
   border-radius: 10px;
   background: var(--color-brand);
   color: white;
-  font-size: 10px;
+  font-size: var(--font-size-small);
   font-weight: 800;
 }
 

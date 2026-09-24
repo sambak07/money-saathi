@@ -241,7 +241,7 @@
 
 .budget-row-amount span {
   color: var(--color-text-muted);
-  font-size: 11px;
+  font-size: var(--font-size-small);
 }
 
 .budget-progress-track {
@@ -282,7 +282,7 @@
 
   color: var(--color-brand);
 
-  font-size: 11px;
+  font-size: var(--font-size-small);
   font-weight: 700;
 }
 
@@ -382,9 +382,11 @@
 }
 
 .budget-amount-input span {
+  flex: 0 0 auto;
   color: var(--color-text-secondary);
   font-size: 14px;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .budget-amount-input input {

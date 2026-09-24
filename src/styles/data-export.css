@@ -27,7 +27,7 @@
 .data-export-header > a {
   flex: 0 0 auto;
   color: var(--color-brand);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   font-weight: 800;
 }
 
@@ -38,7 +38,7 @@
   border-radius: 12px;
   background: var(--color-brand-soft);
   color: var(--color-brand);
-  font-size: 9px;
+  font-size: var(--font-size-small);
 }
 
 .data-export-warning {
@@ -51,12 +51,12 @@
 }
 
 .data-export-warning strong {
-  font-size: 10px;
+  font-size: var(--font-size-small);
 }
 
 .data-export-warning span {
   color: var(--color-text-secondary);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   line-height: 1.5;
 }
 
@@ -83,7 +83,7 @@
   max-width: 720px;
   margin: 8px 0 0;
   color: var(--color-text-secondary);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   line-height: 1.55;
 }
 
@@ -91,7 +91,7 @@
   display: inline-block;
   margin-top: 8px;
   color: var(--color-text-muted);
-  font-size: 8px;
+  font-size: var(--font-size-meta);
 }
 
 .data-export-primary button,
@@ -103,7 +103,7 @@
   border-radius: 10px;
   background: var(--color-brand);
   color: white;
-  font-size: 9px;
+  font-size: var(--font-size-small);
   font-weight: 800;
 }
 
@@ -130,7 +130,7 @@
 
 .data-export-section-heading > a {
   color: var(--color-brand);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   font-weight: 800;
 }
 
@@ -157,12 +157,12 @@
 }
 
 .data-export-businesses strong {
-  font-size: 10px;
+  font-size: var(--font-size-small);
 }
 
 .data-export-businesses span {
   color: var(--color-text-secondary);
-  font-size: 8px;
+  font-size: var(--font-size-meta);
 }
 
 .data-export-empty {
@@ -171,7 +171,7 @@
   border: 1px dashed var(--color-border-strong);
   border-radius: 13px;
   color: var(--color-text-secondary);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   text-align: center;
 }
 
@@ -191,14 +191,14 @@
 
 .data-export-explainer strong,
 .data-export-backup strong {
-  font-size: 10px;
+  font-size: var(--font-size-small);
 }
 
 .data-export-explainer p,
 .data-export-backup p {
   margin: 6px 0 0;
   color: var(--color-text-secondary);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   line-height: 1.55;
 }
 
@@ -222,7 +222,7 @@
   border-radius: 10px;
   background: var(--color-brand);
   color: white;
-  font-size: 9px;
+  font-size: var(--font-size-small);
   font-weight: 800;
 }
 

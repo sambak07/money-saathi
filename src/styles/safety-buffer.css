@@ -22,7 +22,7 @@
   margin-top: 16px;
   padding: 13px 15px;
   border-radius: 12px;
-  font-size: 11px;
+  font-size: var(--font-size-small);
   line-height: 1.55;
 }
 
@@ -59,7 +59,7 @@
   max-width: 620px;
   margin: 8px 0 0;
   color: var(--color-text-secondary);
-  font-size: 10px;
+  font-size: var(--font-size-small);
   line-height: 1.55;
 }
 
@@ -70,7 +70,7 @@
 }
 
 .safety-buffer-form label {
-  font-size: 11px;
+  font-size: var(--font-size-small);
   font-weight: 800;
 }
 
@@ -96,7 +96,7 @@
   border-radius: 12px;
   background: var(--color-brand);
   color: white;
-  font-size: 11px;
+  font-size: var(--font-size-small);
   font-weight: 800;
 }
 
@@ -120,7 +120,7 @@
 
 .safety-buffer-facts span {
   color: var(--color-text-muted);
-  font-size: 9px;
+  font-size: var(--font-size-small);
 }
 
 .safety-buffer-facts strong {
@@ -130,7 +130,7 @@
 .safety-buffer-facts p {
   margin: 0;
   color: var(--color-text-secondary);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   line-height: 1.5;
 }
 
@@ -143,7 +143,7 @@
   border-radius: 14px;
   background: var(--color-brand-soft);
   color: var(--color-text-secondary);
-  font-size: 10px;
+  font-size: var(--font-size-small);
 }
 
 .safety-buffer-note a {

@@ -25,7 +25,7 @@
   border-radius: 12px;
   background: var(--color-brand-soft);
   color: var(--color-brand);
-  font-size: 11px;
+  font-size: var(--font-size-small);
   line-height: 1.55;
 }
 
@@ -82,7 +82,7 @@
 
 .adaptive-need-card > span:last-child {
   color: var(--color-text-secondary);
-  font-size: 10px;
+  font-size: var(--font-size-small);
   line-height: 1.55;
 }
 
@@ -108,7 +108,7 @@
   max-width: 680px;
   margin: 8px 0 0;
   color: var(--color-text-secondary);
-  font-size: 10px;
+  font-size: var(--font-size-small);
   line-height: 1.55;
 }
 
@@ -120,7 +120,7 @@
   border-radius: 12px;
   background: var(--color-brand);
   color: white;
-  font-size: 11px;
+  font-size: var(--font-size-small);
   font-weight: 800;
 }
 
@@ -144,7 +144,7 @@
 
 .adaptive-principles span {
   color: var(--color-text-muted);
-  font-size: 9px;
+  font-size: var(--font-size-small);
 }
 
 .adaptive-principles strong {
@@ -154,7 +154,7 @@
 .adaptive-principles p {
   margin: 0;
   color: var(--color-text-secondary);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   line-height: 1.5;
 }
 
@@ -168,7 +168,7 @@
   border-radius: 14px;
   background: var(--color-brand-soft);
   color: var(--color-text-secondary);
-  font-size: 10px;
+  font-size: var(--font-size-small);
   line-height: 1.55;
 }
 
@@ -229,7 +229,7 @@
 .adaptive-home-choice p:last-child {
   margin: 8px 0 0;
   color: var(--color-text-secondary);
-  font-size: 10px;
+  font-size: var(--font-size-small);
   line-height: 1.55;
 }
 
@@ -263,7 +263,7 @@
 
 .adaptive-home-choice-buttons span {
   color: var(--color-text-secondary);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   line-height: 1.5;
 }
 
@@ -287,12 +287,12 @@
 
 .adaptive-bhutan-note strong {
   flex: 0 0 auto;
-  font-size: 9px;
+  font-size: var(--font-size-small);
 }
 
 .adaptive-bhutan-note span {
   color: var(--color-text-secondary);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   line-height: 1.45;
 }
 

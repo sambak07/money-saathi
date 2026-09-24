@@ -67,7 +67,7 @@
 
 .asset-summary-card small {
   color: var(--color-text-muted);
-  font-size: 10px;
+  font-size: var(--font-size-small);
   line-height: 1.45;
 }
 
@@ -205,9 +205,11 @@
 }
 
 .asset-money-input span {
+  flex: 0 0 auto;
   color: var(--color-text-secondary);
   font-size: 14px;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .asset-money-input input {
@@ -230,7 +232,7 @@
   border-radius: 11px;
   background: #f6f8f6;
   color: var(--color-text-muted);
-  font-size: 11px;
+  font-size: var(--font-size-small);
   line-height: 1.55;
 }
 
@@ -278,7 +280,7 @@
 .deposit-card p {
   margin: 5px 0 0;
   color: var(--color-text-muted);
-  font-size: 11px;
+  font-size: var(--font-size-small);
 }
 
 .asset-row-value {
@@ -301,7 +303,7 @@
   border: 0;
   background: transparent;
   color: var(--color-brand);
-  font-size: 11px;
+  font-size: var(--font-size-small);
   font-weight: 700;
 }
 
@@ -353,7 +355,7 @@
 
 .deposit-details span {
   color: var(--color-text-muted);
-  font-size: 10px;
+  font-size: var(--font-size-small);
 }
 
 .deposit-details strong {

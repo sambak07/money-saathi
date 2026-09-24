@@ -27,7 +27,7 @@
 .money-timeline-header > a {
   flex: 0 0 auto;
   color: var(--color-brand);
-  font-size: 10px;
+  font-size: var(--font-size-small);
   font-weight: 800;
 }
 
@@ -44,7 +44,7 @@
 }
 
 .money-timeline-range > span {
-  font-size: 10px;
+  font-size: var(--font-size-small);
   font-weight: 800;
 }
 
@@ -61,7 +61,7 @@
   border-radius: 10px;
   background: white;
   color: var(--color-text-secondary);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   font-weight: 800;
 }
 
@@ -91,7 +91,7 @@
 
 .money-timeline-summary span {
   color: var(--color-text-muted);
-  font-size: 9px;
+  font-size: var(--font-size-small);
 }
 
 .money-timeline-summary strong {
@@ -100,7 +100,7 @@
 
 .money-timeline-summary small {
   color: var(--color-text-secondary);
-  font-size: 8px;
+  font-size: var(--font-size-meta);
   line-height: 1.45;
 }
 
@@ -114,12 +114,12 @@
 }
 
 .money-timeline-warning strong {
-  font-size: 11px;
+  font-size: var(--font-size-small);
 }
 
 .money-timeline-warning span {
   color: var(--color-text-secondary);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   line-height: 1.5;
 }
 
@@ -147,7 +147,7 @@
 .money-timeline-panel-heading > span,
 .money-timeline-panel-heading > a {
   color: var(--color-brand);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   font-weight: 800;
 }
 
@@ -173,12 +173,12 @@
 }
 
 .money-timeline-date strong {
-  font-size: 11px;
+  font-size: var(--font-size-small);
 }
 
 .money-timeline-date span {
   color: var(--color-text-secondary);
-  font-size: 8px;
+  font-size: var(--font-size-meta);
 }
 
 .money-timeline-items {
@@ -207,7 +207,7 @@
 .money-timeline-row span,
 .scheme-reference-row span {
   color: var(--color-text-secondary);
-  font-size: 8px;
+  font-size: var(--font-size-meta);
 }
 
 .money-timeline-empty {
@@ -229,7 +229,7 @@
 .money-timeline-empty p {
   margin: 6px 0 0;
   color: var(--color-text-secondary);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   line-height: 1.5;
 }
 
@@ -237,7 +237,7 @@
   max-width: 820px;
   margin: 12px 0 0;
   color: var(--color-text-secondary);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   line-height: 1.55;
 }
 
@@ -260,13 +260,13 @@
 }
 
 .money-timeline-limitations strong {
-  font-size: 11px;
+  font-size: var(--font-size-small);
 }
 
 .money-timeline-limitations p {
   margin: 6px 0 0;
   color: var(--color-text-secondary);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   line-height: 1.55;
 }
 

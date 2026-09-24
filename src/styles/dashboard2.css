@@ -63,7 +63,7 @@
 }
 
 .dashboard2-hero-balance span {
-  font-size: 11px;
+  font-size: var(--font-size-small);
   font-weight: 700;
 }
 
@@ -73,7 +73,7 @@
 }
 
 .dashboard2-hero-balance small {
-  font-size: 9px;
+  font-size: var(--font-size-small);
   line-height: 1.45;
 }
 
@@ -93,7 +93,7 @@
   border-radius: 11px;
   background: white;
   color: var(--color-text-secondary);
-  font-size: 11px;
+  font-size: var(--font-size-small);
   font-weight: 700;
 }
 
@@ -125,7 +125,7 @@
 
 .dashboard2-stat-card span {
   color: var(--color-text-muted);
-  font-size: 11px;
+  font-size: var(--font-size-small);
   font-weight: 650;
 }
 
@@ -136,7 +136,7 @@
 
 .dashboard2-stat-card small {
   color: var(--color-text-muted);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   line-height: 1.4;
 }
 
@@ -147,7 +147,7 @@
   border-radius: 11px;
   background: #fff;
   color: var(--color-text-secondary);
-  font-size: 11px;
+  font-size: var(--font-size-small);
   line-height: 1.5;
 }
 
@@ -190,7 +190,7 @@
 
 .dashboard2-panel-heading > a {
   color: var(--color-brand);
-  font-size: 10px;
+  font-size: var(--font-size-small);
   font-weight: 750;
   white-space: nowrap;
 }
@@ -213,7 +213,7 @@
 .dashboard2-scheme-grid span,
 .dashboard2-inline-facts span {
   color: var(--color-text-muted);
-  font-size: 10px;
+  font-size: var(--font-size-small);
 }
 
 .dashboard2-budget-numbers strong,
@@ -242,7 +242,7 @@
 .dashboard2-panel-note {
   margin: 10px 20px 18px;
   color: var(--color-text-muted);
-  font-size: 10px;
+  font-size: var(--font-size-small);
   line-height: 1.5;
 }
 
@@ -252,7 +252,7 @@
   display: grid;
   place-items: center;
   color: var(--color-text-muted);
-  font-size: 11px;
+  font-size: var(--font-size-small);
   text-align: center;
 }
 
@@ -284,16 +284,16 @@
 }
 
 .dashboard2-mini-row > div strong {
-  font-size: 11px;
+  font-size: var(--font-size-small);
 }
 
 .dashboard2-mini-row > div span {
   color: var(--color-text-muted);
-  font-size: 9px;
+  font-size: var(--font-size-small);
 }
 
 .dashboard2-mini-row > strong {
-  font-size: 11px;
+  font-size: var(--font-size-small);
 }
 
 .dashboard2-financial-position {
@@ -337,7 +337,7 @@
 }
 
 .dashboard2-position-grid span {
-  font-size: 10px;
+  font-size: var(--font-size-small);
 }
 
 .dashboard2-position-grid strong {
@@ -345,7 +345,7 @@
 }
 
 .dashboard2-position-grid small {
-  font-size: 9px;
+  font-size: var(--font-size-small);
   line-height: 1.45;
 }
 
@@ -363,7 +363,7 @@
   margin: 0;
   padding: 0 22px 20px;
   color: rgba(255, 255, 255, 0.7);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   line-height: 1.5;
 }
 
@@ -376,7 +376,7 @@
 .dashboard2-goal-hero span,
 .dashboard2-goal-hero small {
   color: var(--color-text-muted);
-  font-size: 10px;
+  font-size: var(--font-size-small);
 }
 
 .dashboard2-goal-hero strong {
@@ -437,12 +437,12 @@
 }
 
 .dashboard2-transaction-row strong {
-  font-size: 11px;
+  font-size: var(--font-size-small);
 }
 
 .dashboard2-transaction-row span {
   color: var(--color-text-muted);
-  font-size: 9px;
+  font-size: var(--font-size-small);
 }
 
 @media (max-width: 1000px) {
@@ -517,14 +517,14 @@
 .dashboard2-adaptive-strip span {
   max-width: 820px;
   color: var(--color-text-secondary);
-  font-size: 10px;
+  font-size: var(--font-size-small);
   line-height: 1.5;
 }
 
 .dashboard2-adaptive-strip a {
   flex: 0 0 auto;
   color: var(--color-brand);
-  font-size: 10px;
+  font-size: var(--font-size-small);
   font-weight: 800;
 }
 
@@ -551,7 +551,7 @@
 }
 
 .dashboard2-safe-main > span {
-  font-size: 11px;
+  font-size: var(--font-size-small);
   font-weight: 700;
 }
 
@@ -565,7 +565,7 @@
   max-width: 440px;
   margin-top: 6px;
   color: rgba(255, 255, 255, 0.74);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   line-height: 1.55;
 }
 
@@ -588,7 +588,7 @@
 
 .dashboard2-safe-breakdown span {
   color: rgba(255, 255, 255, 0.72);
-  font-size: 9px;
+  font-size: var(--font-size-small);
 }
 
 .dashboard2-safe-breakdown strong {
@@ -603,7 +603,7 @@
   justify-content: space-between;
   gap: 14px;
   color: rgba(255, 255, 255, 0.78);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   line-height: 1.5;
 }
 
@@ -639,7 +639,7 @@
 
 .dashboard2-focus-grid span {
   color: var(--color-text-muted);
-  font-size: 9px;
+  font-size: var(--font-size-small);
 }
 
 .dashboard2-focus-grid strong {
@@ -649,7 +649,7 @@
 .dashboard2-focus-grid p {
   margin: 0;
   color: var(--color-text-secondary);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   line-height: 1.5;
 }
 

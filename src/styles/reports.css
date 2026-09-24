@@ -39,7 +39,7 @@
 
 .reports-month-control label {
   color: var(--color-text-muted);
-  font-size: 10px;
+  font-size: var(--font-size-small);
   font-weight: 700;
 }
 
@@ -59,7 +59,7 @@
   margin-top: 16px;
   padding: 12px 14px;
   border-radius: 11px;
-  font-size: 11px;
+  font-size: var(--font-size-small);
   line-height: 1.5;
 }
 
@@ -102,7 +102,7 @@
 
 .reports-summary-card span {
   color: var(--color-text-muted);
-  font-size: 11px;
+  font-size: var(--font-size-small);
   font-weight: 650;
 }
 
@@ -118,7 +118,7 @@
 
 .reports-summary-card small {
   color: var(--color-text-muted);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   line-height: 1.45;
 }
 
@@ -148,7 +148,7 @@
 
 .reports-panel-heading > span {
   color: var(--color-text-muted);
-  font-size: 10px;
+  font-size: var(--font-size-small);
   font-weight: 650;
 }
 
@@ -176,12 +176,12 @@
 }
 
 .reports-trend-label strong {
-  font-size: 11px;
+  font-size: var(--font-size-small);
 }
 
 .reports-trend-label span {
   color: var(--color-text-muted);
-  font-size: 9px;
+  font-size: var(--font-size-small);
 }
 
 .reports-trend-bars {
@@ -199,7 +199,7 @@
 
 .reports-trend-line > span {
   color: var(--color-text-muted);
-  font-size: 9px;
+  font-size: var(--font-size-small);
   font-weight: 700;
 }
 
@@ -211,7 +211,7 @@
 }
 
 .reports-trend-line > strong {
-  font-size: 10px;
+  font-size: var(--font-size-small);
   text-align: right;
 }
 
@@ -264,12 +264,12 @@
 }
 
 .reports-category-top strong {
-  font-size: 11px;
+  font-size: var(--font-size-small);
 }
 
 .reports-category-top span {
   color: var(--color-text-muted);
-  font-size: 9px;
+  font-size: var(--font-size-small);
 }
 
 .reports-category-track {
@@ -307,7 +307,7 @@
 .reports-insight-grid span,
 .reports-insight-grid small {
   color: var(--color-text-muted);
-  font-size: 9px;
+  font-size: var(--font-size-small);
 }
 
 .reports-insight-grid strong {
@@ -320,7 +320,7 @@
   display: grid;
   place-items: center;
   color: var(--color-text-muted);
-  font-size: 11px;
+  font-size: var(--font-size-small);
   text-align: center;
 }
 
@@ -353,12 +353,12 @@
 }
 
 .reports-transaction-row strong {
-  font-size: 11px;
+  font-size: var(--font-size-small);
 }
 
 .reports-transaction-row span {
   color: var(--color-text-muted);
-  font-size: 9px;
+  font-size: var(--font-size-small);
 }
 
 @media (max-width: 1000px) {
