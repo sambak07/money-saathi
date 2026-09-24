@@ -12,6 +12,12 @@ import {
   clearAllFinancialData,
 } from '../storage/db'
 import {
+  clearVaultSessionKey,
+} from '../vault/vaultSession'
+import {
+  clearVaultStorage,
+} from '../vault/vaultStore'
+import {
   type DashboardRecentCount,
   type MoneySaathiPreferences,
   type ReportTrendMonths,
@@ -90,15 +96,24 @@ function SettingsPage() {
     setErasing(true)
 
     try {
+      // Money Vault is intentionally stored in a separate IndexedDB.
+      // Erase it first so the most sensitive local records are not
+      // accidentally left behind by the app-wide erase control.
+      await clearVaultStorage()
+      clearVaultSessionKey()
+
       await clearAllFinancialData()
       clearLoanDueReminders()
+
       setErasePhrase('')
       setMessage(
-        'All personal and business financial records, including verified loan reminders, were erased. App Lock and device preferences were kept.',
+        'All personal and business financial records, Money Vault records and verified loan reminders were erased from this browser. App Lock and device preferences were kept. Exported backup files are not deleted.',
       )
     } catch {
+      clearVaultSessionKey()
+
       setError(
-        'Money Saathi could not erase the financial database.',
+        'Money Saathi could not complete the full local data erase. Some records may already have been erased; retry DELETE ALL before leaving this device.',
       )
     } finally {
       setErasing(false)
@@ -330,10 +345,12 @@ function SettingsPage() {
             <h2>Erase all financial records</h2>
 
             <p>
-              This clears transactions, budgets, Regular Money,
-              goals, savings, deposits, loans and schemes from
-              this browser. App Lock and display preferences are
-              preserved.
+              This clears personal and business money records,
+              Money Vault records, loan reminders, transactions,
+              budgets, Regular Money, goals, savings, deposits,
+              loans and schemes from this browser. App Lock and
+              device preferences are preserved. Exported backup
+              files are not deleted.
             </p>
           </div>
 

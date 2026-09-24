@@ -282,21 +282,27 @@ function VaultPage() {
       return
     }
 
+    function lockForSecurity(
+      reason: string,
+    ) {
+      clearVaultSessionKey()
+      setEntries([])
+      setRevealed(
+        new Set(),
+      )
+      setDraft(
+        emptyDraft,
+      )
+      setEditingId(null)
+      setPendingDeleteId(null)
+      setStatus('locked')
+      setError(reason)
+    }
+
     let timer =
       window.setTimeout(
         () => {
-          clearVaultSessionKey()
-          setEntries([])
-          setRevealed(
-            new Set(),
-          )
-          setDraft(
-            emptyDraft,
-          )
-          setEditingId(null)
-          setPendingDeleteId(null)
-          setStatus('locked')
-          setError(
+          lockForSecurity(
             'Money Vault locked after 10 minutes of inactivity.',
           )
         },
@@ -311,23 +317,31 @@ function VaultPage() {
       timer =
         window.setTimeout(
           () => {
-            clearVaultSessionKey()
-            setEntries([])
-            setRevealed(
-              new Set(),
-            )
-            setDraft(
-              emptyDraft,
-            )
-            setEditingId(null)
-            setPendingDeleteId(null)
-            setStatus('locked')
-            setError(
+            lockForSecurity(
               'Money Vault locked after 10 minutes of inactivity.',
             )
           },
           VAULT_IDLE_LOCK_MS,
         )
+    }
+
+    function handleVisibilityChange() {
+      if (
+        document.visibilityState ===
+        'hidden'
+      ) {
+        window.clearTimeout(
+          timer,
+        )
+
+        lockForSecurity(
+          'Money Vault locked because Money Saathi moved to the background.',
+        )
+      }
+    }
+
+    function handlePageHide() {
+      clearVaultSessionKey()
     }
 
     window.addEventListener(
@@ -343,6 +357,16 @@ function VaultPage() {
     window.addEventListener(
       'touchstart',
       resetIdleTimer,
+    )
+
+    document.addEventListener(
+      'visibilitychange',
+      handleVisibilityChange,
+    )
+
+    window.addEventListener(
+      'pagehide',
+      handlePageHide,
     )
 
     return () => {
@@ -363,6 +387,16 @@ function VaultPage() {
       window.removeEventListener(
         'touchstart',
         resetIdleTimer,
+      )
+
+      document.removeEventListener(
+        'visibilitychange',
+        handleVisibilityChange,
+      )
+
+      window.removeEventListener(
+        'pagehide',
+        handlePageHide,
       )
     }
   }, [status])
@@ -832,8 +866,9 @@ function VaultPage() {
             <p>
               Keep important financial reference details encrypted
               on this device. Money Vault is separate from your
-              everyday transaction records and automatically locks
-              after 10 minutes without activity.
+              everyday transaction records, locks after 10 minutes
+              without activity and locks when Money Saathi moves
+              to the background.
             </p>
           </div>
 
@@ -1635,13 +1670,13 @@ function VaultPage() {
 
             <section className="vault-ai-boundary">
               <strong>
-                Saathi AI access: off
+                Saathi cannot read Money Vault
               </strong>
 
               <p>
-                This foundation does not send Money Vault records to
-                any AI service. A future permission layer must request
-                the minimum data needed for each question.
+                Money Vault stays outside Saathi's local question
+                tools. Saathi does not decrypt, inspect or use Vault
+                records.
               </p>
             </section>
           </>

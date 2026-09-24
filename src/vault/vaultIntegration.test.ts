@@ -70,13 +70,17 @@ describe('Money Vault foundation integration', () => {
     )
   })
 
-  it('keeps AI access off in this foundation', () => {
+  it('keeps Money Vault outside Saathi local question tools', () => {
     expect(page).toContain(
-      'Saathi AI access: off',
+      'Saathi cannot read Money Vault',
     )
 
     expect(page).toContain(
-      'does not send Money Vault records to',
+      "Money Vault stays outside Saathi's local question",
+    )
+
+    expect(page).toContain(
+      'does not decrypt, inspect or use Vault',
     )
   })
 })
