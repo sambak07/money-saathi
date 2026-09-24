@@ -31,7 +31,7 @@ const app =
   readSource('../App.tsx')
 
 describe('Saathi privacy integration', () => {
-  it('makes AI context opt-in by default', () => {
+  it('keeps Saathi context access opt-in by default', () => {
     expect(engine).toContain(
       'enabled: false',
     )
@@ -55,13 +55,13 @@ describe('Saathi privacy integration', () => {
     )
   })
 
-  it('provides an exact local context preview before any future AI call', () => {
+  it('provides an exact local context preview without sending data anywhere', () => {
     expect(page).toContain(
       'Preview exact context',
     )
 
     expect(page).toContain(
-      'This is a preview only. It has not been sent anywhere.',
+      'This is a local preview only. It has not been sent anywhere.',
     )
   })
 

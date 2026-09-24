@@ -121,7 +121,7 @@ const groups: MoreGroup[] = [
       {
         to: '/app/saathi/privacy',
         label: 'Saathi data permissions',
-        description: 'Control and preview what a future AI request may use.',
+        description: 'Control and preview what local Saathi question tools may use.',
       },
       {
         to: '/app/security',

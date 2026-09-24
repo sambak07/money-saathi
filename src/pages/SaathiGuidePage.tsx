@@ -323,7 +323,7 @@ function SaathiGuidePage() {
               to="/app/saathi/privacy"
               className="saathi-privacy-link"
             >
-              Review future AI data permissions
+              Review local Saathi data permissions
             </Link>
           </div>
         </section>

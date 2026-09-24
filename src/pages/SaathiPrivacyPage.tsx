@@ -354,7 +354,7 @@ function SaathiPrivacyPage() {
     setMessage(
       permissions.enabled
         ? 'Saathi data permissions are saved locally on this device. Nothing was sent anywhere.'
-        : 'Saathi AI data access remains off.',
+        : 'Saathi local data access remains off.',
     )
   }
 
@@ -369,7 +369,7 @@ function SaathiPrivacyPage() {
     setShowPreview(false)
 
     setMessage(
-      'Saathi AI data permissions were reset to off.',
+      'Saathi local data permissions were reset to off.',
     )
   }
 
@@ -378,7 +378,7 @@ function SaathiPrivacyPage() {
       <div className="dashboard-container saathi-privacy-page">
         <header className="saathi-privacy-header">
           <p className="dashboard-eyebrow">
-            Privacy before intelligence
+            Local data control
           </p>
 
           <h1>
@@ -386,9 +386,10 @@ function SaathiPrivacyPage() {
           </h1>
 
           <p>
-            Decide what a future Saathi AI request may use.
-            Nothing on this page calls an AI model, sends data to a
-            server or changes your financial records.
+            Decide which Money Saathi records local Saathi tools may
+            use when answering supported questions on this device.
+            Nothing on this page sends data to a server or changes
+            your financial records.
           </p>
 
           <Link to="/app/saathi">
@@ -404,7 +405,7 @@ function SaathiPrivacyPage() {
           <span>
             Vault records, PINs, CVVs, OTPs, passwords, seed phrases,
             recovery codes, App Lock secrets and backup passwords are
-            not available as Saathi context categories.
+            not available to local Saathi question tools.
           </span>
         </section>
 
@@ -425,12 +426,12 @@ function SaathiPrivacyPage() {
               </p>
 
               <h2>
-                Future AI data access
+                Local Saathi data access
               </h2>
 
               <p>
-                Off means no personal financial context may be
-                prepared for an external AI request.
+                Off means Saathi will not prepare personal financial
+                context for question-specific local guidance.
               </p>
             </div>
 
@@ -655,7 +656,7 @@ function SaathiPrivacyPage() {
                 </strong>
 
                 <span>
-                  This is a preview only. It has not been sent anywhere.
+                  This is a local preview only. It has not been sent anywhere.
                 </span>
               </div>
 
