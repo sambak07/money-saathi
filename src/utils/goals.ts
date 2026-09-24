@@ -1,5 +1,8 @@
 ﻿import type { Goal, GoalContribution } from '../types/goal'
 import { getLocalToday } from './money'
+import {
+  sumChetrumExact,
+} from './moneyTotals'
 
 function parseLocalDate(value: string): Date {
   const [year, month, day] = value.split('-').map(Number)
@@ -20,9 +23,18 @@ export function getGoalSaved(
   goalId: string,
   contributions: GoalContribution[],
 ): number {
-  return contributions
-    .filter((item) => item.goalId === goalId)
-    .reduce((sum, item) => sum + item.amountChetrum, 0)
+  return sumChetrumExact(
+    contributions
+      .filter(
+        (item) =>
+          item.goalId === goalId,
+      )
+      .map(
+        (item) =>
+          item.amountChetrum,
+      ),
+    'Goal contributions',
+  )
 }
 
 export function getGoalProgress(

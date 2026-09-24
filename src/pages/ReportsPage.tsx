@@ -69,10 +69,11 @@ function ReportsPage() {
   }, [])
 
   const report = useMemo(() => {
-    const current = summarizeMonth(
-      transactions,
-      selectedMonth,
-    )
+    try {
+      const current = summarizeMonth(
+        transactions,
+        selectedMonth,
+      )
 
     const previousMonth =
       getMonthKeyOffset(selectedMonth, -1)
@@ -128,16 +129,19 @@ function ReportsPage() {
         expenseTransactionCount,
       )
 
-    return {
-      current,
-      previous,
-      trend,
-      categories,
-      monthTransactions,
-      cashFlowRateBps,
-      maxTrendValue,
-      topCategory,
-      averageExpenseChetrum,
+      return {
+        current,
+        previous,
+        trend,
+        categories,
+        monthTransactions,
+        cashFlowRateBps,
+        maxTrendValue,
+        topCategory,
+        averageExpenseChetrum,
+      }
+    } catch {
+      return null
     }
   }, [selectedMonth, transactions, trendMonths])
 
@@ -147,6 +151,23 @@ function ReportsPage() {
         <div className="dashboard-container">
           <div className="reports-loading">
             Preparing reports...
+          </div>
+        </div>
+      </AppShell>
+    )
+  }
+
+  if (!report) {
+    return (
+      <AppShell>
+        <div className="dashboard-container reports-page">
+          <div
+            className="reports-error"
+            role="alert"
+          >
+            One or more report totals exceed the money range
+            Money Saathi can represent exactly. No rounded report
+            has been shown.
           </div>
         </div>
       </AppShell>

@@ -1,4 +1,8 @@
 ﻿import type { MoneyTransaction } from '../types/transaction'
+import {
+  addChetrumExact,
+  subtractChetrumExact,
+} from './moneyTotals'
 
 export interface MonthlyReportSummary {
   month: string
@@ -56,9 +60,19 @@ export function summarizeMonth(
     transactionCount += 1
 
     if (transaction.kind === 'income') {
-      incomeChetrum += transaction.amountChetrum
+      incomeChetrum =
+        addChetrumExact(
+          incomeChetrum,
+          transaction.amountChetrum,
+          'Monthly report income',
+        )
     } else {
-      expenseChetrum += transaction.amountChetrum
+      expenseChetrum =
+        addChetrumExact(
+          expenseChetrum,
+          transaction.amountChetrum,
+          'Monthly report expenses',
+        )
     }
   }
 
@@ -66,7 +80,12 @@ export function summarizeMonth(
     month: monthKey,
     incomeChetrum,
     expenseChetrum,
-    netChetrum: incomeChetrum - expenseChetrum,
+    netChetrum:
+      subtractChetrumExact(
+        incomeChetrum,
+        expenseChetrum,
+        'Monthly report net cash flow',
+      ),
     transactionCount,
   }
 }
@@ -177,7 +196,12 @@ export function buildExpenseCategoryBreakdown(
       continue
     }
 
-    totalExpenseChetrum += transaction.amountChetrum
+    totalExpenseChetrum =
+      addChetrumExact(
+        totalExpenseChetrum,
+        transaction.amountChetrum,
+        'Report expense total',
+      )
 
     const current = categoryMap.get(transaction.category) ?? {
       amountChetrum: 0,
@@ -186,7 +210,11 @@ export function buildExpenseCategoryBreakdown(
 
     categoryMap.set(transaction.category, {
       amountChetrum:
-        current.amountChetrum + transaction.amountChetrum,
+        addChetrumExact(
+          current.amountChetrum,
+          transaction.amountChetrum,
+          'Report category total',
+        ),
       transactionCount: current.transactionCount + 1,
     })
   }

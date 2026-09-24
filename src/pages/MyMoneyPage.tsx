@@ -38,6 +38,9 @@ import {
   parseNuToChetrum,
   parseNuToChetrumAllowZero,
 } from '../utils/money'
+import {
+  sumChetrumExact,
+} from '../utils/moneyTotals'
 
 import '../styles/my-money.css'
 
@@ -145,31 +148,53 @@ function MyMoneyPage() {
   }, [])
 
   const summary = useMemo(() => {
-    const savingsTotal = savings.reduce(
-      (sum, item) => sum + item.balanceChetrum,
-      0,
-    )
+    try {
+      const savingsTotal =
+        sumChetrumExact(
+          savings.map(
+            (item) =>
+              item.balanceChetrum,
+          ),
+          'Savings total',
+        )
 
-    const fdTotal = fds.reduce(
-      (sum, item) => sum + item.principalChetrum,
-      0,
-    )
+      const fdTotal =
+        sumChetrumExact(
+          fds.map(
+            (item) =>
+              item.principalChetrum,
+          ),
+          'Fixed deposit total',
+        )
 
-    const rdTotal = rds.reduce(
-      (sum, item) =>
-        sum +
-        multiplyChetrum(
-          item.installmentChetrum,
-          item.installmentsPaid,
-        ),
-      0,
-    )
+      const rdTotal =
+        sumChetrumExact(
+          rds.map(
+            (item) =>
+              multiplyChetrum(
+                item.installmentChetrum,
+                item.installmentsPaid,
+              ),
+          ),
+          'Recurring deposit total',
+        )
 
-    return {
-      savingsTotal,
-      fdTotal,
-      rdTotal,
-      total: savingsTotal + fdTotal + rdTotal,
+      return {
+        savingsTotal,
+        fdTotal,
+        rdTotal,
+        total:
+          sumChetrumExact(
+            [
+              savingsTotal,
+              fdTotal,
+              rdTotal,
+            ],
+            'Tracked asset total',
+          ),
+      }
+    } catch {
+      return null
     }
   }, [savings, fds, rds])
 
@@ -498,6 +523,22 @@ function MyMoneyPage() {
     } finally {
       setDeleting(false)
     }
+  }
+
+  if (!summary) {
+    return (
+      <AppShell>
+        <div className="dashboard-container">
+          <div
+            className="my-money-error"
+            role="alert"
+          >
+            Asset totals exceed the money range Money Saathi can
+            represent exactly. No rounded total has been shown.
+          </div>
+        </div>
+      </AppShell>
+    )
   }
 
   return (

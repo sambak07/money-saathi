@@ -28,6 +28,10 @@ import {
   parseNuToChetrum,
   parseNuToChetrumAllowZero,
 } from '../utils/money'
+import {
+  subtractChetrumExact,
+  sumChetrumExact,
+} from '../utils/moneyTotals'
 
 import '../styles/loans.css'
 
@@ -157,29 +161,48 @@ function LoansPage() {
   }, [])
 
   const summary = useMemo(() => {
-    const original = loans.reduce(
-      (sum, loan) =>
-        sum + loan.originalPrincipalChetrum,
-      0,
-    )
+    try {
+      const original =
+        sumChetrumExact(
+          loans.map(
+            (loan) =>
+              loan.originalPrincipalChetrum,
+          ),
+          'Original loan principal',
+        )
 
-    const outstanding = loans.reduce(
-      (sum, loan) =>
-        sum + loan.outstandingPrincipalChetrum,
-      0,
-    )
+      const outstanding =
+        sumChetrumExact(
+          loans.map(
+            (loan) =>
+              loan.outstandingPrincipalChetrum,
+          ),
+          'Outstanding loan principal',
+        )
 
-    const active = loans.filter(
-      (loan) => loan.outstandingPrincipalChetrum > 0,
-    ).length
+      const active = loans.filter(
+        (loan) => loan.outstandingPrincipalChetrum > 0,
+      ).length
 
-    return {
-      original,
-      outstanding,
-      principalReduced: original - outstanding,
-      active,
-      netTrackedPosition:
-        trackedAssets - outstanding,
+      return {
+        original,
+        outstanding,
+        principalReduced:
+          subtractChetrumExact(
+            original,
+            outstanding,
+            'Principal reduced',
+          ),
+        active,
+        netTrackedPosition:
+          subtractChetrumExact(
+            trackedAssets,
+            outstanding,
+            'Net tracked position',
+          ),
+      }
+    } catch {
+      return null
     }
   }, [loans, trackedAssets])
 
@@ -363,6 +386,23 @@ function LoansPage() {
     } finally {
       setDeleting(false)
     }
+  }
+
+  if (!summary) {
+    return (
+      <AppShell>
+        <div className="dashboard-container">
+          <div
+            className="loans-error"
+            role="alert"
+          >
+            Loan or tracked-asset totals exceed the money range
+            Money Saathi can represent exactly. No rounded total
+            has been shown.
+          </div>
+        </div>
+      </AppShell>
+    )
   }
 
   return (

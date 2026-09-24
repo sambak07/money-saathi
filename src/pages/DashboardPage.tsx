@@ -38,6 +38,11 @@ import {
   getLocalToday,
 } from '../utils/money'
 import {
+  addChetrumExact,
+  subtractChetrumExact,
+  sumChetrumExact,
+} from '../utils/moneyTotals'
+import {
   formatScheduleDate,
   generateOccurrencesBetween,
   getMonthBounds,
@@ -154,7 +159,8 @@ function DashboardPage() {
   const dashboard = useMemo(() => {
     if (!data) return null
 
-    const recordedTransactions =
+    try {
+      const recordedTransactions =
       data.transactions.filter(
         (item) =>
           item.date <= today,
@@ -168,60 +174,67 @@ function DashboardPage() {
       )
 
     const monthlyIncome =
-      monthTransactions
-        .filter(
-          (item) =>
-            item.kind === 'income',
-        )
-        .reduce(
-          (sum, item) =>
-            sum +
-            item.amountChetrum,
-          0,
-        )
+      sumChetrumExact(
+        monthTransactions
+          .filter(
+            (item) =>
+              item.kind === 'income',
+          )
+          .map(
+            (item) =>
+              item.amountChetrum,
+          ),
+        'Monthly income',
+      )
 
     const monthlyExpense =
-      monthTransactions
-        .filter(
-          (item) =>
-            item.kind === 'expense',
-        )
-        .reduce(
-          (sum, item) =>
-            sum +
-            item.amountChetrum,
-          0,
-        )
+      sumChetrumExact(
+        monthTransactions
+          .filter(
+            (item) =>
+              item.kind === 'expense',
+          )
+          .map(
+            (item) =>
+              item.amountChetrum,
+          ),
+        'Monthly expenses',
+      )
 
     const allTimeIncome =
-      recordedTransactions
-        .filter(
-          (item) =>
-            item.kind === 'income',
-        )
-        .reduce(
-          (sum, item) =>
-            sum +
-            item.amountChetrum,
-          0,
-        )
+      sumChetrumExact(
+        recordedTransactions
+          .filter(
+            (item) =>
+              item.kind === 'income',
+          )
+          .map(
+            (item) =>
+              item.amountChetrum,
+          ),
+        'Recorded income',
+      )
 
     const allTimeExpense =
-      recordedTransactions
-        .filter(
-          (item) =>
-            item.kind === 'expense',
-        )
-        .reduce(
-          (sum, item) =>
-            sum +
-            item.amountChetrum,
-          0,
-        )
+      sumChetrumExact(
+        recordedTransactions
+          .filter(
+            (item) =>
+              item.kind === 'expense',
+          )
+          .map(
+            (item) =>
+              item.amountChetrum,
+          ),
+        'Recorded expenses',
+      )
 
     const transactionBalance =
-      allTimeIncome -
-      allTimeExpense
+      subtractChetrumExact(
+        allTimeIncome,
+        allTimeExpense,
+        'Transaction balance',
+      )
     const safeToSpend =
       calculateSafeToSpend(
         today,
@@ -261,26 +274,27 @@ function DashboardPage() {
 
       budgetSpentByCategory.set(
         transaction.category,
-        current +
+        addChetrumExact(
+          current,
           transaction.amountChetrum,
+          'Budget category spending',
+        ),
       )
     }
 
     const budgetPlanned =
-      data.budgets.reduce(
-        (sum, budget) =>
-          sum +
-          budget.limitChetrum,
-        0,
+      sumChetrumExact(
+        data.budgets.map(
+          (budget) =>
+            budget.limitChetrum,
+        ),
+        'Budget plan',
       )
 
     const budgetSpent =
-      Array.from(
+      sumChetrumExact(
         budgetSpentByCategory.values(),
-      ).reduce(
-        (sum, amount) =>
-          sum + amount,
-        0,
+        'Budget spending',
       )
 
     const overBudgetCategories =
@@ -390,9 +404,19 @@ function DashboardPage() {
         item.amountChetrum
 
       if (item.kind === 'income') {
-        regularExpectedIncome += total
+        regularExpectedIncome =
+          addChetrumExact(
+            regularExpectedIncome,
+            total,
+            'Expected Regular Money income',
+          )
       } else {
-        regularExpectedExpense += total
+        regularExpectedExpense =
+          addChetrumExact(
+            regularExpectedExpense,
+            total,
+            'Expected Regular Money expenses',
+          )
       }
     }
 
@@ -407,10 +431,19 @@ function DashboardPage() {
           data.goalContributions,
         )
 
-      goalTarget +=
-        goal.targetChetrum
+      goalTarget =
+        addChetrumExact(
+          goalTarget,
+          goal.targetChetrum,
+          'Goal targets',
+        )
 
-      goalSaved += saved
+      goalSaved =
+        addChetrumExact(
+          goalSaved,
+          saved,
+          'Goal savings',
+        )
 
       if (
         saved >=
@@ -421,79 +454,94 @@ function DashboardPage() {
     }
 
     const savingsAssets =
-      data.savings.reduce(
-        (sum, item) =>
-          sum +
-          item.balanceChetrum,
-        0,
+      sumChetrumExact(
+        data.savings.map(
+          (item) =>
+            item.balanceChetrum,
+        ),
+        'Savings assets',
       )
 
     const fdAssets =
-      data.fixedDeposits.reduce(
-        (sum, item) =>
-          sum +
-          item.principalChetrum,
-        0,
+      sumChetrumExact(
+        data.fixedDeposits.map(
+          (item) =>
+            item.principalChetrum,
+        ),
+        'Fixed deposit assets',
       )
 
     const rdAssets =
-      data.recurringDeposits.reduce(
-        (sum, item) =>
-          sum +
-          multiplyChetrum(
-            item.installmentChetrum,
-            item.installmentsPaid,
-          ),
-        0,
+      sumChetrumExact(
+        data.recurringDeposits.map(
+          (item) =>
+            multiplyChetrum(
+              item.installmentChetrum,
+              item.installmentsPaid,
+            ),
+        ),
+        'Recurring deposit assets',
       )
 
     const trackedAssets =
-      savingsAssets +
-      fdAssets +
-      rdAssets
+      sumChetrumExact(
+        [
+          savingsAssets,
+          fdAssets,
+          rdAssets,
+        ],
+        'Tracked assets',
+      )
 
     const outstandingDebt =
-      data.loans.reduce(
-        (sum, loan) =>
-          sum +
-          loan.outstandingPrincipalChetrum,
-        0,
+      sumChetrumExact(
+        data.loans.map(
+          (loan) =>
+            loan.outstandingPrincipalChetrum,
+        ),
+        'Outstanding debt',
       )
 
     const netTrackedPosition =
-      trackedAssets -
-      outstandingDebt
+      subtractChetrumExact(
+        trackedAssets,
+        outstandingDebt,
+        'Net tracked position',
+      )
 
     const schemeCurrentValue =
-      data.schemes.reduce(
-        (sum, scheme) =>
-          sum +
-          scheme.currentValueChetrum,
-        0,
+      sumChetrumExact(
+        data.schemes.map(
+          (scheme) =>
+            scheme.currentValueChetrum,
+        ),
+        'Scheme current values',
       )
 
     const protectionCover =
-      data.schemes.reduce(
-        (sum, scheme) =>
-          sum +
-          scheme.protectionCoverChetrum,
-        0,
+      sumChetrumExact(
+        data.schemes.map(
+          (scheme) =>
+            scheme.protectionCoverChetrum,
+        ),
+        'Protection cover',
       )
 
     const annualSchemeCommitment =
-      data.schemes
-        .filter(
-          (scheme) =>
-            scheme.status === 'active',
-        )
-        .reduce(
-          (sum, scheme) =>
-            sum +
-            annualContributionChetrum(
-              scheme,
-            ),
-          0,
-        )
+      sumChetrumExact(
+        data.schemes
+          .filter(
+            (scheme) =>
+              scheme.status === 'active',
+          )
+          .map(
+            (scheme) =>
+              annualContributionChetrum(
+                scheme,
+              ),
+          ),
+        'Active annual scheme commitments',
+      )
 
     const activeSchemes =
       data.schemes.filter(
@@ -514,21 +562,38 @@ function DashboardPage() {
         preferences.dashboardRecentCount,
       )
 
-    return {
+      const monthlyNet =
+        subtractChetrumExact(
+          monthlyIncome,
+          monthlyExpense,
+          'Monthly net cash flow',
+        )
+
+      const budgetRemaining =
+        subtractChetrumExact(
+          budgetPlanned,
+          budgetSpent,
+          'Budget remaining',
+        )
+
+      const goalDifference =
+        subtractChetrumExact(
+          goalTarget,
+          goalSaved,
+          'Goal remaining amount',
+        )
+
+      return {
       monthlyIncome,
       monthlyExpense,
-      monthlyNet:
-        monthlyIncome -
-        monthlyExpense,
+      monthlyNet,
       transactionBalance,
       safeToSpend,
 
       budgetPlanned,
 
       budgetSpent,
-      budgetRemaining:
-        budgetPlanned -
-        budgetSpent,
+      budgetRemaining,
       overBudgetCategories,
 
       regularDueCount,
@@ -541,8 +606,7 @@ function DashboardPage() {
       goalRemaining:
         Math.max(
           0,
-          goalTarget -
-            goalSaved,
+          goalDifference,
         ),
       goalsReached,
 
@@ -558,6 +622,9 @@ function DashboardPage() {
       activeSchemes,
 
       recentTransactions,
+      }
+    } catch {
+      return null
     }
   }, [
     currentMonth,

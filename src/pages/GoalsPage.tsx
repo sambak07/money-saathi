@@ -27,6 +27,10 @@ import {
   getGoalProgress,
   getGoalSaved,
 } from '../utils/goals'
+import {
+  addChetrumExact,
+  subtractChetrumExact,
+} from '../utils/moneyTotals'
 
 import '../styles/goals.css'
 
@@ -107,25 +111,59 @@ function GoalsPage() {
   }, [])
 
   const summary = useMemo(() => {
-    let targetTotal = 0
-    let savedTotal = 0
-    let reached = 0
+    try {
+      let targetTotal = 0
+      let savedTotal = 0
+      let reached = 0
 
-    for (const goal of goals) {
-      const saved = getGoalSaved(goal.id, contributions)
-      targetTotal += goal.targetChetrum
-      savedTotal += saved
+      for (const goal of goals) {
+        const saved =
+          getGoalSaved(
+            goal.id,
+            contributions,
+          )
 
-      if (saved >= goal.targetChetrum) {
-        reached += 1
+        targetTotal =
+          addChetrumExact(
+            targetTotal,
+            goal.targetChetrum,
+            'Goal targets',
+          )
+
+        savedTotal =
+          addChetrumExact(
+            savedTotal,
+            saved,
+            'Goal savings',
+          )
+
+        if (
+          saved >=
+          goal.targetChetrum
+        ) {
+          reached += 1
+        }
       }
-    }
 
-    return {
-      targetTotal,
-      savedTotal,
-      remaining: Math.max(0, targetTotal - savedTotal),
-      reached,
+      const remaining =
+        subtractChetrumExact(
+          targetTotal,
+          savedTotal,
+          'Goal remaining amount',
+        )
+
+      return {
+        targetTotal,
+        savedTotal,
+        remaining:
+          Math.max(
+            0,
+            remaining,
+          ),
+        reached,
+      }
+    } catch {
+      return null
     }
   }, [goals, contributions])
 
@@ -296,6 +334,22 @@ function GoalsPage() {
     } finally {
       setDeleting(false)
     }
+  }
+
+  if (!summary) {
+    return (
+      <AppShell>
+        <div className="dashboard-container">
+          <div
+            className="goals-error"
+            role="alert"
+          >
+            Goal totals exceed the money range Money Saathi can
+            represent exactly. No rounded total has been shown.
+          </div>
+        </div>
+      </AppShell>
+    )
   }
 
   return (

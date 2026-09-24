@@ -31,6 +31,9 @@ import {
   getLocalToday,
   parseNuToChetrumAllowZero,
 } from '../utils/money'
+import {
+  addChetrumExact,
+} from '../utils/moneyTotals'
 
 import '../styles/schemes.css'
 
@@ -127,32 +130,57 @@ function SchemesPage() {
   }, [])
 
   const summary = useMemo(() => {
-    let current = 0
-    let protection = 0
-    let future = 0
-    let annualCommitment = 0
-    let active = 0
+    try {
+      let current = 0
+      let protection = 0
+      let future = 0
+      let annualCommitment = 0
+      let active = 0
 
-    for (const scheme of schemes) {
-      current += scheme.currentValueChetrum
-      protection += scheme.protectionCoverChetrum
-      future += scheme.futureBenefitChetrum
-
-      if (scheme.status === 'active') {
-        annualCommitment +=
-          annualContributionChetrum(
-            scheme,
+      for (const scheme of schemes) {
+        current =
+          addChetrumExact(
+            current,
+            scheme.currentValueChetrum,
+            'Scheme current value',
           )
-        active += 1
-      }
-    }
 
-    return {
-      current,
-      protection,
-      future,
-      annualCommitment,
-      active,
+        protection =
+          addChetrumExact(
+            protection,
+            scheme.protectionCoverChetrum,
+            'Protection cover',
+          )
+
+        future =
+          addChetrumExact(
+            future,
+            scheme.futureBenefitChetrum,
+            'Future scheme benefits',
+          )
+
+        if (scheme.status === 'active') {
+          annualCommitment =
+            addChetrumExact(
+              annualCommitment,
+              annualContributionChetrum(
+                scheme,
+              ),
+              'Active annual scheme commitments',
+            )
+          active += 1
+        }
+      }
+
+      return {
+        current,
+        protection,
+        future,
+        annualCommitment,
+        active,
+      }
+    } catch {
+      return null
     }
   }, [schemes])
 
@@ -336,6 +364,22 @@ function SchemesPage() {
     } finally {
       setDeleting(false)
     }
+  }
+
+  if (!summary) {
+    return (
+      <AppShell>
+        <div className="dashboard-container">
+          <div
+            className="scheme-error"
+            role="alert"
+          >
+            Scheme totals exceed the money range Money Saathi can
+            represent exactly. No rounded total has been shown.
+          </div>
+        </div>
+      </AppShell>
+    )
   }
 
   return (

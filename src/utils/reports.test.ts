@@ -106,6 +106,32 @@ describe('report utilities', () => {
     ).toBeNull()
   })
 
+  it('rejects a monthly aggregate beyond the exact safe range', () => {
+    const records = [
+      transaction({
+        id: 'large-1',
+        kind: 'income',
+        amountChetrum:
+          Number.MAX_SAFE_INTEGER,
+      }),
+      transaction({
+        id: 'large-2',
+        kind: 'income',
+        amountChetrum: 1,
+      }),
+    ]
+
+    expect(
+      () =>
+        summarizeMonth(
+          records,
+          '2026-09',
+        ),
+    ).toThrow(
+      'supported money range',
+    )
+  })
+
   it('groups expense categories from largest to smallest', () => {
     const records = [
       transaction({
