@@ -37,3 +37,11 @@ export interface VaultConfig {
   verifierCiphertext: string
   createdAt: number
 }
+
+export interface VaultBackupEnvelope {
+  format: 'MoneySaathiVaultBackup'
+  version: 1
+  exportedAt: string
+  config: VaultConfig
+  records: EncryptedVaultRecord[]
+}

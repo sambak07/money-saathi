@@ -333,3 +333,53 @@ export async function clearVaultStorage(): Promise<void> {
     database.close()
   }
 }
+export async function replaceVaultStorage(
+  config: VaultConfig,
+  records: EncryptedVaultRecord[],
+): Promise<void> {
+  const database =
+    await openVaultDatabase()
+
+  try {
+    const transaction =
+      database.transaction(
+        [
+          META_STORE,
+          RECORD_STORE,
+        ],
+        'readwrite',
+      )
+
+    const metaStore =
+      transaction.objectStore(
+        META_STORE,
+      )
+
+    const recordStore =
+      transaction.objectStore(
+        RECORD_STORE,
+      )
+
+    metaStore.clear()
+    recordStore.clear()
+
+    metaStore.put({
+      id: CONFIG_KEY,
+      value: config,
+    } satisfies StoredVaultConfig)
+
+    for (
+      const record of records
+    ) {
+      recordStore.put(
+        record,
+      )
+    }
+
+    await waitForTransaction(
+      transaction,
+    )
+  } finally {
+    database.close()
+  }
+}

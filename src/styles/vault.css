@@ -439,3 +439,108 @@
     justify-content: space-between;
   }
 }
+.vault-backup-card {
+  margin-top: 18px;
+  padding: 24px;
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.vault-recovery-card {
+  max-width: 760px;
+}
+
+.vault-backup-card h2 {
+  margin: 4px 0 0;
+  font-size: var(--font-size-section);
+}
+
+.vault-backup-intro {
+  max-width: 780px;
+  margin: 12px 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  line-height: 1.55;
+}
+
+.vault-backup-actions {
+  margin-top: 18px;
+}
+
+.vault-restore-box {
+  margin-top: 20px;
+  padding: 18px;
+  display: grid;
+  gap: 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background: var(--color-surface-soft);
+}
+
+.vault-restore-box h3 {
+  margin: 0;
+  font-size: 17px;
+}
+
+.vault-restore-box > p {
+  margin: -5px 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  line-height: 1.5;
+}
+
+.vault-restore-box > label:not(.vault-restore-confirm) {
+  display: grid;
+  gap: 8px;
+  color: var(--color-text);
+  font-size: var(--font-size-small);
+  font-weight: 700;
+}
+
+.vault-restore-box input[type="file"],
+.vault-restore-box input[type="password"] {
+  width: 100%;
+  min-height: 46px;
+  padding: 9px 11px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 11px;
+  background: white;
+  color: var(--color-text);
+  font: inherit;
+  font-weight: 500;
+}
+
+.vault-restore-confirm {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  line-height: 1.45;
+}
+
+.vault-restore-confirm input {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  margin-top: 1px;
+}
+
+.vault-success {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid rgba(23, 107, 75, 0.22);
+  border-radius: 12px;
+  background: var(--color-brand-soft);
+  color: var(--color-brand);
+  font-size: var(--font-size-small);
+  line-height: 1.5;
+}
+
+@media (max-width: 680px) {
+  .vault-backup-card {
+    padding: 18px;
+  }
+}

@@ -1,4 +1,7 @@
-﻿let sessionKey: CryptoKey | null = null
+﻿export const VAULT_IDLE_LOCK_MS =
+  10 * 60 * 1000
+
+let sessionKey: CryptoKey | null = null
 
 export function getVaultSessionKey(): CryptoKey | null {
   return sessionKey

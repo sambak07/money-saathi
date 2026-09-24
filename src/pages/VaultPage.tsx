@@ -13,6 +13,12 @@ import {
   VAULT_KINDS,
 } from '../types/vault'
 import {
+  buildVaultBackup,
+  parseVaultBackupText,
+  restoreVaultBackup,
+  serializeVaultBackup,
+} from '../vault/vaultBackup'
+import {
   createVaultSecurity,
   decryptVaultRecord,
   encryptVaultEntry,
@@ -24,6 +30,7 @@ import {
   clearVaultSessionKey,
   getVaultSessionKey,
   setVaultSessionKey,
+  VAULT_IDLE_LOCK_MS,
 } from '../vault/vaultSession'
 import {
   clearVaultStorage,
@@ -145,6 +152,28 @@ function VaultPage() {
     setWorking,
   ] = useState(false)
 
+  const [
+    backupMessage,
+    setBackupMessage,
+  ] = useState('')
+
+  const [
+    restoreFile,
+    setRestoreFile,
+  ] = useState<File | null>(
+    null,
+  )
+
+  const [
+    restorePassphrase,
+    setRestorePassphrase,
+  ] = useState('')
+
+  const [
+    confirmRestore,
+    setConfirmRestore,
+  ] = useState(false)
+
   const groupedCount =
     useMemo(
       () =>
@@ -244,6 +273,99 @@ function VaultPage() {
       active = false
     }
   }, [])
+
+  useEffect(() => {
+    if (
+      status !==
+      'unlocked'
+    ) {
+      return
+    }
+
+    let timer =
+      window.setTimeout(
+        () => {
+          clearVaultSessionKey()
+          setEntries([])
+          setRevealed(
+            new Set(),
+          )
+          setDraft(
+            emptyDraft,
+          )
+          setEditingId(null)
+          setPendingDeleteId(null)
+          setStatus('locked')
+          setError(
+            'Money Vault locked after 10 minutes of inactivity.',
+          )
+        },
+        VAULT_IDLE_LOCK_MS,
+      )
+
+    function resetIdleTimer() {
+      window.clearTimeout(
+        timer,
+      )
+
+      timer =
+        window.setTimeout(
+          () => {
+            clearVaultSessionKey()
+            setEntries([])
+            setRevealed(
+              new Set(),
+            )
+            setDraft(
+              emptyDraft,
+            )
+            setEditingId(null)
+            setPendingDeleteId(null)
+            setStatus('locked')
+            setError(
+              'Money Vault locked after 10 minutes of inactivity.',
+            )
+          },
+          VAULT_IDLE_LOCK_MS,
+        )
+    }
+
+    window.addEventListener(
+      'pointerdown',
+      resetIdleTimer,
+    )
+
+    window.addEventListener(
+      'keydown',
+      resetIdleTimer,
+    )
+
+    window.addEventListener(
+      'touchstart',
+      resetIdleTimer,
+    )
+
+    return () => {
+      window.clearTimeout(
+        timer,
+      )
+
+      window.removeEventListener(
+        'pointerdown',
+        resetIdleTimer,
+      )
+
+      window.removeEventListener(
+        'keydown',
+        resetIdleTimer,
+      )
+
+      window.removeEventListener(
+        'touchstart',
+        resetIdleTimer,
+      )
+    }
+  }, [status])
 
   function updateDraft(
     field: keyof EntryDraft,
@@ -541,6 +663,140 @@ function VaultPage() {
     }
   }
 
+  async function exportVaultBackup() {
+    setBackupMessage('')
+    setError('')
+
+    try {
+      const envelope =
+        await buildVaultBackup()
+
+      const text =
+        serializeVaultBackup(
+          envelope,
+        )
+
+      const blob =
+        new Blob(
+          [text],
+          {
+            type: 'application/json',
+          },
+        )
+
+      const url =
+        URL.createObjectURL(
+          blob,
+        )
+
+      const anchor =
+        document.createElement(
+          'a',
+        )
+
+      const date =
+        envelope.exportedAt
+          .slice(0, 10)
+
+      anchor.href = url
+      anchor.download =
+        `money-saathi-vault-${date}.json`
+
+      document.body.appendChild(
+        anchor,
+      )
+
+      anchor.click()
+      anchor.remove()
+
+      URL.revokeObjectURL(
+        url,
+      )
+
+      setBackupMessage(
+        'Encrypted Vault backup created. Keep the file and your Vault passphrase separately.',
+      )
+    } catch {
+      setError(
+        'Money Vault backup could not be created.',
+      )
+    }
+  }
+
+  async function importVaultBackup() {
+    setBackupMessage('')
+    setError('')
+
+    if (
+      !restoreFile
+    ) {
+      setError(
+        'Choose a Money Vault backup file first.',
+      )
+      return
+    }
+
+    if (
+      !restorePassphrase
+    ) {
+      setError(
+        'Enter the passphrase that protects this Vault backup.',
+      )
+      return
+    }
+
+    if (
+      !confirmRestore
+    ) {
+      setError(
+        'Confirm that restoring will replace the Vault currently stored in this browser.',
+      )
+      return
+    }
+
+    setWorking(true)
+
+    try {
+      const text =
+        await restoreFile.text()
+
+      const envelope =
+        parseVaultBackupText(
+          text,
+        )
+
+      const key =
+        await restoreVaultBackup(
+          envelope,
+          restorePassphrase,
+        )
+
+      setVaultSessionKey(
+        key,
+      )
+
+      await loadEntries(
+        key,
+      )
+
+      setRestoreFile(null)
+      setRestorePassphrase('')
+      setConfirmRestore(false)
+      setPassphrase('')
+      setStatus('unlocked')
+      setBackupMessage(
+        'Encrypted Vault backup restored and verified.',
+      )
+    } catch {
+      clearVaultSessionKey()
+      setError(
+        'That backup could not be restored. Check the file and its Vault passphrase.',
+      )
+    } finally {
+      setWorking(false)
+    }
+  }
+
   function toggleReveal(
     id: string,
   ) {
@@ -576,7 +832,8 @@ function VaultPage() {
             <p>
               Keep important financial reference details encrypted
               on this device. Money Vault is separate from your
-              everyday transaction records.
+              everyday transaction records and automatically locks
+              after 10 minutes without activity.
             </p>
           </div>
 
@@ -797,6 +1054,96 @@ function VaultPage() {
                 </div>
               )}
             </div>
+          </section>
+        )}
+
+        {(status === 'setup' || status === 'locked') && (
+          <section className="vault-backup-card vault-recovery-card">
+            <p className="dashboard-eyebrow">
+              Recovery
+            </p>
+
+            <h2>
+              Restore encrypted Vault backup
+            </h2>
+
+            <p className="vault-backup-intro">
+              If you previously exported Money Vault, choose that
+              encrypted file and enter the passphrase that protected it.
+            </p>
+
+            <div className="vault-restore-box">
+              <label>
+                Vault backup file
+                <input
+                  type="file"
+                  accept=".json,application/json"
+                  onChange={(event) => {
+                    setRestoreFile(
+                      event.target.files?.[0] ??
+                      null,
+                    )
+                    setConfirmRestore(false)
+                    setBackupMessage('')
+                    setError('')
+                  }}
+                />
+              </label>
+
+              <label>
+                Backup Vault passphrase
+                <input
+                  type="password"
+                  autoComplete="current-password"
+                  value={restorePassphrase}
+                  onChange={(event) => {
+                    setRestorePassphrase(
+                      event.target.value,
+                    )
+                    setError('')
+                  }}
+                />
+              </label>
+
+              <label className="vault-restore-confirm">
+                <input
+                  type="checkbox"
+                  checked={confirmRestore}
+                  onChange={(event) =>
+                    setConfirmRestore(
+                      event.target.checked,
+                    )
+                  }
+                />
+
+                <span>
+                  I understand this replaces the Vault currently
+                  stored in this browser.
+                </span>
+              </label>
+
+              <button
+                type="button"
+                className="vault-danger-button"
+                disabled={working}
+                onClick={() => {
+                  void importVaultBackup()
+                }}
+              >
+                {working
+                  ? 'Restoring…'
+                  : 'Restore and replace Vault'}
+              </button>
+            </div>
+
+            {backupMessage && (
+              <div
+                className="vault-success"
+                role="status"
+              >
+                {backupMessage}
+              </div>
+            )}
           </section>
         )}
 
@@ -1168,6 +1515,120 @@ function VaultPage() {
                       )
                     },
                   )}
+                </div>
+              )}
+            </section>
+
+            <section className="vault-backup-card">
+              <div className="vault-section-heading">
+                <div>
+                  <p className="dashboard-eyebrow">
+                    Resilience
+                  </p>
+
+                  <h2>
+                    Encrypted Vault backup
+                  </h2>
+                </div>
+              </div>
+
+              <p className="vault-backup-intro">
+                Money Saathi's normal backup does not include Money
+                Vault in this stage. Use this separate encrypted Vault
+                backup and keep the file away from the passphrase.
+              </p>
+
+              <div className="vault-backup-actions">
+                <button
+                  type="button"
+                  className="vault-primary-button"
+                  onClick={() => {
+                    void exportVaultBackup()
+                  }}
+                >
+                  Export encrypted Vault
+                </button>
+              </div>
+
+              <div className="vault-restore-box">
+                <h3>
+                  Restore encrypted Vault
+                </h3>
+
+                <p>
+                  Restoring verifies every encrypted record before
+                  replacing the Vault currently stored in this browser.
+                </p>
+
+                <label>
+                  Vault backup file
+                  <input
+                    type="file"
+                    accept=".json,application/json"
+                    onChange={(event) => {
+                      setRestoreFile(
+                        event.target.files?.[0] ??
+                        null,
+                      )
+                      setConfirmRestore(false)
+                      setBackupMessage('')
+                      setError('')
+                    }}
+                  />
+                </label>
+
+                <label>
+                  Backup Vault passphrase
+                  <input
+                    type="password"
+                    autoComplete="current-password"
+                    value={restorePassphrase}
+                    onChange={(event) => {
+                      setRestorePassphrase(
+                        event.target.value,
+                      )
+                      setError('')
+                    }}
+                  />
+                </label>
+
+                <label className="vault-restore-confirm">
+                  <input
+                    type="checkbox"
+                    checked={confirmRestore}
+                    onChange={(event) =>
+                      setConfirmRestore(
+                        event.target.checked,
+                      )
+                    }
+                  />
+
+                  <span>
+                    I understand this replaces the Vault currently
+                    stored in this browser.
+                  </span>
+                </label>
+
+                <button
+                  type="button"
+                  className="vault-danger-button"
+                  disabled={working}
+                  onClick={() => {
+                    void importVaultBackup()
+                  }}
+                >
+                  {working
+                    ? 'Restoring…'
+                    : 'Restore and replace Vault'}
+                </button>
+              </div>
+
+              {backupMessage && (
+                <div
+                  className="vault-success"
+                  role="status"
+                >
+                  {backupMessage}
                 </div>
               )}
             </section>
