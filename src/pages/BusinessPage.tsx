@@ -485,6 +485,10 @@ function BusinessPage() {
               Customers & dues
             </Link>
 
+            <Link to="/app/business/inventory">
+              Inventory
+            </Link>
+
             <Link to="/app">
               Personal Home
             </Link>

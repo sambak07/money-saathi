@@ -128,6 +128,11 @@ const groups: MoreGroup[] = [
         label: 'Customers & dues',
         description: 'Track customers, suppliers, receivables and payables for a business.',
       },
+      {
+        to: '/app/business/inventory',
+        label: 'Inventory',
+        description: 'Track stock items, quantities, unit cost and low-stock levels.',
+      },
     ],
   },
   {
