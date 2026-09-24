@@ -33,6 +33,12 @@ import {
   VAULT_IDLE_LOCK_MS,
 } from '../vault/vaultSession'
 import {
+  formatVaultUnlockCooldown,
+  getVaultUnlockGuard,
+  recordVaultUnlockFailure,
+  resetVaultUnlockGuard,
+} from '../vault/vaultUnlockGuard'
+import {
   clearVaultStorage,
   deleteEncryptedVaultRecord,
   getEncryptedVaultRecords,
@@ -470,6 +476,19 @@ function VaultPage() {
 
   async function handleUnlock() {
     setError('')
+
+    const guard =
+      getVaultUnlockGuard()
+
+    if (
+      guard.blocked
+    ) {
+      setError(
+        `Too many incorrect Vault passphrases. Try again in ${formatVaultUnlockCooldown(guard.remainingMs)}.`,
+      )
+      return
+    }
+
     setWorking(true)
 
     try {
@@ -481,15 +500,48 @@ function VaultPage() {
         return
       }
 
-      const key =
-        await unlockVaultKey(
-          passphrase,
-          config,
-        )
+      let key: CryptoKey
 
-      await loadEntries(
-        key,
-      )
+      try {
+        key =
+          await unlockVaultKey(
+            passphrase,
+            config,
+          )
+      } catch {
+        clearVaultSessionKey()
+
+        const afterFailure =
+          recordVaultUnlockFailure()
+
+        if (
+          afterFailure.blocked
+        ) {
+          setError(
+            `Too many incorrect Vault passphrases. A temporary cooldown is active for ${formatVaultUnlockCooldown(afterFailure.remainingMs)}.`,
+          )
+        } else {
+          setError(
+            `That Vault passphrase is incorrect. ${afterFailure.failuresRemaining} attempt${afterFailure.failuresRemaining === 1 ? '' : 's'} remain before a temporary cooldown.`,
+          )
+        }
+
+        return
+      }
+
+      resetVaultUnlockGuard()
+
+      try {
+        await loadEntries(
+          key,
+        )
+      } catch {
+        clearVaultSessionKey()
+        setError(
+          'The Vault passphrase was accepted, but one or more encrypted records could not be opened safely.',
+        )
+        return
+      }
 
       setVaultSessionKey(
         key,
@@ -497,11 +549,6 @@ function VaultPage() {
 
       setPassphrase('')
       setStatus('unlocked')
-    } catch {
-      clearVaultSessionKey()
-      setError(
-        'That Vault passphrase did not unlock these records.',
-      )
     } finally {
       setWorking(false)
     }
