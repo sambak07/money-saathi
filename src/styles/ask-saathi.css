@@ -292,3 +292,115 @@
     gap: 5px;
   }
 }
+.ask-saathi-question-box {
+  margin-top: 18px;
+  padding: 22px;
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  background:
+    linear-gradient(
+      135deg,
+      var(--color-surface),
+      var(--color-saffron-soft)
+    );
+  box-shadow: var(--shadow-sm);
+}
+
+.ask-saathi-question-box h2 {
+  margin: 4px 0 0;
+  font-size: var(--font-size-section);
+}
+
+.ask-saathi-question-box > div:first-child > p:last-child {
+  margin: 8px 0 0;
+  max-width: 760px;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  line-height: 1.5;
+}
+
+.ask-saathi-question-input-row {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+}
+
+.ask-saathi-question-input-row input {
+  min-height: 50px;
+  padding: 10px 14px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 13px;
+  background: white;
+  color: var(--color-text);
+  font: inherit;
+}
+
+.ask-saathi-question-input-row button {
+  min-height: 50px;
+  padding: 0 18px;
+  border: 1px solid var(--color-brand);
+  border-radius: 13px;
+  background: var(--color-brand);
+  color: white;
+  font-size: var(--font-size-ui);
+  font-weight: 750;
+}
+
+.ask-saathi-question-examples {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ask-saathi-question-examples button {
+  min-height: 36px;
+  padding: 0 11px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+}
+
+.ask-saathi-local-message,
+.ask-saathi-learning-answer {
+  margin-top: 14px;
+  padding: 13px 14px;
+  border-radius: 13px;
+}
+
+.ask-saathi-local-message {
+  border: 1px solid rgba(23, 90, 67, 0.2);
+  background: var(--color-brand-soft);
+  color: var(--color-brand);
+  font-size: var(--font-size-small);
+  line-height: 1.5;
+}
+
+.ask-saathi-learning-answer {
+  border: 1px solid var(--color-border);
+  background: #fffdf8;
+}
+
+.ask-saathi-learning-answer p {
+  margin: 6px 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  line-height: 1.55;
+}
+
+@media (max-width: 680px) {
+  .ask-saathi-question-box {
+    padding: 18px;
+  }
+
+  .ask-saathi-question-input-row {
+    grid-template-columns: 1fr;
+  }
+
+  .ask-saathi-question-input-row button {
+    width: 100%;
+  }
+}

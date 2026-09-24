@@ -12,6 +12,11 @@ import {
   getProfile,
 } from '../profile/userProfile'
 import {
+  LOCAL_LEARNING_ANSWERS,
+  routeLocalSaathiQuestion,
+  type LocalLearningTopic,
+} from '../saathi/localQuestionRouter'
+import {
   buildAttentionItems,
   buildDebtSnapshot,
   compareRecordedMonths,
@@ -107,6 +112,26 @@ function AskSaathiPage() {
       'month' |
       'debt'
     >('affordability')
+
+  const [
+    question,
+    setQuestion,
+  ] =
+    useState('')
+
+  const [
+    localMessage,
+    setLocalMessage,
+  ] =
+    useState('')
+
+  const [
+    learningTopic,
+    setLearningTopic,
+  ] =
+    useState<LocalLearningTopic | null>(
+      null,
+    )
 
   useEffect(() => {
     let active = true
@@ -249,6 +274,107 @@ function AskSaathiPage() {
       today,
     ])
 
+  function handleLocalQuestion() {
+    const routed =
+      routeLocalSaathiQuestion(
+        question,
+      )
+
+    setLearningTopic(null)
+
+    if (
+      routed.intent ===
+      'affordability'
+    ) {
+      setActiveTool(
+        'affordability',
+      )
+
+      if (
+        routed.amountNu
+      ) {
+        setAmountText(
+          routed.amountNu,
+        )
+
+        setLocalMessage(
+          'I understood this as an affordability question and opened the local Safe to Spend comparison.',
+        )
+      } else {
+        setLocalMessage(
+          'I understood this as an affordability question. Enter the amount you want to test.',
+        )
+      }
+
+      return
+    }
+
+    if (
+      routed.intent ===
+      'attention'
+    ) {
+      setActiveTool(
+        'attention',
+      )
+
+      setLocalMessage(
+        'I understood this as a request to review what currently deserves attention.',
+      )
+
+      return
+    }
+
+    if (
+      routed.intent ===
+      'month-change'
+    ) {
+      setActiveTool(
+        'month',
+      )
+
+      setLocalMessage(
+        'I understood this as a request to compare this month with the previous recorded month.',
+      )
+
+      return
+    }
+
+    if (
+      routed.intent ===
+      'debt'
+    ) {
+      setActiveTool(
+        'debt',
+      )
+
+      setLocalMessage(
+        'I understood this as a debt question and opened the recorded debt snapshot.',
+      )
+
+      return
+    }
+
+    if (
+      routed.intent ===
+        'learn' &&
+      routed.learningTopic
+    ) {
+      setLearningTopic(
+        routed.learningTopic,
+      )
+
+      setLocalMessage(
+        'I understood this as a financial-learning question.',
+      )
+
+      return
+    }
+
+    setLocalMessage(
+      'I could not safely match that question yet. Try asking about spending an amount, what needs attention, what changed this month, debt, EMI, interest, budget, safety buffer, FD, insurance or digital-money safety.',
+    )
+  }
+
   const amountChetrum =
     parseNuInputToChetrum(
       amountText,
@@ -333,6 +459,120 @@ function AskSaathiPage() {
             Spend. Missing records can still make the real-world
             picture incomplete.
           </span>
+        </section>
+
+        <section className="ask-saathi-question-box">
+          <div>
+            <p className="dashboard-eyebrow">
+              Ask in your own words
+            </p>
+
+            <h2>
+              What would you like to understand?
+            </h2>
+
+            <p>
+              This local language router matches supported phrases to
+              Money Saathi's verified tools. It does not send your
+              question or financial records anywhere.
+            </p>
+          </div>
+
+          <div className="ask-saathi-question-input-row">
+            <input
+              type="text"
+              value={question}
+              placeholder="Example: Can I spend Nu. 5,000 before salary?"
+              onChange={(event) => {
+                setQuestion(
+                  event.target.value,
+                )
+                setLocalMessage('')
+                setLearningTopic(null)
+              }}
+              onKeyDown={(event) => {
+                if (
+                  event.key ===
+                  'Enter'
+                ) {
+                  handleLocalQuestion()
+                }
+              }}
+            />
+
+            <button
+              type="button"
+              onClick={
+                handleLocalQuestion
+              }
+            >
+              Ask locally
+            </button>
+          </div>
+
+          <div className="ask-saathi-question-examples">
+            <button
+              type="button"
+              onClick={() =>
+                setQuestion(
+                  'What needs attention?',
+                )
+              }
+            >
+              What needs attention?
+            </button>
+
+            <button
+              type="button"
+              onClick={() =>
+                setQuestion(
+                  'Why did I spend more this month?',
+                )
+              }
+            >
+              Why did I spend more?
+            </button>
+
+            <button
+              type="button"
+              onClick={() =>
+                setQuestion(
+                  'Explain EMI',
+                )
+              }
+            >
+              Explain EMI
+            </button>
+          </div>
+
+          {localMessage && (
+            <div
+              className="ask-saathi-local-message"
+              role="status"
+            >
+              {localMessage}
+            </div>
+          )}
+
+          {learningTopic && (
+            <div className="ask-saathi-learning-answer">
+              <strong>
+                {
+                  LOCAL_LEARNING_ANSWERS[
+                    learningTopic
+                  ].title
+                }
+              </strong>
+
+              <p>
+                {
+                  LOCAL_LEARNING_ANSWERS[
+                    learningTopic
+                  ].answer
+                }
+              </p>
+            </div>
+          )}
         </section>
 
         <nav
