@@ -21,8 +21,12 @@ import {
 } from '../alerts/loanDueReminders'
 import AppShell from '../components/AppShell'
 import {
+  getBusinessOpenItems,
+  getBusinessProfiles,
   getFinancialSchemes,
+  getFixedDeposits,
   getLoans,
+  getRecurringDeposits,
   getRegularMoney,
   getTransactions,
 } from '../storage/db'
@@ -32,6 +36,7 @@ import {
 import {
   buildMoneyAlerts,
   countAlertLevels,
+  type BusinessDueReference,
 } from '../utils/moneyAlerts'
 import {
   formatNu,
@@ -62,6 +67,13 @@ interface AlertData {
   loans: Awaited<
     ReturnType<typeof getLoans>
   >
+  fixedDeposits: Awaited<
+    ReturnType<typeof getFixedDeposits>
+  >
+  recurringDeposits: Awaited<
+    ReturnType<typeof getRecurringDeposits>
+  >
+  businessDues: BusinessDueReference[]
 }
 
 const DUE_SOON_OPTIONS:
@@ -112,12 +124,56 @@ function AlertCentrePage() {
           transactions,
           schemes,
           loans,
+          fixedDeposits,
+          recurringDeposits,
+          businessProfiles,
         ] = await Promise.all([
           getRegularMoney(),
           getTransactions(),
           getFinancialSchemes(),
           getLoans(),
+          getFixedDeposits(),
+          getRecurringDeposits(),
+          getBusinessProfiles(),
         ])
+
+        const businessDues =
+          (
+            await Promise.all(
+              businessProfiles.map(
+                async (business) => {
+                  const items =
+                    await getBusinessOpenItems(
+                      business.id,
+                    )
+
+                  return items
+                    .filter(
+                      (item) =>
+                        item.dueDate &&
+                        item.outstandingAmountChetrum >
+                          0,
+                    )
+                    .map(
+                      (item): BusinessDueReference => ({
+                        id:
+                          item.id,
+                        businessId:
+                          business.id,
+                        businessName:
+                          business.name,
+                        direction:
+                          item.direction,
+                        outstandingAmountChetrum:
+                          item.outstandingAmountChetrum,
+                        dueDate:
+                          item.dueDate,
+                      }),
+                    )
+                },
+              ),
+            )
+          ).flat()
 
         if (!active) return
 
@@ -126,6 +182,9 @@ function AlertCentrePage() {
           transactions,
           schemes,
           loans,
+          fixedDeposits,
+          recurringDeposits,
+          businessDues,
         })
       } catch {
         if (active) {
@@ -188,6 +247,12 @@ function AlertCentrePage() {
             data.loans,
             getLoanDueReminders(),
           ),
+        fixedDeposits:
+          data.fixedDeposits,
+        recurringDeposits:
+          data.recurringDeposits,
+        businessDues:
+          data.businessDues,
       })
 
     const visibleAlerts =
@@ -325,8 +390,9 @@ function AlertCentrePage() {
             <h1>Alerts & reminders</h1>
 
             <p>
-              Money Saathi watches the financial dates you
-              actually record. It does not invent bill dates,
+              Money Saathi watches dates you record and deposit
+              maturity dates calculated from the start date and
+              tenure you entered. It does not guess loan due dates,
               payment failures or future income.
             </p>
           </div>
@@ -565,9 +631,10 @@ function AlertCentrePage() {
               </strong>
 
               <p>
-                New reminders appear from Regular Money, active
-                scheme contribution dates, verified loan due dates
-                and important Safe to Spend status.
+                New reminders appear from Regular Money, deposit
+                and scheme maturity dates, scheme contributions,
+                verified loan dates, recorded business dues and
+                important Safe to Spend status.
               </p>
             </div>
           ) : (

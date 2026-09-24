@@ -2,6 +2,10 @@
   LoanReminderReference,
 } from '../alerts/loanDueReminders'
 import type {
+  FixedDeposit,
+  RecurringDeposit,
+} from '../types/asset'
+import type {
   FinancialScheme,
 } from '../types/scheme'
 import type {
@@ -10,6 +14,9 @@ import type {
 import type {
   MoneyTransaction,
 } from '../types/transaction'
+import {
+  addMonthsClampedIso,
+} from './financialDates'
 import {
   generateOccurrencesBetween,
 } from './recurrence'
@@ -30,6 +37,8 @@ export type MoneyAlertSource =
   | 'scheme'
   | 'safe-to-spend'
   | 'loan'
+  | 'deposit'
+  | 'business-due'
 
 export interface MoneyAlert {
   id: string
@@ -45,6 +54,15 @@ export interface MoneyAlert {
   notificationEligible: boolean
 }
 
+export interface BusinessDueReference {
+  id: string
+  businessId: string
+  businessName: string
+  direction: 'receivable' | 'payable'
+  outstandingAmountChetrum: number
+  dueDate: string
+}
+
 export interface BuildMoneyAlertsInput {
   today: string
   dueSoonDays: number
@@ -55,6 +73,9 @@ export interface BuildMoneyAlertsInput {
   safeToSpendChetrum: number
   upcomingCommitmentsChetrum: number
   loanReminders?: LoanReminderReference[]
+  fixedDeposits?: FixedDeposit[]
+  recurringDeposits?: RecurringDeposit[]
+  businessDues?: BusinessDueReference[]
 }
 
 const DAY_MS =
@@ -302,6 +323,181 @@ function loanAlert(
   }
 }
 
+function depositMaturityAlert(
+  deposit: {
+    id: string
+    name: string
+    startDate: string
+    tenureMonths: number
+  },
+  depositKind:
+    | 'Fixed deposit'
+    | 'Recurring deposit',
+  today: string,
+): MoneyAlert {
+  const date =
+    addMonthsClampedIso(
+      deposit.startDate,
+      deposit.tenureMonths,
+    )
+
+  const days =
+    daysFromToday(
+      today,
+      date,
+    )
+
+  const status:
+    MoneyAlertStatus =
+    days < 0
+      ? 'overdue'
+      : days === 0
+        ? 'today'
+        : 'soon'
+
+  return {
+    id:
+      `deposit:${depositKind}:${deposit.id}:${date}`,
+    level:
+      days <= 0
+        ? 'attention'
+        : 'info',
+    status,
+    source:
+      'deposit',
+    title:
+      days < 0
+        ? `${deposit.name} maturity date has passed`
+        : days === 0
+          ? `${deposit.name} matures today`
+          : `${deposit.name} maturity is coming up`,
+    detail:
+      `${describeDue(days)}. The maturity date is calculated only from the recorded start date and tenure. Money Saathi does not assume the maturity payout amount.`,
+    dueDate:
+      date,
+    amountChetrum:
+      null,
+    href:
+      '/app/my-money',
+    actionLabel:
+      `Review ${depositKind.toLowerCase()}`,
+    notificationEligible:
+      true,
+  }
+}
+
+function schemeMaturityAlert(
+  scheme: FinancialScheme,
+  today: string,
+): MoneyAlert {
+  const date =
+    scheme.maturityDate
+
+  const days =
+    daysFromToday(
+      today,
+      date,
+    )
+
+  const status:
+    MoneyAlertStatus =
+    days < 0
+      ? 'overdue'
+      : days === 0
+        ? 'today'
+        : 'soon'
+
+  return {
+    id:
+      `scheme-maturity:${scheme.id}:${date}`,
+    level:
+      days <= 0
+        ? 'attention'
+        : 'info',
+    status,
+    source:
+      'scheme',
+    title:
+      days < 0
+        ? `${scheme.name} maturity date has passed`
+        : days === 0
+          ? `${scheme.name} maturity date is today`
+          : `${scheme.name} maturity date is coming up`,
+    detail:
+      `${describeDue(days)}. This reminder uses the maturity date recorded in the scheme. Future benefit values are references and are not treated as guaranteed cash.`,
+    dueDate:
+      date,
+    amountChetrum:
+      null,
+    href:
+      '/app/my-money/schemes',
+    actionLabel:
+      'Review scheme',
+    notificationEligible:
+      true,
+  }
+}
+
+function businessDueAlert(
+  due: BusinessDueReference,
+  today: string,
+): MoneyAlert {
+  const days =
+    daysFromToday(
+      today,
+      due.dueDate,
+    )
+
+  const status:
+    MoneyAlertStatus =
+    days < 0
+      ? 'overdue'
+      : days === 0
+        ? 'today'
+        : 'soon'
+
+  const payable =
+    due.direction ===
+    'payable'
+
+  return {
+    id:
+      `business-due:${due.id}:${due.dueDate}`,
+    level:
+      payable &&
+      days <= 0
+        ? 'urgent'
+        : 'attention',
+    status,
+    source:
+      'business-due',
+    title:
+      payable
+        ? days < 0
+          ? `${due.businessName} supplier payment is overdue`
+          : days === 0
+            ? `${due.businessName} supplier payment is due today`
+            : `${due.businessName} supplier payment is coming up`
+        : days < 0
+          ? `${due.businessName} customer amount is overdue to collect`
+          : days === 0
+            ? `${due.businessName} customer amount is due today`
+            : `${due.businessName} customer amount is coming due`,
+    detail:
+      `${describeDue(days)}. This reminder uses the due date and current outstanding amount recorded in Business dues; it does not prove that payment has or has not happened.`,
+    dueDate:
+      due.dueDate,
+    amountChetrum:
+      due.outstandingAmountChetrum,
+    href:
+      '/app/business/credit',
+    actionLabel:
+      'Review business dues',
+    notificationEligible:
+      true,
+  }
+}
+
 function alertRank(
   alert: MoneyAlert,
 ): number {
@@ -449,6 +645,112 @@ export function buildMoneyAlerts(
     alerts.push(
       loanAlert(
         reminder,
+        input.today,
+      ),
+    )
+  }
+
+  for (
+    const deposit of
+      input.fixedDeposits ?? []
+  ) {
+    const maturityDate =
+      addMonthsClampedIso(
+        deposit.startDate,
+        deposit.tenureMonths,
+      )
+
+    if (
+      maturityDate >
+      rangeEnd
+    ) {
+      continue
+    }
+
+    alerts.push(
+      depositMaturityAlert(
+        deposit,
+        'Fixed deposit',
+        input.today,
+      ),
+    )
+  }
+
+  for (
+    const deposit of
+      input.recurringDeposits ?? []
+  ) {
+    const maturityDate =
+      addMonthsClampedIso(
+        deposit.startDate,
+        deposit.tenureMonths,
+      )
+
+    if (
+      maturityDate >
+      rangeEnd
+    ) {
+      continue
+    }
+
+    alerts.push(
+      depositMaturityAlert(
+        deposit,
+        'Recurring deposit',
+        input.today,
+      ),
+    )
+  }
+
+  for (
+    const scheme of
+      input.schemes
+  ) {
+    if (
+      scheme.status !==
+        'active' ||
+      !scheme.maturityDate ||
+      scheme.maturityDate >
+        rangeEnd
+    ) {
+      continue
+    }
+
+    alerts.push(
+      schemeMaturityAlert(
+        scheme,
+        input.today,
+      ),
+    )
+  }
+
+  for (
+    const due of
+      input.businessDues ?? []
+  ) {
+    if (
+      !due.dueDate ||
+      due.dueDate >
+        rangeEnd ||
+      due.outstandingAmountChetrum <=
+        0
+    ) {
+      continue
+    }
+
+    if (
+      !Number.isSafeInteger(
+        due.outstandingAmountChetrum,
+      )
+    ) {
+      throw new Error(
+        'Business due amount must be a non-negative safe integer.',
+      )
+    }
+
+    alerts.push(
+      businessDueAlert(
+        due,
         input.today,
       ),
     )
