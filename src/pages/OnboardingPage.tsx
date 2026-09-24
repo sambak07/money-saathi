@@ -1,20 +1,29 @@
 ﻿import { useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
+import {
+  onboardingNeeds,
+} from '../onboarding/onboardingProfile'
+import {
+  getProfile,
+  saveProfile,
+} from '../profile/userProfile'
+import {
+  getPreferences,
+  savePreferences,
+} from '../settings/preferences'
+
 import '../styles/onboarding.css'
 
 type MoneySituation =
-  | 'salary'
-  | 'business'
-  | 'student'
-  | 'mixed'
-  | 'other'
+  Parameters<
+    typeof onboardingNeeds
+  >[0]
 
 type MoneyGoal =
-  | 'control-spending'
-  | 'save-more'
-  | 'build-goals'
-  | 'understand-money'
+  Parameters<
+    typeof onboardingNeeds
+  >[1]
 
 const situations: Array<{
   id: MoneySituation
@@ -107,7 +116,39 @@ function OnboardingPage() {
       return
     }
 
-    navigate('/app')
+    if (
+      !situation ||
+      !goal
+    ) {
+      return
+    }
+
+    const preferences =
+      getPreferences()
+
+    savePreferences({
+      ...preferences,
+      displayName:
+        name.trim(),
+    })
+
+    const profile =
+      getProfile()
+
+    saveProfile({
+      ...profile,
+      needs: [
+        ...new Set([
+          ...profile.needs,
+          ...onboardingNeeds(
+            situation,
+            goal,
+          ),
+        ]),
+      ],
+    })
+
+    navigate('/app/start')
   }
 
   return (

@@ -7,9 +7,12 @@
 import { useLocation } from 'react-router-dom'
 
 import {
+  clearPinThrottle,
+  getPinThrottleState,
   getSecurityEventName,
   isAppLockEnabled,
   isSessionUnlocked,
+  recordFailedPinAttempt,
   unlockSession,
   verifyAppPin,
 } from './appLock'
@@ -28,6 +31,11 @@ function AppLockGate({
   const [error, setError] = useState('')
   const [checking, setChecking] = useState(false)
   const [, setRevision] = useState(0)
+  const [, setThrottleRevision] =
+    useState(0)
+
+  const pinThrottle =
+    getPinThrottleState()
 
   useEffect(() => {
     const eventName = getSecurityEventName()
@@ -49,6 +57,42 @@ function AppLockGate({
     }
   }, [])
 
+  useEffect(() => {
+    if (
+      !pinThrottle.blocked ||
+      !pinThrottle.blockedUntil
+    ) {
+      return
+    }
+
+    const delay =
+      Math.max(
+        0,
+        pinThrottle.blockedUntil -
+          Date.now(),
+      ) + 50
+
+    const timer =
+      window.setTimeout(
+        () => {
+          setThrottleRevision(
+            (current) =>
+              current + 1,
+          )
+        },
+        delay,
+      )
+
+    return () => {
+      window.clearTimeout(
+        timer,
+      )
+    }
+  }, [
+    pinThrottle.blocked,
+    pinThrottle.blockedUntil,
+  ])
+
   const protectedRoute =
     location.pathname === '/app' ||
     location.pathname.startsWith('/app/')
@@ -64,6 +108,13 @@ function AppLockGate({
     event.preventDefault()
     setError('')
 
+    if (pinThrottle.blocked) {
+      setError(
+        'Too many incorrect attempts. Wait 30 seconds, then try again.',
+      )
+      return
+    }
+
     if (!/^\d{6}$/.test(pin)) {
       setError('Enter your six-digit PIN.')
       return
@@ -75,11 +126,28 @@ function AppLockGate({
       const valid = await verifyAppPin(pin)
 
       if (!valid) {
-        setError('That PIN is not correct.')
+        const nextThrottle =
+          recordFailedPinAttempt()
+
+        setThrottleRevision(
+          (current) =>
+            current + 1,
+        )
+
+        setError(
+          nextThrottle.blocked
+            ? 'Too many incorrect attempts. Wait 30 seconds, then try again.'
+            : `That PIN is not correct. ${nextThrottle.remainingAttempts} attempt${nextThrottle.remainingAttempts === 1 ? '' : 's'} left before a short cooldown.`,
+        )
         setPin('')
         return
       }
 
+      clearPinThrottle()
+      setThrottleRevision(
+        (current) =>
+          current + 1,
+      )
       unlockSession()
       setPin('')
     } catch {
@@ -99,7 +167,7 @@ function AppLockGate({
     <main className="app-lock-screen">
       <section className="app-lock-card">
         <div className="app-lock-mark">
-          MS
+          M
         </div>
 
         <p className="dashboard-eyebrow">
@@ -153,7 +221,10 @@ function AppLockGate({
 
           <button
             type="submit"
-            disabled={checking}
+            disabled={
+              checking ||
+              pinThrottle.blocked
+            }
           >
             {checking
               ? 'Checking...'
@@ -164,6 +235,14 @@ function AppLockGate({
         <p className="app-lock-footnote">
           Your PIN is not stored directly. Money Saathi stores
           only a one-way verifier on this device.
+        </p>
+
+        <p className="app-lock-footnote">
+          Forgot the PIN? There is no email or OTP reset because
+          Money Saathi has no account server. Clearing this site's
+          browser data removes the local lock, but it also removes
+          local financial records unless you have an encrypted
+          backup.
         </p>
       </section>
     </main>

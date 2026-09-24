@@ -5,6 +5,7 @@
 } from 'vitest'
 
 import {
+  calculatePinThrottleAfterFailure,
   isValidAppPin,
 } from './appLock'
 
@@ -22,5 +23,17 @@ describe('App Lock PIN validation', () => {
   it('rejects non-numeric PINs', () => {
     expect(isValidAppPin('12a456')).toBe(false)
     expect(isValidAppPin('123 56')).toBe(false)
+  })
+
+  it('starts a short cooldown on the fifth failed PIN attempt', () => {
+    expect(
+      calculatePinThrottleAfterFailure(
+        4,
+        1_000,
+      ),
+    ).toEqual({
+      failures: 5,
+      blockedUntil: 31_000,
+    })
   })
 })

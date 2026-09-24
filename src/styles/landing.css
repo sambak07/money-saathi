@@ -485,3 +485,20 @@
     width: min(calc(100% - 32px), var(--container));
   }
 }
+
+.site-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.primary-header-action {
+  border-color: var(--color-brand);
+  background: var(--color-brand);
+  color: white;
+}
+
+.primary-header-action:hover {
+  border-color: var(--color-brand-hover);
+  background: var(--color-brand-hover);
+}

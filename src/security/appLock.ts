@@ -1,6 +1,11 @@
 ﻿const LOCK_CONFIG_KEY = 'money-saathi:app-lock:v1'
 const SESSION_UNLOCKED_KEY = 'money-saathi:app-lock:unlocked'
 const SECURITY_EVENT = 'money-saathi-security-change'
+const PIN_THROTTLE_KEY =
+  'money-saathi:app-lock:throttle:v1'
+
+const MAX_PIN_FAILURES = 5
+const PIN_COOLDOWN_MS = 30_000
 
 const PBKDF2_ITERATIONS = 600_000
 const SALT_BYTES = 16
@@ -11,6 +16,18 @@ interface StoredLockConfig {
   iterations: number
   salt: string
   verifier: string
+}
+
+interface StoredPinThrottle {
+  failures: number
+  blockedUntil: number
+}
+
+export interface PinThrottleState {
+  failures: number
+  remainingAttempts: number
+  blocked: boolean
+  blockedUntil: number | null
 }
 
 function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {
@@ -105,6 +122,161 @@ function equalBytes(
   }
 
   return difference === 0
+}
+
+export function calculatePinThrottleAfterFailure(
+  currentFailures: number,
+  now: number,
+): StoredPinThrottle {
+  const failures =
+    currentFailures + 1
+
+  return {
+    failures,
+    blockedUntil:
+      failures >= MAX_PIN_FAILURES
+        ? now + PIN_COOLDOWN_MS
+        : 0,
+  }
+}
+
+function readPinThrottle(
+  now: number,
+): StoredPinThrottle {
+  const raw =
+    localStorage.getItem(
+      PIN_THROTTLE_KEY,
+    )
+
+  if (!raw) {
+    return {
+      failures: 0,
+      blockedUntil: 0,
+    }
+  }
+
+  try {
+    const parsed =
+      JSON.parse(
+        raw,
+      ) as Partial<StoredPinThrottle>
+
+    if (
+      !Number.isInteger(
+        parsed.failures,
+      ) ||
+      (parsed.failures ?? -1) < 0 ||
+      typeof parsed.blockedUntil !== 'number' ||
+      !Number.isSafeInteger(
+        parsed.blockedUntil,
+      ) ||
+      parsed.blockedUntil < 0
+    ) {
+      throw new Error(
+        'Invalid PIN throttle state.',
+      )
+    }
+
+    if (
+      parsed.blockedUntil > 0 &&
+      parsed.blockedUntil <= now
+    ) {
+      localStorage.removeItem(
+        PIN_THROTTLE_KEY,
+      )
+
+      return {
+        failures: 0,
+        blockedUntil: 0,
+      }
+    }
+
+    return {
+      failures:
+        parsed.failures ?? 0,
+      blockedUntil:
+        parsed.blockedUntil,
+    }
+  } catch {
+    localStorage.removeItem(
+      PIN_THROTTLE_KEY,
+    )
+
+    return {
+      failures: 0,
+      blockedUntil: 0,
+    }
+  }
+}
+
+export function getPinThrottleState(
+  now = Date.now(),
+): PinThrottleState {
+  const stored =
+    readPinThrottle(
+      now,
+    )
+
+  const blocked =
+    stored.blockedUntil > now
+
+  return {
+    failures:
+      stored.failures,
+    remainingAttempts:
+      blocked
+        ? 0
+        : Math.max(
+            0,
+            MAX_PIN_FAILURES -
+              stored.failures,
+          ),
+    blocked,
+    blockedUntil:
+      blocked
+        ? stored.blockedUntil
+        : null,
+  }
+}
+
+export function recordFailedPinAttempt(
+  now = Date.now(),
+): PinThrottleState {
+  const current =
+    readPinThrottle(
+      now,
+    )
+
+  if (
+    current.blockedUntil > now
+  ) {
+    return getPinThrottleState(
+      now,
+    )
+  }
+
+  const next =
+    calculatePinThrottleAfterFailure(
+      current.failures,
+      now,
+    )
+
+  localStorage.setItem(
+    PIN_THROTTLE_KEY,
+    JSON.stringify(
+      next,
+    ),
+  )
+
+  return getPinThrottleState(
+    now,
+  )
+}
+
+export function clearPinThrottle(): void {
+  localStorage.removeItem(
+    PIN_THROTTLE_KEY,
+  )
 }
 
 function notifySecurityChange(): void {

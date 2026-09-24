@@ -105,6 +105,11 @@ function AlertNotifier() {
       handleChange,
     )
 
+    window.addEventListener(
+      'money-saathi-data-change',
+      handleChange,
+    )
+
     return () => {
       window.removeEventListener(
         'money-saathi-alert-preferences-change',
@@ -113,6 +118,11 @@ function AlertNotifier() {
 
       window.removeEventListener(
         'money-saathi-loan-reminders-change',
+        handleChange,
+      )
+
+      window.removeEventListener(
+        'money-saathi-data-change',
         handleChange,
       )
     }
@@ -164,9 +174,16 @@ function AlertNotifier() {
         const today =
           getLocalToday()
 
+        const recordedTransactions =
+          transactions.filter(
+            (transaction) =>
+              transaction.date <= today,
+          )
+
         const recordedBalanceChetrum =
           transactionBalanceChetrum(
-            transactions,
+            recordedTransactions,
+            today,
           )
 
         const preferences =
@@ -177,7 +194,7 @@ function AlertNotifier() {
             today,
             recordedBalanceChetrum,
             regularMoney,
-            transactions,
+            recordedTransactions,
             preferences.safetyBufferChetrum,
           )
 
@@ -187,7 +204,8 @@ function AlertNotifier() {
             dueSoonDays:
               alertPreferences.dueSoonDays,
             regularMoney,
-            transactions,
+            transactions:
+              recordedTransactions,
             schemes,
             recordedBalanceChetrum,
             safeToSpendChetrum:

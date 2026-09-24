@@ -148,7 +148,20 @@ function waitForTransaction(
   transaction: IDBTransaction,
 ): Promise<void> {
   return new Promise((resolve, reject) => {
-    transaction.oncomplete = () => resolve()
+    transaction.oncomplete = () => {
+      if (
+        transaction.mode === 'readwrite' &&
+        typeof window !== 'undefined'
+      ) {
+        window.dispatchEvent(
+          new Event(
+            'money-saathi-data-change',
+          ),
+        )
+      }
+
+      resolve()
+    }
     transaction.onerror = () =>
       reject(
         transaction.error ??

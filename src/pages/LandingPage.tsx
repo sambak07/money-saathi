@@ -10,9 +10,15 @@ function LandingPage() {
           <span>Money Saathi</span>
         </Link>
 
-        <Link to="/onboarding" className="header-action">
-          Get started
-        </Link>
+        <div className="site-header-actions">
+          <Link to="/app" className="header-action">
+            Open Money Saathi
+          </Link>
+
+          <Link to="/onboarding" className="header-action primary-header-action">
+            Get started
+          </Link>
+        </div>
       </header>
 
       <main>
@@ -20,7 +26,7 @@ function LandingPage() {
           <div className="hero-copy">
             <p className="eyebrow">
               <span className="eyebrow-dot" aria-hidden="true" />
-              Simple personal finance
+              Bhutan-first personal finance
             </p>
 
             <h1>
@@ -38,9 +44,9 @@ function LandingPage() {
                 Start with Money Saathi
               </Link>
 
-              <a href="#why-money-saathi" className="secondary-button">
-                See how it works
-              </a>
+              <Link to="/app" className="secondary-button">
+                Open existing Money Saathi
+              </Link>
             </div>
 
             <div className="trust-line" aria-label="Money Saathi principles">
@@ -57,6 +63,11 @@ function LandingPage() {
               <span className="trust-item">
                 <span className="trust-check" aria-hidden="true">✓</span>
                 Built around Nu.
+              </span>
+
+              <span className="trust-item">
+                <span className="trust-check" aria-hidden="true">✓</span>
+                Made in Bhutan
               </span>
             </div>
           </div>

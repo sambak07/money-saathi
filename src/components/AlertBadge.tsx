@@ -85,9 +85,16 @@ function AlertBadge() {
           const alertPreferences =
             getAlertPreferences()
 
+          const recordedTransactions =
+            transactions.filter(
+              (transaction) =>
+                transaction.date <= today,
+            )
+
           const recordedBalanceChetrum =
             transactionBalanceChetrum(
-              transactions,
+              recordedTransactions,
+              today,
             )
 
           const safe =
@@ -95,7 +102,7 @@ function AlertBadge() {
               today,
               recordedBalanceChetrum,
               regularMoney,
-              transactions,
+              recordedTransactions,
               appPreferences.safetyBufferChetrum,
             )
 
@@ -105,7 +112,8 @@ function AlertBadge() {
               dueSoonDays:
                 alertPreferences.dueSoonDays,
               regularMoney,
-              transactions,
+              transactions:
+                recordedTransactions,
               schemes,
               recordedBalanceChetrum,
               safeToSpendChetrum:
@@ -194,6 +202,11 @@ function AlertBadge() {
       handleChange,
     )
 
+    window.addEventListener(
+      'money-saathi-data-change',
+      handleChange,
+    )
+
     const interval =
       window.setInterval(
         handleChange,
@@ -218,6 +231,11 @@ function AlertBadge() {
 
       window.removeEventListener(
         'money-saathi-alerts-change',
+        handleChange,
+      )
+
+      window.removeEventListener(
+        'money-saathi-data-change',
         handleChange,
       )
 
