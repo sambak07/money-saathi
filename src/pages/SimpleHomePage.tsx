@@ -118,15 +118,22 @@ function SimpleHomePage() {
     const month =
       today.slice(0, 7)
 
+    const recordedTransactions =
+      data.transactions.filter(
+        (transaction) =>
+          transaction.date <= today,
+      )
+
     const monthSummary =
       summarizeSimpleMonth(
         month,
-        data.transactions,
+        recordedTransactions,
       )
 
     const balance =
       transactionBalanceChetrum(
-        data.transactions,
+        recordedTransactions,
+        today,
       )
 
     const safe =
@@ -134,7 +141,7 @@ function SimpleHomePage() {
         today,
         balance,
         data.regularMoney,
-        data.transactions,
+        recordedTransactions,
         preferences.safetyBufferChetrum,
       )
 
@@ -156,7 +163,7 @@ function SimpleHomePage() {
       firstGoal,
       firstGoalSaved,
       recentTransactions:
-        data.transactions.slice(0, 3),
+        recordedTransactions.slice(0, 3),
     }
   }, [
     data,

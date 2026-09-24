@@ -236,10 +236,15 @@ export function calculateSafeToSpend(
       continue
     }
 
+    const commitmentStart =
+      item.startDate < today
+        ? item.startDate
+        : today
+
     const occurrences =
       generateOccurrencesBetween(
         item,
-        today,
+        commitmentStart,
         horizonDate,
       )
 

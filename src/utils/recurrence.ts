@@ -55,6 +55,25 @@ function occurrenceAtIndex(
   return formatLocalDate(new Date(year, month, day))
 }
 
+export function regularOccurrenceTransactionId(
+  sourceId: string,
+  scheduledFor: string,
+): string {
+  if (!sourceId) {
+    throw new Error(
+      'Regular Money source ID is required.',
+    )
+  }
+
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(scheduledFor)) {
+    throw new Error(
+      'Scheduled occurrence date must use YYYY-MM-DD.',
+    )
+  }
+
+  return `regular:${sourceId}:${scheduledFor}`
+}
+
 export function generateOccurrencesBetween(
   item: RegularMoney,
   fromDate: string,

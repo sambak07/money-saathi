@@ -101,6 +101,27 @@ export function savePreferences(
   )
 }
 
+export function displayDefaultsPreservingSafetyBuffer(
+  preferences: MoneySaathiPreferences,
+): MoneySaathiPreferences {
+  const current =
+    sanitizePreferences(preferences)
+
+  return {
+    ...DEFAULT_PREFERENCES,
+    safetyBufferChetrum:
+      current.safetyBufferChetrum,
+  }
+}
+
+export function resetDisplayPreferences(): void {
+  savePreferences(
+    displayDefaultsPreservingSafetyBuffer(
+      getPreferences(),
+    ),
+  )
+}
+
 export function resetPreferences(): void {
   localStorage.removeItem(PREFERENCES_KEY)
 

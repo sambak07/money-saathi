@@ -26,6 +26,10 @@ import {
   getLocalToday,
   parseNuToChetrum,
 } from '../utils/money'
+import {
+  isFutureTransactionDate,
+  preserveRecurringMetadata,
+} from '../utils/transactionIntegrity'
 
 const incomeCategories = [
   'Salary',
@@ -56,13 +60,18 @@ function TransactionFormPage() {
   const params = useParams()
 
   const editingId = params.id
+  const [today] =
+    useState(() => getLocalToday())
+
+  const [existingTransaction, setExistingTransaction] =
+    useState<MoneyTransaction | null>(null)
 
   const [kind, setKind] =
     useState<TransactionKind>('expense')
 
   const [amount, setAmount] = useState('')
   const [category, setCategory] = useState('')
-  const [date, setDate] = useState(getLocalToday())
+  const [date, setDate] = useState(today)
   const [note, setNote] = useState('')
 
   const [createdAt, setCreatedAt] =
@@ -112,6 +121,7 @@ function TransactionFormPage() {
         setDate(record.date)
         setNote(record.note)
         setCreatedAt(record.createdAt)
+        setExistingTransaction(record)
       } finally {
         if (active) {
           setLoading(false)
@@ -129,6 +139,16 @@ function TransactionFormPage() {
   function handleKindChange(
     nextKind: TransactionKind,
   ) {
+    if (
+      existingTransaction?.recurringSourceId &&
+      existingTransaction.scheduledFor
+    ) {
+      setError(
+        'This transaction is linked to Regular Money. Change the schedule if its Money in or Money out type is wrong.',
+      )
+      return
+    }
+
     setKind(nextKind)
     setCategory('')
     setError('')
@@ -157,6 +177,18 @@ function TransactionFormPage() {
       return
     }
 
+    if (
+      isFutureTransactionDate(
+        date,
+        today,
+      )
+    ) {
+      setError(
+        'Transactions are money already received or paid. Use Regular Money or planning tools for future dates.',
+      )
+      return
+    }
+
     setSaving(true)
 
     try {
@@ -171,6 +203,9 @@ function TransactionFormPage() {
         date,
         createdAt: createdAt ?? now,
         updatedAt: now,
+        ...preserveRecurringMetadata(
+          existingTransaction,
+        ),
       }
 
       if (editingId) {
@@ -245,6 +280,10 @@ function TransactionFormPage() {
                     ? 'kind-button selected'
                     : 'kind-button'
                 }
+                disabled={Boolean(
+                  existingTransaction?.recurringSourceId &&
+                  existingTransaction.scheduledFor,
+                )}
                 onClick={() =>
                   handleKindChange('expense')
                 }
@@ -259,6 +298,10 @@ function TransactionFormPage() {
                     ? 'kind-button selected'
                     : 'kind-button'
                 }
+                disabled={Boolean(
+                  existingTransaction?.recurringSourceId &&
+                  existingTransaction.scheduledFor,
+                )}
                 onClick={() =>
                   handleKindChange('income')
                 }
@@ -266,6 +309,15 @@ function TransactionFormPage() {
                 Money in
               </button>
             </div>
+
+            {existingTransaction?.recurringSourceId &&
+              existingTransaction.scheduledFor && (
+                <p className="input-preview">
+                  Linked to Regular Money for{' '}
+                  {existingTransaction.scheduledFor}. Its Money
+                  in/out type stays linked to that schedule.
+                </p>
+              )}
           </fieldset>
 
           <div className="form-field">
@@ -332,6 +384,7 @@ function TransactionFormPage() {
             <input
               id="date"
               type="date"
+              max={today}
               value={date}
               onChange={(event) =>
                 setDate(event.target.value)

@@ -13,7 +13,7 @@ import {
   type MoneySaathiPreferences,
   type ReportTrendMonths,
   getPreferences,
-  resetPreferences,
+  resetDisplayPreferences,
   savePreferences,
 } from '../settings/preferences'
 
@@ -66,9 +66,11 @@ function SettingsPage() {
     setMessage('')
     setError('')
 
-    resetPreferences()
+    resetDisplayPreferences()
     setPreferences(getPreferences())
-    setMessage('Display preferences reset to defaults.')
+    setMessage(
+      'Display preferences reset. Your safety buffer was kept.',
+    )
   }
 
   async function eraseFinancialData() {
@@ -137,8 +139,8 @@ function SettingsPage() {
             <h2>Personalize the app</h2>
 
             <p>
-              These settings stay on this browser and are not
-              part of encrypted financial backups.
+              These settings stay on this browser and are included
+              in encrypted backups. App Lock remains device-specific.
             </p>
           </div>
 

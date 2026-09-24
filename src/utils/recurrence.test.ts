@@ -9,6 +9,7 @@ import {
   generateOccurrencesBetween,
   getMonthBounds,
   getNextOccurrence,
+  regularOccurrenceTransactionId,
 } from './recurrence'
 
 function regular(
@@ -103,5 +104,26 @@ describe('recurrence utilities', () => {
       start: '2028-02-01',
       end: '2028-02-29',
     })
+  })
+
+  it('builds a stable unique transaction ID for each scheduled occurrence', () => {
+    expect(
+      regularOccurrenceTransactionId(
+        'rent',
+        '2026-09-01',
+      ),
+    ).toBe('regular:rent:2026-09-01')
+
+    expect(
+      regularOccurrenceTransactionId(
+        'rent',
+        '2026-10-01',
+      ),
+    ).not.toBe(
+      regularOccurrenceTransactionId(
+        'rent',
+        '2026-09-01',
+      ),
+    )
   })
 })

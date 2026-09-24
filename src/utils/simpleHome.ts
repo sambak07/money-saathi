@@ -72,11 +72,19 @@ export function summarizeSimpleMonth(
 
 export function transactionBalanceChetrum(
   transactions: MoneyTransaction[],
+  asOfDate?: string,
 ): number {
   let income = 0n
   let expense = 0n
 
   for (const transaction of transactions) {
+    if (
+      asOfDate &&
+      transaction.date > asOfDate
+    ) {
+      continue
+    }
+
     if (transaction.kind === 'income') {
       income = addMoney(
         income,

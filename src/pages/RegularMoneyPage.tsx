@@ -33,6 +33,7 @@ import {
   getFrequencyLabel,
   getMonthBounds,
   getNextOccurrence,
+  regularOccurrenceTransactionId,
 } from '../utils/recurrence'
 
 import '../styles/regular-money.css'
@@ -343,7 +344,10 @@ function RegularMoneyPage() {
 
     try {
       const transaction: MoneyTransaction = {
-        id: `regular::`,
+        id: regularOccurrenceTransactionId(
+          item.id,
+          scheduledFor,
+        ),
         kind: item.kind,
         amountChetrum: item.amountChetrum,
         category: item.category,

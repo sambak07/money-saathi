@@ -154,8 +154,14 @@ function DashboardPage() {
   const dashboard = useMemo(() => {
     if (!data) return null
 
-    const monthTransactions =
+    const recordedTransactions =
       data.transactions.filter(
+        (item) =>
+          item.date <= today,
+      )
+
+    const monthTransactions =
+      recordedTransactions.filter(
         (item) =>
           item.date.slice(0, 7) ===
           currentMonth,
@@ -188,7 +194,7 @@ function DashboardPage() {
         )
 
     const allTimeIncome =
-      data.transactions
+      recordedTransactions
         .filter(
           (item) =>
             item.kind === 'income',
@@ -201,7 +207,7 @@ function DashboardPage() {
         )
 
     const allTimeExpense =
-      data.transactions
+      recordedTransactions
         .filter(
           (item) =>
             item.kind === 'expense',
@@ -221,7 +227,7 @@ function DashboardPage() {
         today,
         transactionBalance,
         data.regularMoney,
-        data.transactions,
+        recordedTransactions,
         preferences.safetyBufferChetrum,
       )
 
@@ -291,7 +297,7 @@ function DashboardPage() {
     const recordedKeys =
       new Set<string>()
 
-    for (const transaction of data.transactions) {
+    for (const transaction of recordedTransactions) {
       if (
         transaction.recurringSourceId &&
         transaction.scheduledFor
@@ -498,7 +504,7 @@ function DashboardPage() {
       ).length
 
     const recentTransactions =
-      data.transactions.slice(
+      recordedTransactions.slice(
         0,
         preferences.dashboardRecentCount,
       )

@@ -6,6 +6,7 @@
 
 import {
   DEFAULT_PREFERENCES,
+  displayDefaultsPreservingSafetyBuffer,
   sanitizePreferences,
 } from './preferences'
 
@@ -48,6 +49,20 @@ describe('Money Saathi preferences', () => {
         DEFAULT_PREFERENCES.dashboardRecentCount,
       safetyBufferChetrum:
         DEFAULT_PREFERENCES.safetyBufferChetrum,
+    })
+  })
+
+  it('resets display preferences without removing the financial safety buffer', () => {
+    expect(
+      displayDefaultsPreservingSafetyBuffer({
+        displayName: 'Karma',
+        reportTrendMonths: 12,
+        dashboardRecentCount: 8,
+        safetyBufferChetrum: 250_000,
+      }),
+    ).toEqual({
+      ...DEFAULT_PREFERENCES,
+      safetyBufferChetrum: 250_000,
     })
   })
 })

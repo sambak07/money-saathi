@@ -199,4 +199,28 @@ describe('Safe to Spend', () => {
       result.safeToSpendChetrum,
     ).toBe(0)
   })
+
+  it('keeps an unresolved overdue expense in Safe to Spend commitments', () => {
+    const result = calculateSafeToSpend(
+      '2026-09-22',
+      1_000_000,
+      [
+        regular({
+          id: 'overdue-rent',
+          amountChetrum: 100_000,
+          startDate: '2026-09-21',
+        }),
+      ],
+      [],
+      0,
+    )
+
+    expect(
+      result.upcomingCommitmentsChetrum,
+    ).toBe(100_000)
+
+    expect(
+      result.safeToSpendChetrum,
+    ).toBe(900_000)
+  })
 })

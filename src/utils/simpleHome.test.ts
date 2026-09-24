@@ -72,4 +72,24 @@ describe('Simple Home money summary', () => {
       ]),
     ).toBe(600)
   })
+
+  it('excludes future transactions from an as-of recorded balance', () => {
+    expect(
+      transactionBalanceChetrum(
+        [
+          transaction({
+            id: 'today',
+            amountChetrum: 1_000,
+            date: '2026-09-22',
+          }),
+          transaction({
+            id: 'future',
+            amountChetrum: 10_000,
+            date: '2026-10-01',
+          }),
+        ],
+        '2026-09-22',
+      ),
+    ).toBe(1_000)
+  })
 })
