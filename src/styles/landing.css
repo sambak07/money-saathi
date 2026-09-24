@@ -1161,3 +1161,59 @@
     width: 150px;
   }
 }
+
+/* === Money Saathi Landing Header Polish === */
+
+.site-header {
+  min-height: 72px;
+}
+
+.brand-mark,
+.brand-mark img {
+  width: 156px;
+}
+
+.header-action {
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: 11px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.hero {
+  padding-top: 60px;
+  padding-bottom: 76px;
+}
+
+.hero-copy {
+  align-self: center;
+}
+
+@media (max-width: 900px) {
+  .site-header {
+    min-height: 70px;
+  }
+
+  .hero {
+    padding-top: 48px;
+  }
+}
+
+@media (max-width: 560px) {
+  .brand-mark,
+  .brand-mark img {
+    width: 138px;
+  }
+
+  .header-action {
+    min-height: 40px;
+    padding: 0 12px;
+    font-size: 12px;
+  }
+
+  .hero {
+    padding-top: 38px;
+    padding-bottom: 54px;
+  }
+}
