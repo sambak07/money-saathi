@@ -133,6 +133,11 @@ const groups: MoreGroup[] = [
         label: 'Inventory',
         description: 'Track stock items, quantities, unit cost and low-stock levels.',
       },
+      {
+        to: '/app/business/trade',
+        label: 'Sales & purchases',
+        description: 'Record item-level sales, purchases, payment-at-entry and explicit COGS.',
+      },
     ],
   },
   {

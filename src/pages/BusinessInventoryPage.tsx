@@ -507,6 +507,10 @@ function BusinessInventoryPage() {
           </div>
 
           <div className="business-inventory-header-actions">
+            <Link to="/app/business/trade">
+              Sales & purchases
+            </Link>
+
             <Link to="/app/business/credit">
               Customers & dues
             </Link>
