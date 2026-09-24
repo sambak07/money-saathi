@@ -7,6 +7,7 @@ import type {
   BusinessOpenItem,
   BusinessParty,
   BusinessProfile,
+  BusinessTradeEntry,
   BusinessTransaction,
 } from '../types/business'
 import type { Budget } from '../types/budget'
@@ -17,7 +18,7 @@ import type { RegularMoney } from '../types/regularMoney'
 import type { MoneyTransaction } from '../types/transaction'
 
 const DATABASE_NAME = 'money-saathi'
-const DATABASE_VERSION = 9
+const DATABASE_VERSION = 10
 
 const TRANSACTION_STORE = 'transactions'
 const BUDGET_STORE = 'budgets'
@@ -33,6 +34,7 @@ const BUSINESS_PROFILE_STORE = 'business-profiles'
 const BUSINESS_TRANSACTION_STORE = 'business-transactions'
 const BUSINESS_PARTY_STORE = 'business-parties'
 const BUSINESS_OPEN_ITEM_STORE = 'business-open-items'
+const BUSINESS_TRADE_ENTRY_STORE = 'business-trade-entries'
 
 function openDatabase(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -185,6 +187,31 @@ function openDatabase(): Promise<IDBDatabase> {
         store.createIndex(
           'dueDate',
           'dueDate',
+          { unique: false },
+        )
+      }
+
+      if (!database.objectStoreNames.contains(BUSINESS_TRADE_ENTRY_STORE)) {
+        const store = database.createObjectStore(
+          BUSINESS_TRADE_ENTRY_STORE,
+          { keyPath: 'id' },
+        )
+
+        store.createIndex(
+          'businessId',
+          'businessId',
+          { unique: false },
+        )
+
+        store.createIndex(
+          'kind',
+          'kind',
+          { unique: false },
+        )
+
+        store.createIndex(
+          'date',
+          'date',
           { unique: false },
         )
       }
@@ -1290,6 +1317,99 @@ export async function deleteBusinessOpenItem(
   }
 }
 
+export async function getBusinessTradeEntries(
+  businessId: string,
+): Promise<BusinessTradeEntry[]> {
+  const database = await openDatabase()
+
+  try {
+    const transaction = database.transaction(
+      BUSINESS_TRADE_ENTRY_STORE,
+      'readonly',
+    )
+
+    const request = transaction
+      .objectStore(BUSINESS_TRADE_ENTRY_STORE)
+      .index('businessId')
+      .getAll(businessId)
+
+    const records =
+      await new Promise<BusinessTradeEntry[]>(
+        (resolve, reject) => {
+          request.onsuccess = () =>
+            resolve(
+              request.result as BusinessTradeEntry[],
+            )
+
+          request.onerror = () =>
+            reject(
+              request.error ??
+                new Error(
+                  'Could not read business sales and purchases',
+                ),
+            )
+        },
+      )
+
+    await waitForTransaction(transaction)
+
+    return records.sort((a, b) => {
+      const dateComparison =
+        b.date.localeCompare(a.date)
+
+      if (dateComparison !== 0) {
+        return dateComparison
+      }
+
+      return b.createdAt - a.createdAt
+    })
+  } finally {
+    database.close()
+  }
+}
+
+export async function upsertBusinessTradeEntry(
+  record: BusinessTradeEntry,
+): Promise<void> {
+  const database = await openDatabase()
+
+  try {
+    const transaction = database.transaction(
+      BUSINESS_TRADE_ENTRY_STORE,
+      'readwrite',
+    )
+
+    transaction
+      .objectStore(BUSINESS_TRADE_ENTRY_STORE)
+      .put(record)
+
+    await waitForTransaction(transaction)
+  } finally {
+    database.close()
+  }
+}
+
+export async function deleteBusinessTradeEntry(
+  id: string,
+): Promise<void> {
+  const database = await openDatabase()
+
+  try {
+    const transaction = database.transaction(
+      BUSINESS_TRADE_ENTRY_STORE,
+      'readwrite',
+    )
+
+    transaction
+      .objectStore(BUSINESS_TRADE_ENTRY_STORE)
+      .delete(id)
+
+    await waitForTransaction(transaction)
+  } finally {
+    database.close()
+  }
+}
+
 export async function deleteBusinessProfileWithTransactions(
   businessId: string,
 ): Promise<void> {
@@ -1301,6 +1421,7 @@ export async function deleteBusinessProfileWithTransactions(
         BUSINESS_TRANSACTION_STORE,
         BUSINESS_PARTY_STORE,
         BUSINESS_OPEN_ITEM_STORE,
+        BUSINESS_TRADE_ENTRY_STORE,
       ],
       'readonly',
     )
@@ -1323,10 +1444,17 @@ export async function deleteBusinessProfileWithTransactions(
         .index('businessId')
         .getAllKeys(businessId)
 
+    const tradeKeysRequest =
+      readTransaction
+        .objectStore(BUSINESS_TRADE_ENTRY_STORE)
+        .index('businessId')
+        .getAllKeys(businessId)
+
     const [
       transactionKeys,
       partyKeys,
       openItemKeys,
+      tradeKeys,
     ] =
       await Promise.all([
         new Promise<IDBValidKey[]>(
@@ -1377,6 +1505,22 @@ export async function deleteBusinessProfileWithTransactions(
               )
           },
         ),
+        new Promise<IDBValidKey[]>(
+          (resolve, reject) => {
+            tradeKeysRequest.onsuccess = () =>
+              resolve(
+                tradeKeysRequest.result,
+              )
+
+            tradeKeysRequest.onerror = () =>
+              reject(
+                tradeKeysRequest.error ??
+                  new Error(
+                    'Could not find business sales and purchases',
+                  ),
+              )
+          },
+        ),
       ])
 
     await waitForTransaction(readTransaction)
@@ -1387,6 +1531,7 @@ export async function deleteBusinessProfileWithTransactions(
         BUSINESS_TRANSACTION_STORE,
         BUSINESS_PARTY_STORE,
         BUSINESS_OPEN_ITEM_STORE,
+        BUSINESS_TRADE_ENTRY_STORE,
       ],
       'readwrite',
     )
@@ -1434,6 +1579,19 @@ export async function deleteBusinessProfileWithTransactions(
       )
     }
 
+    const tradeStore =
+      writeTransaction.objectStore(
+        BUSINESS_TRADE_ENTRY_STORE,
+      )
+
+    for (
+      const key of tradeKeys
+    ) {
+      tradeStore.delete(
+        key,
+      )
+    }
+
     await waitForTransaction(writeTransaction)
   } finally {
     database.close()
@@ -1454,6 +1612,7 @@ export interface MoneySaathiDatabaseSnapshot {
   businessTransactions: BusinessTransaction[]
   businessParties: BusinessParty[]
   businessOpenItems: BusinessOpenItem[]
+  businessTradeEntries: BusinessTradeEntry[]
 }
 
 export async function exportDatabaseSnapshot(): Promise<
@@ -1477,6 +1636,7 @@ export async function exportDatabaseSnapshot(): Promise<
       businessTransactions,
       businessParties,
       businessOpenItems,
+      businessTradeEntries,
     ] = await Promise.all([
 
       getAllFromStore<MoneyTransaction>(
@@ -1535,6 +1695,10 @@ export async function exportDatabaseSnapshot(): Promise<
         database,
         BUSINESS_OPEN_ITEM_STORE,
       ),
+      getAllFromStore<BusinessTradeEntry>(
+        database,
+        BUSINESS_TRADE_ENTRY_STORE,
+      ),
     ])
 
     return {
@@ -1552,6 +1716,7 @@ export async function exportDatabaseSnapshot(): Promise<
       businessTransactions,
       businessParties,
       businessOpenItems,
+      businessTradeEntries,
     }
   } finally {
     database.close()
@@ -1578,6 +1743,7 @@ export async function replaceDatabaseSnapshot(
     BUSINESS_TRANSACTION_STORE,
     BUSINESS_PARTY_STORE,
     BUSINESS_OPEN_ITEM_STORE,
+    BUSINESS_TRADE_ENTRY_STORE,
   ]
 
   try {
@@ -1618,6 +1784,10 @@ export async function replaceDatabaseSnapshot(
         BUSINESS_OPEN_ITEM_STORE,
         snapshot.businessOpenItems,
       ],
+      [
+        BUSINESS_TRADE_ENTRY_STORE,
+        snapshot.businessTradeEntries,
+      ],
     ]
 
     for (const [storeName, records] of mappings) {
@@ -1652,6 +1822,7 @@ export async function clearAllFinancialData(): Promise<void> {
     BUSINESS_TRANSACTION_STORE,
     BUSINESS_PARTY_STORE,
     BUSINESS_OPEN_ITEM_STORE,
+    BUSINESS_TRADE_ENTRY_STORE,
   ]
 
   try {

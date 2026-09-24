@@ -55,6 +55,7 @@ export interface BackupSummary {
   businessTransactions: number
   businessParties: number
   businessOpenItems: number
+  businessTradeEntries: number
 }
 
 function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {
@@ -198,7 +199,9 @@ function isValidBackupRecord(
   if (
     'kind' in value &&
     value.kind !== 'income' &&
-    value.kind !== 'expense'
+    value.kind !== 'expense' &&
+    value.kind !== 'sale' &&
+    value.kind !== 'purchase'
   ) {
     return false
   }
@@ -822,6 +825,62 @@ function isValidBusinessOpenItem(
   )
 }
 
+function isValidBusinessTradeEntry(
+  value: unknown,
+): boolean {
+  if (!isValidBackupRecord(value)) return false
+
+  const paymentMethods = [
+    'cash',
+    'bank',
+    'credit',
+    'mixed',
+    'other',
+  ]
+
+  return (
+    isNonEmptyText(
+      value.businessId,
+    ) &&
+    (
+      value.kind === 'sale' ||
+      value.kind === 'purchase'
+    ) &&
+    isText(
+      value.partyName,
+    ) &&
+    isSafePositiveInteger(
+      value.totalChetrum,
+    ) &&
+    isSafeNonNegativeInteger(
+      value.paidAtEntryChetrum,
+    ) &&
+    Number(
+      value.paidAtEntryChetrum,
+    ) <=
+      Number(
+        value.totalChetrum,
+      ) &&
+    paymentMethods.includes(
+      String(
+        value.paymentMethod,
+      ),
+    ) &&
+    isRequiredDate(
+      value.date,
+    ) &&
+    isText(
+      value.reference,
+    ) &&
+    isText(
+      value.note,
+    ) &&
+    hasValidTimes(
+      value,
+    )
+  )
+}
+
 function isValidTypedCollection(
   value: unknown,
   validator: (
@@ -897,6 +956,10 @@ function hasSnapshotArrays(
     !isValidTypedCollection(
       value.businessOpenItems,
       isValidBusinessOpenItem,
+    ) ||
+    !isValidTypedCollection(
+      value.businessTradeEntries,
+      isValidBusinessTradeEntry,
     )
   ) {
     return false
@@ -967,6 +1030,17 @@ function hasSnapshotArrays(
         ) ||
         !partyIds.has(
           item.partyId,
+        ),
+    )
+  ) {
+    return false
+  }
+
+  if (
+    value.businessTradeEntries.some(
+      (entry) =>
+        !businessIds.has(
+          entry.businessId,
         ),
     )
   ) {
@@ -1067,6 +1141,12 @@ export function migrateBackupPayload(
         )
           ? data.businessOpenItems
           : [],
+      businessTradeEntries:
+        Array.isArray(
+          data.businessTradeEntries,
+        )
+          ? data.businessTradeEntries
+          : [],
     },
   }
 
@@ -1116,6 +1196,7 @@ export function buildBackupSummary(
     businessTransactions: data.businessTransactions.length,
     businessParties: data.businessParties.length,
     businessOpenItems: data.businessOpenItems.length,
+    businessTradeEntries: data.businessTradeEntries.length,
   }
 
   return {

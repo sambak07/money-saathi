@@ -33,7 +33,7 @@ const types =
 describe('business credit data integration', () => {
   it('upgrades the local database and creates dedicated stores', () => {
     expect(db).toContain(
-      'const DATABASE_VERSION = 9',
+      'const DATABASE_VERSION = 10',
     )
 
     expect(db).toContain(

@@ -30,6 +30,7 @@ const emptySnapshot: MoneySaathiDatabaseSnapshot = {
   businessTransactions: [],
   businessParties: [],
   businessOpenItems: [],
+  businessTradeEntries: [],
 }
 
 describe('backup validation', () => {
@@ -286,6 +287,9 @@ describe('backup validation', () => {
     ).toEqual([])
     expect(
       migrated?.data.businessOpenItems,
+    ).toEqual([])
+    expect(
+      migrated?.data.businessTradeEntries,
     ).toEqual([])
   })
 

@@ -55,3 +55,29 @@ export interface BusinessOpenItem {
   createdAt: number
   updatedAt: number
 }
+
+export type BusinessTradeKind =
+  | 'sale'
+  | 'purchase'
+
+export type BusinessPaymentMethod =
+  | 'cash'
+  | 'bank'
+  | 'credit'
+  | 'mixed'
+  | 'other'
+
+export interface BusinessTradeEntry {
+  id: string
+  businessId: string
+  kind: BusinessTradeKind
+  partyName: string
+  totalChetrum: number
+  paidAtEntryChetrum: number
+  paymentMethod: BusinessPaymentMethod
+  date: string
+  reference: string
+  note: string
+  createdAt: number
+  updatedAt: number
+}
