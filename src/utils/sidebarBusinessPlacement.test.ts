@@ -25,7 +25,15 @@ describe('desktop sidebar Business placement', () => {
     )
   })
 
-  it('shows Business before Home when small-business mode is enabled', () => {
+  it('keeps Business permanently visible before Home', () => {
+    expect(shell).not.toContain(
+      'showBusiness',
+    )
+
+    expect(shell).not.toContain(
+      'getProfile()',
+    )
+
     const business =
       shell.indexOf(
         'to="/app/business"',
@@ -55,5 +63,23 @@ describe('desktop sidebar Business placement', () => {
     expect(
       occurrences,
     ).toHaveLength(1)
+  })
+
+  it('does not make More active for Business routes', () => {
+    const prefixBlock =
+      shell.slice(
+        shell.indexOf(
+          'const sidebarMorePrefixes',
+        ),
+        shell.indexOf(
+          'const planPrefixes',
+        ),
+      )
+
+    expect(
+      prefixBlock,
+    ).not.toContain(
+      "'/app/business'",
+    )
   })
 })

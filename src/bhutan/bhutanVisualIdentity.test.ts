@@ -58,17 +58,17 @@ describe('Bhutan-first visual foundation', () => {
     )
   })
 
-  it('shows Business directly only for small-business profiles', () => {
+  it('keeps Business as a direct core sidebar destination', () => {
     expect(shell).toContain(
+      'to="/app/business"',
+    )
+
+    expect(shell).not.toContain(
       "'small-business'",
     )
 
-    expect(shell).toContain(
+    expect(shell).not.toContain(
       'showBusiness &&',
-    )
-
-    expect(shell).toContain(
-      'to="/app/business"',
     )
   })
 

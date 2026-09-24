@@ -8,10 +8,6 @@ import {
   useLocation,
 } from 'react-router-dom'
 
-import {
-  getProfile,
-} from '../profile/userProfile'
-
 import '../styles/dashboard.css'
 
 interface AppShellProps {
@@ -25,7 +21,6 @@ const sidebarMorePrefixes = [
   '/app/install',
   '/app/setup',
   '/app/safety-buffer',
-  '/app/business',
   '/app/vault',
   '/app/saathi',
   '/app/upcoming',
@@ -60,26 +55,14 @@ function isWithin(
 function AppShell({ children }: AppShellProps) {
   const { pathname } = useLocation()
 
-  const showBusiness =
-    getProfile().needs.includes(
-      'small-business',
-    )
-
   const sidebarMoreActive =
     pathname === '/app/more' ||
-    sidebarMorePrefixes.some((prefix) => {
-      if (
-        prefix === '/app/business' &&
-        showBusiness
-      ) {
-        return false
-      }
-
-      return isWithin(
+    sidebarMorePrefixes.some((prefix) =>
+      isWithin(
         pathname,
         prefix,
-      )
-    })
+      ),
+    )
 
   const mobileHomeActive =
     pathname === '/app'
@@ -131,18 +114,16 @@ function AppShell({ children }: AppShellProps) {
           className="sidebar-nav"
           aria-label="Money Saathi navigation"
         >
-          {showBusiness && (
-            <NavLink
-              to="/app/business"
-              className={({ isActive }) =>
-                isActive
-                  ? 'sidebar-item active'
-                  : 'sidebar-item'
-              }
-            >
-              Business
-            </NavLink>
-          )}
+          <NavLink
+            to="/app/business"
+            className={({ isActive }) =>
+              isActive
+                ? 'sidebar-item active'
+                : 'sidebar-item'
+            }
+          >
+            Business
+          </NavLink>
 
           <NavLink
             to="/app"
