@@ -1,5 +1,6 @@
 ﻿import AlertBadge from './AlertBadge'
 import AlertNotifier from './AlertNotifier'
+import SaathiFloatingAssistant from './SaathiFloatingAssistant'
 import '../styles/accessibility.css'
 import type { ReactNode } from 'react'
 import {
@@ -251,6 +252,8 @@ function AppShell({ children }: AppShellProps) {
                 </div>
         {children}
       </main>
+
+      <SaathiFloatingAssistant />
 
       <nav
         className="mobile-nav"

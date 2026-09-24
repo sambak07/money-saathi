@@ -1,0 +1,376 @@
+﻿.saathi-floating-launcher {
+  position: fixed;
+  z-index: 32;
+  right: 24px;
+  bottom: 24px;
+
+  min-width: 132px;
+  min-height: 54px;
+  padding: 7px 13px 7px 8px;
+
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  border: 1px solid rgba(23, 90, 67, 0.22);
+  border-radius: 999px;
+
+  background: var(--color-brand);
+  color: white;
+
+  box-shadow:
+    0 12px 34px rgba(22, 41, 31, 0.2);
+
+  font: inherit;
+}
+
+.saathi-floating-launcher:hover {
+  background: var(--color-brand-hover);
+}
+
+.saathi-floating-launcher:focus-visible {
+  outline: 3px solid rgba(214, 161, 61, 0.55);
+  outline-offset: 3px;
+}
+
+.saathi-floating-mark {
+  width: 38px;
+  height: 38px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  background: #fffdf8;
+  color: var(--color-brand);
+
+  font-size: 17px;
+  font-weight: 850;
+}
+
+.saathi-floating-label {
+  display: grid;
+  justify-items: start;
+  line-height: 1.05;
+}
+
+.saathi-floating-label strong {
+  font-size: 14px;
+}
+
+.saathi-floating-label small {
+  margin-top: 3px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 11px;
+}
+
+.saathi-floating-panel {
+  position: fixed;
+  z-index: 31;
+  right: 24px;
+  bottom: 88px;
+
+  width: min(390px, calc(100vw - 32px));
+  max-height: min(650px, calc(100vh - 120px));
+
+  display: grid;
+  grid-template-rows: auto minmax(120px, 1fr) auto auto auto;
+
+  overflow: hidden;
+
+  border: 1px solid var(--color-border);
+  border-radius: 22px;
+
+  background: #fffdf8;
+
+  box-shadow:
+    0 24px 70px rgba(22, 41, 31, 0.24);
+}
+
+.saathi-floating-header {
+  min-height: 66px;
+  padding: 13px 14px 13px 17px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+
+  border-bottom: 1px solid var(--color-border);
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--color-brand-soft),
+      var(--color-saffron-soft)
+    );
+}
+
+.saathi-floating-header > div {
+  display: grid;
+  gap: 3px;
+}
+
+.saathi-floating-header strong {
+  color: var(--color-text);
+  font-size: 17px;
+}
+
+.saathi-floating-kicker {
+  color: var(--color-maroon);
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.saathi-floating-close {
+  width: 44px;
+  height: 44px;
+
+  display: grid;
+  place-items: center;
+
+  border: 0;
+  border-radius: 12px;
+
+  background: transparent;
+  color: var(--color-text-secondary);
+
+  font-size: 26px;
+  line-height: 1;
+}
+
+.saathi-floating-close:hover {
+  background: rgba(255, 255, 255, 0.65);
+}
+
+.saathi-floating-messages {
+  padding: 15px;
+
+  display: grid;
+  align-content: start;
+  gap: 10px;
+
+  overflow-y: auto;
+  overscroll-behavior: contain;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(214, 161, 61, 0.025),
+      transparent 120px
+    );
+}
+
+.saathi-floating-message {
+  max-width: 88%;
+  padding: 10px 12px;
+
+  display: grid;
+  gap: 4px;
+
+  border-radius: 14px;
+}
+
+.saathi-floating-message.saathi {
+  justify-self: start;
+
+  border: 1px solid var(--color-border);
+  border-bottom-left-radius: 5px;
+
+  background: var(--color-surface);
+}
+
+.saathi-floating-message.user {
+  justify-self: end;
+
+  border: 1px solid rgba(23, 90, 67, 0.18);
+  border-bottom-right-radius: 5px;
+
+  background: var(--color-brand-soft);
+}
+
+.saathi-floating-message > span {
+  color: var(--color-text-muted);
+  font-size: 10px;
+  font-weight: 750;
+  text-transform: uppercase;
+}
+
+.saathi-floating-message p {
+  margin: 0;
+
+  color: var(--color-text);
+  font-size: 13px;
+  line-height: 1.48;
+}
+
+.saathi-floating-error {
+  margin: 0 14px 10px;
+  padding: 10px 12px;
+
+  border: 1px solid rgba(181, 61, 61, 0.22);
+  border-radius: 11px;
+
+  background: rgba(181, 61, 61, 0.06);
+  color: var(--color-danger);
+
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.saathi-floating-suggestions {
+  padding: 10px 14px 0;
+
+  display: flex;
+  gap: 7px;
+
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.saathi-floating-suggestions button {
+  min-height: 34px;
+  padding: 0 10px;
+
+  flex: 0 0 auto;
+
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.saathi-floating-form {
+  padding: 10px 14px;
+
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.saathi-floating-form input {
+  min-width: 0;
+  min-height: 46px;
+  padding: 9px 12px;
+
+  border: 1px solid var(--color-border-strong);
+  border-radius: 12px;
+
+  background: white;
+  color: var(--color-text);
+
+  font: inherit;
+  font-size: 13px;
+}
+
+.saathi-floating-form input:focus {
+  border-color: var(--color-brand);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(23, 90, 67, 0.08);
+}
+
+.saathi-floating-form button {
+  min-width: 60px;
+  min-height: 46px;
+  padding: 0 13px;
+
+  border: 1px solid var(--color-brand);
+  border-radius: 12px;
+
+  background: var(--color-brand);
+  color: white;
+
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.saathi-floating-form button:disabled {
+  opacity: 0.45;
+}
+
+.saathi-floating-footer {
+  min-height: 46px;
+  padding: 10px 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  border-top: 1px solid var(--color-border);
+
+  background: var(--color-surface-soft);
+}
+
+.saathi-floating-footer span {
+  color: var(--color-text-muted);
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+.saathi-floating-footer a {
+  flex: 0 0 auto;
+
+  color: var(--color-brand);
+  font-size: 11px;
+  font-weight: 750;
+}
+
+@media (max-width: 850px) {
+  .saathi-floating-launcher {
+    right: 18px;
+    bottom: 98px;
+
+    min-width: 112px;
+    min-height: 48px;
+    padding: 5px 11px 5px 6px;
+  }
+
+  .saathi-floating-mark {
+    width: 36px;
+    height: 36px;
+  }
+
+  .saathi-floating-panel {
+    right: 12px;
+    bottom: 154px;
+
+    width: calc(100vw - 24px);
+    max-height: calc(100vh - 174px);
+  }
+}
+
+@media (max-width: 420px) {
+  .saathi-floating-launcher {
+    min-width: 48px;
+    width: 48px;
+    padding: 5px;
+
+    justify-content: center;
+  }
+
+  .saathi-floating-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .saathi-floating-panel {
+    border-radius: 18px;
+  }
+
+  .saathi-floating-footer {
+    align-items: flex-start;
+  }
+}
