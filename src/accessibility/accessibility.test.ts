@@ -20,6 +20,18 @@ function readSource(relativePath: string): string {
 const indexHtml = readSource('../../index.html')
 const shellSource = readSource('../components/AppShell.tsx')
 const accessibilityCss = readSource('../styles/accessibility.css')
+const dialogHookSource =
+  readSource('./useAccessibleDialog.ts')
+
+const dialogPageSources = [
+  readSource('../pages/TransactionsPage.tsx'),
+  readSource('../pages/BudgetPage.tsx'),
+  readSource('../pages/RegularMoneyPage.tsx'),
+  readSource('../pages/GoalsPage.tsx'),
+  readSource('../pages/MyMoneyPage.tsx'),
+  readSource('../pages/LoansPage.tsx'),
+  readSource('../pages/SchemesPage.tsx'),
+]
 
 describe('accessibility and mobile foundations', () => {
   it('keeps the viewport meta tag', () => {
@@ -61,5 +73,31 @@ describe('accessibility and mobile foundations', () => {
   it('keeps visible keyboard focus treatment', () => {
     expect(accessibilityCss).toContain(':focus-visible')
     expect(accessibilityCss).toContain('outline:')
+  })
+
+  it('gives custom dialogs keyboard focus lifecycle management', () => {
+    expect(dialogHookSource).toContain(
+      "event.key === 'Escape'",
+    )
+    expect(dialogHookSource).toContain(
+      "event.key !== 'Tab'",
+    )
+    expect(dialogHookSource).toContain(
+      'previousFocus?.focus()',
+    )
+  })
+
+  it('gives custom dialogs accessible names and focus refs', () => {
+    for (const source of dialogPageSources) {
+      expect(source).toContain(
+        'useAccessibleDialog',
+      )
+      expect(source).toContain(
+        'aria-labelledby=',
+      )
+      expect(source).toContain(
+        'tabIndex={-1}',
+      )
+    }
   })
 })

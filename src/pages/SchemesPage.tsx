@@ -6,6 +6,9 @@
 } from 'react'
 import { Link } from 'react-router-dom'
 
+import {
+  useAccessibleDialog,
+} from '../accessibility/useAccessibleDialog'
 import AppShell from '../components/AppShell'
 import {
   deleteFinancialScheme,
@@ -94,6 +97,16 @@ function SchemesPage() {
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState('')
+
+  const schemeDeleteDialogRef =
+    useAccessibleDialog(
+      deleteTarget !== null,
+      () => {
+        if (!deleting) {
+          setDeleteTarget(null)
+        }
+      },
+    )
 
   async function loadSchemes() {
     setSchemes(await getFinancialSchemes())
@@ -982,17 +995,23 @@ function SchemesPage() {
       {deleteTarget && (
         <div className="scheme-dialog-backdrop">
           <section
+            ref={schemeDeleteDialogRef}
             className="scheme-dialog"
             role="dialog"
             aria-modal="true"
+            aria-labelledby="scheme-delete-title"
+            aria-describedby="scheme-delete-description"
+            tabIndex={-1}
           >
             <div className="scheme-dialog-icon">
               !
             </div>
 
-            <h2>Delete scheme?</h2>
+            <h2 id="scheme-delete-title">
+              Delete scheme?
+            </h2>
 
-            <p>
+            <p id="scheme-delete-description">
               <strong>{deleteTarget.name}</strong> will be removed
               from Schemes & Commitments. Transactions, assets,
               loans and Regular Money are not changed.

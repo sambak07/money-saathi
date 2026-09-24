@@ -5,6 +5,9 @@
   useState,
 } from 'react'
 
+import {
+  useAccessibleDialog,
+} from '../accessibility/useAccessibleDialog'
 import AppShell from '../components/AppShell'
 import {
   addTransaction,
@@ -93,6 +96,16 @@ function RegularMoneyPage() {
     useState<RegularMoney | null>(null)
   const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState('')
+
+  const regularDeleteDialogRef =
+    useAccessibleDialog(
+      deleteTarget !== null,
+      () => {
+        if (!deleting) {
+          setDeleteTarget(null)
+        }
+      },
+    )
 
   async function loadData() {
     const [regularRecords, transactionRecords] =
@@ -754,13 +767,19 @@ function RegularMoneyPage() {
       {deleteTarget && (
         <div className="regular-dialog-backdrop">
           <section
+            ref={regularDeleteDialogRef}
             className="regular-dialog"
             role="dialog"
             aria-modal="true"
+            aria-labelledby="regular-delete-title"
+            aria-describedby="regular-delete-description"
+            tabIndex={-1}
           >
             <div className="regular-dialog-icon">!</div>
-            <h2>Delete schedule?</h2>
-            <p>
+            <h2 id="regular-delete-title">
+              Delete schedule?
+            </h2>
+            <p id="regular-delete-description">
               This removes <strong>{deleteTarget.name}</strong> from
               Regular Money.
             </p>

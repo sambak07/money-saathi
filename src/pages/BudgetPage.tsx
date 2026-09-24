@@ -5,6 +5,9 @@
   useState,
 } from 'react'
 
+import {
+  useAccessibleDialog,
+} from '../accessibility/useAccessibleDialog'
 import AppShell from '../components/AppShell'
 import {
   deleteBudget,
@@ -75,6 +78,16 @@ function BudgetPage() {
     useState<Budget | null>(null)
 
   const [deleting, setDeleting] = useState(false)
+
+  const budgetDeleteDialogRef =
+    useAccessibleDialog(
+      deleteTarget !== null,
+      () => {
+        if (!deleting) {
+          setDeleteTarget(null)
+        }
+      },
+    )
 
   async function loadData(
     selectedMonth: string,
@@ -718,9 +731,11 @@ function BudgetPage() {
       {deleteTarget && (
         <div className="budget-dialog-backdrop">
           <section
+            ref={budgetDeleteDialogRef}
             className="budget-dialog"
             role="dialog"
             aria-modal="true"
+            tabIndex={-1}
             aria-labelledby="budget-delete-title"
           >
             <div className="budget-dialog-icon">

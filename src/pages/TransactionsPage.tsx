@@ -5,6 +5,9 @@
 } from 'react'
 import { Link } from 'react-router-dom'
 
+import {
+  useAccessibleDialog,
+} from '../accessibility/useAccessibleDialog'
 import AppShell from '../components/AppShell'
 import {
   deleteTransaction,
@@ -94,6 +97,17 @@ function TransactionsPage() {
 
   const [deleting, setDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState('')
+
+  const transactionDeleteDialogRef =
+    useAccessibleDialog(
+      deletingRecord !== null,
+      () => {
+        if (deleting) return
+
+        setDeleteError('')
+        setDeletingRecord(null)
+      },
+    )
 
   async function loadTransactions() {
     const records = await getTransactions()
@@ -623,9 +637,11 @@ function TransactionsPage() {
           role="presentation"
         >
           <section
+            ref={transactionDeleteDialogRef}
             className="delete-dialog"
             role="dialog"
             aria-modal="true"
+            tabIndex={-1}
             aria-labelledby="delete-dialog-title"
             aria-describedby="delete-dialog-description"
           >

@@ -6,6 +6,9 @@
 } from 'react'
 import { Link } from 'react-router-dom'
 
+import {
+  useAccessibleDialog,
+} from '../accessibility/useAccessibleDialog'
 import AppShell from '../components/AppShell'
 import {
   deleteLoan,
@@ -59,6 +62,16 @@ function LoansPage() {
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState('')
+
+  const loanDeleteDialogRef =
+    useAccessibleDialog(
+      deleteTarget !== null,
+      () => {
+        if (!deleting) {
+          setDeleteTarget(null)
+        }
+      },
+    )
 
   async function loadData() {
     const [
@@ -845,15 +858,21 @@ function LoansPage() {
       {deleteTarget && (
         <div className="loan-dialog-backdrop">
           <section
+            ref={loanDeleteDialogRef}
             className="loan-dialog"
             role="dialog"
             aria-modal="true"
+            aria-labelledby="loan-delete-title"
+            aria-describedby="loan-delete-description"
+            tabIndex={-1}
           >
             <div className="loan-dialog-icon">!</div>
 
-            <h2>Delete loan record?</h2>
+            <h2 id="loan-delete-title">
+              Delete loan record?
+            </h2>
 
-            <p>
+            <p id="loan-delete-description">
               <strong>{deleteTarget.name}</strong> will be removed
               from your tracked liabilities. Existing expense
               transactions and Regular Money schedules remain

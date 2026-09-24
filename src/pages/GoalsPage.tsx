@@ -5,6 +5,9 @@
   useState,
 } from 'react'
 
+import {
+  useAccessibleDialog,
+} from '../accessibility/useAccessibleDialog'
 import AppShell from '../components/AppShell'
 import {
   addGoalContribution,
@@ -65,6 +68,36 @@ function GoalsPage() {
     useState<GoalContribution | null>(null)
   const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState('')
+
+  const contributionDialogRef =
+    useAccessibleDialog(
+      contributionGoal !== null,
+      () => {
+        if (!savingContribution) {
+          setContributionGoal(null)
+        }
+      },
+    )
+
+  const deleteGoalDialogRef =
+    useAccessibleDialog(
+      deleteGoalTarget !== null,
+      () => {
+        if (!deleting) {
+          setDeleteGoalTarget(null)
+        }
+      },
+    )
+
+  const deleteContributionDialogRef =
+    useAccessibleDialog(
+      deleteContributionTarget !== null,
+      () => {
+        if (!deleting) {
+          setDeleteContributionTarget(null)
+        }
+      },
+    )
 
   async function loadData() {
     const [goalRecords, contributionRecords] =
@@ -697,12 +730,17 @@ function GoalsPage() {
       {contributionGoal && (
         <div className="goal-dialog-backdrop">
           <section
+            ref={contributionDialogRef}
             className="goal-dialog"
             role="dialog"
             aria-modal="true"
+            aria-labelledby="goal-contribution-title"
+            tabIndex={-1}
           >
             <p className="dashboard-eyebrow">Add progress</p>
-            <h2>{contributionGoal.name}</h2>
+            <h2 id="goal-contribution-title">
+              {contributionGoal.name}
+            </h2>
 
             <form
               className="contribution-form"
@@ -800,14 +838,20 @@ function GoalsPage() {
       {deleteGoalTarget && (
         <div className="goal-dialog-backdrop">
           <section
+            ref={deleteGoalDialogRef}
             className="goal-dialog"
             role="dialog"
             aria-modal="true"
+            aria-labelledby="goal-delete-title"
+            aria-describedby="goal-delete-description"
+            tabIndex={-1}
           >
             <div className="goal-dialog-icon">!</div>
-            <h2>Delete goal?</h2>
+            <h2 id="goal-delete-title">
+              Delete goal?
+            </h2>
 
-            <p>
+            <p id="goal-delete-description">
               <strong>{deleteGoalTarget.name}</strong> and its
               contribution history will be permanently removed.
             </p>
@@ -844,14 +888,20 @@ function GoalsPage() {
       {deleteContributionTarget && (
         <div className="goal-dialog-backdrop">
           <section
+            ref={deleteContributionDialogRef}
             className="goal-dialog"
             role="dialog"
             aria-modal="true"
+            aria-labelledby="goal-contribution-delete-title"
+            aria-describedby="goal-contribution-delete-description"
+            tabIndex={-1}
           >
             <div className="goal-dialog-icon">!</div>
-            <h2>Remove contribution?</h2>
+            <h2 id="goal-contribution-delete-title">
+              Remove contribution?
+            </h2>
 
-            <p>
+            <p id="goal-contribution-delete-description">
               Remove{' '}
               <strong>
                 {formatNu(

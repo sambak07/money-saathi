@@ -6,6 +6,9 @@
 } from 'react'
 import { Link } from 'react-router-dom'
 
+import {
+  useAccessibleDialog,
+} from '../accessibility/useAccessibleDialog'
 import AppShell from '../components/AppShell'
 import {
   deleteFixedDeposit,
@@ -79,6 +82,16 @@ function MyMoneyPage() {
   const [deleteTarget, setDeleteTarget] =
     useState<DeleteTarget | null>(null)
   const [deleting, setDeleting] = useState(false)
+
+  const assetDeleteDialogRef =
+    useAccessibleDialog(
+      deleteTarget !== null,
+      () => {
+        if (!deleting) {
+          setDeleteTarget(null)
+        }
+      },
+    )
 
   const [savingsName, setSavingsName] = useState('')
   const [savingsBalance, setSavingsBalance] = useState('')
@@ -1280,13 +1293,19 @@ function MyMoneyPage() {
       {deleteTarget && (
         <div className="asset-dialog-backdrop">
           <section
+            ref={assetDeleteDialogRef}
             className="asset-dialog"
             role="dialog"
             aria-modal="true"
+            aria-labelledby="asset-delete-title"
+            aria-describedby="asset-delete-description"
+            tabIndex={-1}
           >
             <div className="asset-dialog-icon">!</div>
-            <h2>Remove this record?</h2>
-            <p>
+            <h2 id="asset-delete-title">
+              Remove this record?
+            </h2>
+            <p id="asset-delete-description">
               <strong>{deleteTarget.name}</strong> will be removed from
               My Money. This does not delete transactions.
             </p>
