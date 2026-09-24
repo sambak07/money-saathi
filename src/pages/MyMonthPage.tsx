@@ -211,9 +211,15 @@ function MyMonthPage() {
             </p>
           </div>
 
-          <Link to="/app/regular-money">
-            Review Regular Money
-          </Link>
+          <div className="my-month-header-actions">
+            <Link to="/app/forecast">
+              30 / 60 / 90-day forecast
+            </Link>
+
+            <Link to="/app/regular-money">
+              Review Regular Money
+            </Link>
+          </div>
         </header>
 
         <section

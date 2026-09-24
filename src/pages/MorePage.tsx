@@ -24,6 +24,11 @@ const groups: MoreGroup[] = [
         description: 'See recorded money, commitments, Safe to Spend and the rest of this month together.',
       },
       {
+        to: '/app/forecast',
+        label: 'Cash-flow forecast',
+        description: 'Look 30, 60 and 90 days ahead using your recorded balance and Regular Money schedule.',
+      },
+      {
         to: '/app/regular-money',
         label: 'Regular money',
         description: 'Track repeating income and expenses.',
