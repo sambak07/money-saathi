@@ -481,6 +481,9 @@ function BusinessPage() {
           </div>
 
           <div className="business-header-actions">
+            <Link to="/app/business">
+              Business Home
+            </Link>
             <Link to="/app/business/credit">
               Customers & dues
             </Link>

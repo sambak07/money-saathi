@@ -39,6 +39,7 @@ const MyMonthPage = lazy(() => import('./pages/MyMonthPage'))
 const CashFlowForecastPage = lazy(() => import('./pages/CashFlowForecastPage'))
 const DebtGoalPlanPage = lazy(() => import('./pages/DebtGoalPlanPage'))
 const BusinessPage = lazy(() => import('./pages/BusinessPage'))
+const SimpleBusinessHomePage = lazy(() => import('./pages/SimpleBusinessHomePage'))
 const BusinessCreditPage = lazy(() => import('./pages/BusinessCreditPage'))
 const BusinessInventoryPage = lazy(() => import('./pages/BusinessInventoryPage'))
 const BusinessTradePage = lazy(() => import('./pages/BusinessTradePage'))
@@ -122,7 +123,8 @@ function App() {
         <Route path="/app/install" element={<InstallPage />} />
         <Route path="/app/setup" element={<AdaptiveSetupPage />} />
         <Route path="/app/safety-buffer" element={<SafetyBufferPage />} />
-        <Route path="/app/business" element={<BusinessPage />} />
+        <Route path="/app/business" element={<SimpleBusinessHomePage />} />
+        <Route path="/app/business/cash" element={<BusinessPage />} />
         <Route path="/app/business/credit" element={<BusinessCreditPage />} />
         <Route path="/app/business/inventory" element={<BusinessInventoryPage />} />
         <Route path="/app/business/trade" element={<BusinessTradePage />} />

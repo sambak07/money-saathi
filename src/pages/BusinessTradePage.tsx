@@ -950,7 +950,7 @@ function BusinessTradePage() {
             </Link>
 
             <Link to="/app/business">
-              Business cash
+              Business Home
             </Link>
           </div>
         </header>
