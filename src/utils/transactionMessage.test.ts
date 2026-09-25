@@ -144,4 +144,52 @@ describe('transaction message parser', () => {
       ).date,
     ).toBe('2026-09-25')
   })
+
+  it('parses real-style BTN-dot debit alert and ignores total available balance', () => {
+    expect(
+      parseTransactionMessage(
+        'Dear Customer, Your Account XXXXXXXX1003 has been Debited with BTN. 325.00 on 03-09-2026 10:03:21 thru Internet Bkg. Total Aval Bal is BTN.2186.35 CR.',
+      ),
+    ).toEqual({
+      amountChetrum: 32500,
+      date: '2026-09-03',
+      direction: 'expense',
+    })
+  })
+
+  it('parses real-style debit alert and ignores AC BALANCE IS amount', () => {
+    expect(
+      parseTransactionMessage(
+        'DEAR CUSTOMER, YOUR A/C 20XXXXX28 HAS BEEN DEBITED BY BTN 2,000.00 WITH REF : 126-771514503. ON 19/09/2026 AT 03:32 AM. AC BALANCE IS BTN 17,757.07.',
+      ),
+    ).toEqual({
+      amountChetrum: 200000,
+      date: '2026-09-19',
+      direction: 'expense',
+    })
+  })
+
+  it('parses real-style debit alert with AC balance wording', () => {
+    expect(
+      parseTransactionMessage(
+        'Dear Customer, your XXXXX4441 has been Debited by BTN 175.00 with ref:262271218 on 15-08-2026 at 05:35 PM. AC balance is BTN 900.95.',
+      ),
+    ).toEqual({
+      amountChetrum: 17500,
+      date: '2026-08-15',
+      direction: 'expense',
+    })
+  })
+
+  it('parses real-style credit alert and ignores Acc balance is amount', () => {
+    expect(
+      parseTransactionMessage(
+        'Dear Customer, Nu. 15,000.00 is Credited to your a/c 77XXXXX31 on 19-09-2026 at 11:13:14 AM. Acc balance is Nu. 15,881.75',
+      ),
+    ).toEqual({
+      amountChetrum: 1500000,
+      date: '2026-09-19',
+      direction: 'income',
+    })
+  })
 })

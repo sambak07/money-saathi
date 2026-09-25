@@ -27,7 +27,7 @@ const expenseWords =
   /\b(?:debited|debit(?:ed)?\s+from|paid|sent|withdrawn|spent|purchased|purchase\s+of|payment\s+made)\b/i
 
 const balanceLabelBeforeAmount =
-  /(?:available\s+balance|available\s+bal|avl\.?\s*bal|a\/?c\s*bal(?:ance)?|closing\s+bal(?:ance)?|balance|bal)\s*[:=-]?\s*(?:nu\.?|btn|ngultrum)?\s*$/i
+  /(?:total\s+aval\.?\s*bal|available\s+balance|available\s+bal|aval\.?\s*bal|avl\.?\s*bal|a\/?c\s*bal(?:ance)?|ac\s*bal(?:ance)?|acc\s*bal(?:ance)?|closing\s+bal(?:ance)?|balance|bal)\s*(?:is\s*)?[:=-]?\s*(?:nu\.?|btn\.?|ngultrum)?\s*$/i
 
 function normalizeYear(
   year: number,
@@ -209,8 +209,8 @@ function collectAmountCandidates(
   message: string,
 ): AmountCandidate[] {
   const expressions = [
-    /(?:^|[\s(])(?:nu\.?|btn|ngultrum)\s*[:=]?\s*([0-9][0-9,]*(?:\.\d{1,2})?)/gi,
-    /(?:^|[\s(])([0-9][0-9,]*(?:\.\d{1,2})?)\s*(?:nu\.?|btn|ngultrum)\b/gi,
+    /(?:^|[\s(])(?:nu\.?|btn\.?|ngultrum)\s*[:=]?\s*([0-9][0-9,]*(?:\.\d{1,2})?)/gi,
+    /(?:^|[\s(])([0-9][0-9,]*(?:\.\d{1,2})?)\s*(?:nu\.?|btn\.?|ngultrum)\b/gi,
   ]
 
   const candidates: AmountCandidate[] = []
