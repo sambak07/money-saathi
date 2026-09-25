@@ -14,6 +14,7 @@ import AppShell from '../components/AppShell'
 import {
   addTransaction,
   getTransaction,
+  getTransactions,
   updateTransaction,
 } from '../storage/db'
 import type {
@@ -96,6 +97,9 @@ function TransactionFormPage() {
   const [messageError, setMessageError] =
     useState('')
 
+  const [messageDuplicateWarning, setMessageDuplicateWarning] =
+    useState('')
+
   const categories =
     kind === 'income'
       ? incomeCategories
@@ -167,8 +171,9 @@ function TransactionFormPage() {
     setError('')
   }
 
-  function analyzePastedMessage() {
+  async function analyzePastedMessage() {
     setMessageError('')
+    setMessageDuplicateWarning('')
 
     if (!pastedMessage.trim()) {
       setMessageAnalysis(null)
@@ -193,6 +198,41 @@ function TransactionFormPage() {
     ) {
       setMessageError(
         'Money Saathi could not safely identify one transaction amount. Review the message and enter the amount manually.',
+      )
+      return
+    }
+
+    if (
+      analysis.direction ===
+        'unknown' ||
+      !analysis.date
+    ) {
+      return
+    }
+
+    try {
+      const transactions =
+        await getTransactions()
+
+      const possibleDuplicate =
+        transactions.some(
+          (transaction) =>
+            transaction.kind ===
+              analysis.direction &&
+            transaction.amountChetrum ===
+              analysis.amountChetrum &&
+            transaction.date ===
+              analysis.date,
+        )
+
+      if (possibleDuplicate) {
+        setMessageDuplicateWarning(
+          'A transaction with the same money in/out type, amount and date is already recorded. Check it before saving another one.',
+        )
+      }
+    } catch {
+      setMessageDuplicateWarning(
+        'Money Saathi could not check existing records for a possible duplicate. Review your transactions before saving.',
       )
     }
   }
@@ -397,6 +437,7 @@ function TransactionFormPage() {
                       null,
                     )
                     setMessageError('')
+                    setMessageDuplicateWarning('')
                   }}
                 />
               </div>
@@ -405,7 +446,9 @@ function TransactionFormPage() {
                 <button
                   type="button"
                   className="cancel-button"
-                  onClick={analyzePastedMessage}
+                  onClick={() => {
+                    void analyzePastedMessage()
+                  }}
                 >
                   Read message locally
                 </button>
@@ -461,6 +504,15 @@ function TransactionFormPage() {
                   >
                     Use detected details
                   </button>
+                </div>
+              )}
+
+              {messageDuplicateWarning && (
+                <div
+                  className="message-import-warning"
+                  role="status"
+                >
+                  {messageDuplicateWarning}
                 </div>
               )}
 

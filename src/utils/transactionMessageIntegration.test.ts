@@ -68,3 +68,32 @@ describe('paste-message transaction import integration', () => {
     )
   })
 })
+
+
+describe('paste-message duplicate safety', () => {
+  it('checks same-day same-direction same-amount records without auto-blocking or auto-saving', () => {
+    expect(form).toContain(
+      'getTransactions',
+    )
+
+    expect(form).toContain(
+      'transaction.kind ===',
+    )
+
+    expect(form).toContain(
+      'transaction.amountChetrum ===',
+    )
+
+    expect(form).toContain(
+      'transaction.date ===',
+    )
+
+    expect(form).toContain(
+      'A transaction with the same money in/out type, amount and date is already recorded.',
+    )
+
+    expect(form).toContain(
+      'Check it before saving another one.',
+    )
+  })
+})
