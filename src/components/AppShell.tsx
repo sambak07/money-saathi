@@ -115,17 +115,6 @@ function AppShell({ children }: AppShellProps) {
           aria-label="Money Saathi navigation"
         >
           <NavLink
-            to="/app/business"
-            className={({ isActive }) =>
-              isActive
-                ? 'sidebar-item active'
-                : 'sidebar-item'
-            }
-          >
-            Business
-          </NavLink>
-
-          <NavLink
             to="/app"
             end
             className={({ isActive }) =>
@@ -135,6 +124,17 @@ function AppShell({ children }: AppShellProps) {
             }
           >
             Home
+          </NavLink>
+
+          <NavLink
+            to="/app/business"
+            className={({ isActive }) =>
+              isActive
+                ? 'sidebar-item active'
+                : 'sidebar-item'
+            }
+          >
+            Business
           </NavLink>
 
           <NavLink

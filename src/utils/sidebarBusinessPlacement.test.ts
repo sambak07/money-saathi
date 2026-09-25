@@ -25,7 +25,7 @@ describe('desktop sidebar Business placement', () => {
     )
   })
 
-  it('keeps Business permanently visible before Home', () => {
+  it('keeps Home first and Business directly available after it', () => {
     expect(shell).not.toContain(
       'showBusiness',
     )
@@ -34,22 +34,32 @@ describe('desktop sidebar Business placement', () => {
       'getProfile()',
     )
 
-    const business =
-      shell.indexOf(
-        'to="/app/business"',
-      )
-
     const home =
       shell.indexOf(
         'to="/app"',
+      )
+
+    const business =
+      shell.indexOf(
+        'to="/app/business"',
+        home + 1,
+      )
+
+    const transactions =
+      shell.indexOf(
+        'to="/app/transactions"',
         business + 1,
       )
 
-    expect(business).toBeGreaterThan(
+    expect(home).toBeGreaterThan(
       -1,
     )
 
-    expect(home).toBeGreaterThan(
+    expect(business).toBeGreaterThan(
+      home,
+    )
+
+    expect(transactions).toBeGreaterThan(
       business,
     )
   })
