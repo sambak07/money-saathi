@@ -220,9 +220,6 @@ function SimpleHomePage() {
             </p>
           </div>
 
-          <Link to="/app/setup">
-            Change Home view
-          </Link>
         </header>
 
         <section className="simple-safe-card">
@@ -310,7 +307,7 @@ function SimpleHomePage() {
 
         <nav
           className="simple-actions"
-          aria-label="Simple Home actions"
+          aria-label="Home actions"
         >
           <Link
             to="/app/transactions/new"
@@ -319,20 +316,12 @@ function SimpleHomePage() {
             + Add money
           </Link>
 
-          <Link to="/app/transactions">
-            Transactions
-          </Link>
-
           <Link to="/app/month">
             My Month
           </Link>
 
-          <Link to="/app/goals">
-            Goals
-          </Link>
-
-          <Link to="/app/more">
-            More
+          <Link to="/app/saathi/ask">
+            Ask Saathi
           </Link>
         </nav>
 
@@ -424,22 +413,7 @@ function SimpleHomePage() {
           )}
         </section>
 
-        <section className="simple-home-footer">
-          <div>
-            <strong>
-              Need another tool?
-            </strong>
 
-            <p>
-              Budget, Regular Money, My Money, reports, privacy
-              and data tools are kept under More.
-            </p>
-          </div>
-
-          <Link to="/app/more">
-            Open More
-          </Link>
-        </section>
       </div>
     </AppShell>
   )

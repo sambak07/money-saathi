@@ -311,7 +311,7 @@
 
 .simple-home-focused .simple-actions {
   grid-template-columns:
-    repeat(5, minmax(0, 1fr));
+    repeat(3, minmax(0, 1fr));
 }
 
 .simple-home-focused .simple-actions a {

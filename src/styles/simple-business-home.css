@@ -351,3 +351,72 @@
     min-height: 96px;
   }
 }
+/* === Stage 10C: simplified primary Business experience === */
+
+.simple-business-details {
+  margin-top: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 17px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.simple-business-details > summary {
+  min-height: 64px;
+  padding: 14px 17px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.simple-business-details > summary::-webkit-details-marker {
+  display: none;
+}
+
+.simple-business-details > summary > span:first-child {
+  display: grid;
+  gap: 4px;
+}
+
+.simple-business-details > summary strong {
+  font-size: var(--font-size-small);
+}
+
+.simple-business-details > summary small {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-meta);
+  line-height: 1.45;
+}
+
+.simple-business-details-mark {
+  flex: 0 0 auto;
+  color: var(--color-brand);
+  font-size: 22px;
+  font-weight: 800;
+  transition: transform 160ms ease;
+}
+
+.simple-business-details[open] .simple-business-details-mark {
+  transform: rotate(45deg);
+}
+
+.simple-business-details-body {
+  padding: 0 12px 12px;
+}
+
+.simple-business-details-body .simple-business-secondary-grid {
+  margin-top: 0;
+}
+
+.simple-business-details-body .simple-business-boundary {
+  margin-top: 12px;
+}
+
+.simple-business-details > summary:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: -3px;
+}

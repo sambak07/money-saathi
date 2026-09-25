@@ -500,87 +500,59 @@ function SimpleBusinessHomePage() {
               </article>
             </section>
 
-            <section className="simple-business-secondary-grid">
-              <article className="simple-business-margin-card">
+            <section className="simple-business-attention">
+              <div className="simple-business-section-heading">
                 <div>
-                  <span>
-                    Gross margin before other expenses
-                  </span>
+                  <p className="dashboard-eyebrow">
+                    Attention
+                  </p>
 
-                  <strong>
-                    {formatNu(
-                      report.verifiedGrossMarginBeforeOtherBusinessExpensesChetrum,
-                    )}
-                  </strong>
+                  <h2>
+                    What needs you?
+                  </h2>
                 </div>
+              </div>
 
-                <p>
-                  {report.grossMarginCoverageComplete
-                    ? 'All recorded sale documents in this period have verifiable item lines and explicit COGS.'
-                    : `Based only on verified sales. ${report.unverifiedSaleDocumentCount} ${
-                        report.unverifiedSaleDocumentCount ===
-                        1
-                          ? 'sale is'
-                          : 'sales are'
-                      } not included yet.`}
+              {attentionItems.length ===
+              0 ? (
+                <p className="simple-business-all-clear">
+                  Nothing urgent is visible from the records you have
+                  entered.
                 </p>
-
-                <small>
-                  This is not net profit. Rent, wages, transport,
-                  utilities and other business expenses are separate.
-                </small>
-
-                <Link to="/app/business/reports">
-                  View monthly report
-                </Link>
-              </article>
-
-              <article className="simple-business-stock-card">
-                <span>
-                  Stock position
-                </span>
-
-                <strong>
-                  {formatNu(
-                    report.estimatedStockValueChetrum,
+              ) : (
+                <ul>
+                  {attentionItems.map(
+                    (item) => (
+                      <li key={item}>
+                        {item}
+                      </li>
+                    ),
                   )}
-                </strong>
-
-                <small>
-                  Estimated from recorded current unit costs.
-                </small>
-
-                <Link to="/app/business/inventory">
-                  View stock
-                </Link>
-              </article>
+                </ul>
+              )}
             </section>
 
             <section className="simple-business-actions">
               <div className="simple-business-section-heading">
                 <div>
                   <p className="dashboard-eyebrow">
-                    Record
+                    Records
                   </p>
 
                   <h2>
-                    What happened?
+                    Open what you need
                   </h2>
                 </div>
-
-                <span>
-                  Keep it simple.
-                </span>
               </div>
 
               <div className="simple-business-action-grid">
-                <Link to="/app/business/add">
+                <Link to="/app/business/trade">
                   <strong>
-                    Add
+                    Sales & purchases
                   </strong>
 
                   <span>
-                    Sale, purchase, expense or a payment.
+                    Review recorded sale and purchase documents.
                   </span>
                 </Link>
 
@@ -616,49 +588,96 @@ function SimpleBusinessHomePage() {
               </div>
             </section>
 
-            <section className="simple-business-attention">
-              <div className="simple-business-section-heading">
-                <div>
-                  <p className="dashboard-eyebrow">
-                    Attention
-                  </p>
+            <details className="simple-business-details">
+              <summary>
+                <span>
+                  <strong>
+                    More business details
+                  </strong>
 
-                  <h2>
-                    What needs you?
-                  </h2>
-                </div>
+                  <small>
+                    Margin, stock value and how these numbers are kept separate.
+                  </small>
+                </span>
+
+                <span
+                  className="simple-business-details-mark"
+                  aria-hidden="true"
+                >
+                  +
+                </span>
+              </summary>
+
+              <div className="simple-business-details-body">
+                <section className="simple-business-secondary-grid">
+                  <article className="simple-business-margin-card">
+                    <div>
+                      <span>
+                        Gross margin before other expenses
+                      </span>
+
+                      <strong>
+                        {formatNu(
+                          report.verifiedGrossMarginBeforeOtherBusinessExpensesChetrum,
+                        )}
+                      </strong>
+                    </div>
+
+                    <p>
+                      {report.grossMarginCoverageComplete
+                        ? 'All recorded sale documents in this period have verifiable item lines and explicit COGS.'
+                        : `Based only on verified sales. ${report.unverifiedSaleDocumentCount} ${
+                            report.unverifiedSaleDocumentCount ===
+                            1
+                              ? 'sale is'
+                              : 'sales are'
+                          } not included yet.`}
+                    </p>
+
+                    <small>
+                      This is not net profit. Rent, wages, transport,
+                      utilities and other business expenses are separate.
+                    </small>
+
+                    <Link to="/app/business/reports">
+                      View monthly report
+                    </Link>
+                  </article>
+
+                  <article className="simple-business-stock-card">
+                    <span>
+                      Stock position
+                    </span>
+
+                    <strong>
+                      {formatNu(
+                        report.estimatedStockValueChetrum,
+                      )}
+                    </strong>
+
+                    <small>
+                      Estimated from recorded current unit costs.
+                    </small>
+
+                    <Link to="/app/business/inventory">
+                      View stock
+                    </Link>
+                  </article>
+                </section>
+
+                <section className="simple-business-boundary">
+                  <strong>
+                    Money Saathi keeps the numbers separate on purpose.
+                  </strong>
+
+                  <span>
+                    Sales are not automatically cash received. Stock is not
+                    cash. Customer dues are not cash in hand. This keeps the
+                    overview simple without making the financial picture false.
+                  </span>
+                </section>
               </div>
-
-              {attentionItems.length ===
-              0 ? (
-                <p className="simple-business-all-clear">
-                  Nothing urgent is visible from the records you have
-                  entered.
-                </p>
-              ) : (
-                <ul>
-                  {attentionItems.map(
-                    (item) => (
-                      <li key={item}>
-                        {item}
-                      </li>
-                    ),
-                  )}
-                </ul>
-              )}
-            </section>
-
-            <section className="simple-business-boundary">
-              <strong>
-                Money Saathi keeps the numbers separate on purpose.
-              </strong>
-
-              <span>
-                Sales are not automatically cash received. Stock is not
-                cash. Customer dues are not cash in hand. This keeps the
-                overview simple without making the financial picture false.
-              </span>
-            </section>
+            </details>
           </>
         ) : (
           <section className="simple-business-empty">
