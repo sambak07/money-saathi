@@ -662,9 +662,14 @@ function DashboardPage() {
   }
 
   const monthlyDirection =
-    dashboard.monthlyNet >= 0
-      ? 'Your recorded inflow is ahead of outflow this month.'
-      : 'Your recorded outflow is ahead of inflow this month.'
+    dashboard.monthlyIncome === 0 &&
+    dashboard.monthlyExpense === 0
+      ? 'No recorded money movement this month.'
+      : dashboard.monthlyNet > 0
+        ? 'Your recorded inflow is ahead of outflow this month.'
+        : dashboard.monthlyNet < 0
+          ? 'Your recorded outflow is ahead of inflow this month.'
+          : 'Your recorded inflow and outflow are equal this month.'
 
   const nextMoneyMessage =
     dashboard.regularDueCount > 0

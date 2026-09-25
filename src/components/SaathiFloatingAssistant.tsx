@@ -157,6 +157,14 @@ function SaathiFloatingAssistant() {
       null,
     )
 
+  const launcherRef =
+    useRef<HTMLButtonElement | null>(
+      null,
+    )
+
+  const restoreLauncherFocusRef =
+    useRef(false)
+
   const suggestions =
     useMemo(
       () =>
@@ -241,6 +249,7 @@ function SaathiFloatingAssistant() {
         event.key ===
         'Escape'
       ) {
+        restoreLauncherFocusRef.current = true
         setOpen(false)
       }
     }
@@ -264,6 +273,16 @@ function SaathiFloatingAssistant() {
       inputRef.current
     ) {
       inputRef.current.focus()
+    }
+  }, [open])
+
+  useEffect(() => {
+    if (
+      !open &&
+      restoreLauncherFocusRef.current
+    ) {
+      restoreLauncherFocusRef.current = false
+      launcherRef.current?.focus()
     }
   }, [open])
 
@@ -702,9 +721,10 @@ function SaathiFloatingAssistant() {
               type="button"
               className="saathi-floating-close"
               aria-label="Close Saathi"
-              onClick={() =>
+              onClick={() => {
+                restoreLauncherFocusRef.current = true
                 setOpen(false)
-              }
+              }}
             >
               ×
             </button>
@@ -818,6 +838,7 @@ function SaathiFloatingAssistant() {
 
       {!open && (
         <button
+          ref={launcherRef}
           type="button"
           className="saathi-floating-launcher"
           aria-expanded={false}
