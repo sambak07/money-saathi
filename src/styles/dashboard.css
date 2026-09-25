@@ -1,4 +1,4 @@
-﻿.app-layout {
+.app-layout {
   min-height: 100vh;
   display: grid;
   grid-template-columns: 240px minmax(0, 1fr);
@@ -1010,5 +1010,105 @@
 @media (max-width: 850px) {
   .app-utility-row {
     margin-bottom: 2px;
+  }
+}
+
+
+/* === Money Saathi 3.1A: local paste-message import === */
+
+.message-import {
+  padding: 18px;
+
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+
+  background: var(--color-bg);
+}
+
+.message-import summary {
+  cursor: pointer;
+
+  color: var(--color-text);
+  font-weight: 700;
+}
+
+.message-import > p {
+  margin: 10px 0 16px;
+
+  color: var(--color-text-muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.message-import textarea {
+  width: 100%;
+  min-height: 116px;
+  padding: 12px 14px;
+
+  resize: vertical;
+
+  border: 1px solid var(--color-border-strong);
+  border-radius: 13px;
+
+  background: white;
+  color: var(--color-text);
+
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.message-import textarea:focus {
+  border-color: var(--color-brand);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(23, 90, 67, 0.08);
+}
+
+.message-import-actions {
+  margin-top: 12px;
+
+  display: flex;
+  justify-content: flex-start;
+}
+
+.message-import-result {
+  margin-top: 14px;
+  padding: 14px;
+
+  display: grid;
+  gap: 8px;
+
+  border: 1px solid var(--color-border);
+  border-radius: 13px;
+
+  background: var(--color-surface);
+}
+
+.message-import-result span,
+.message-import-result p {
+  margin: 0;
+
+  color: var(--color-text-muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.message-import-result .save-button {
+  margin-top: 4px;
+  justify-self: start;
+}
+
+@media (max-width: 520px) {
+  .message-import {
+    padding: 15px;
+  }
+
+  .message-import-actions,
+  .message-import-result .save-button {
+    width: 100%;
+  }
+
+  .message-import-actions .cancel-button,
+  .message-import-result .save-button {
+    width: 100%;
   }
 }

@@ -1,4 +1,4 @@
-﻿import {
+import {
   type FormEvent,
   useEffect,
   useMemo,
@@ -30,6 +30,10 @@ import {
   isFutureTransactionDate,
   preserveRecurringMetadata,
 } from '../utils/transactionIntegrity'
+import {
+  parseTransactionMessage,
+  type ParsedTransactionMessage,
+} from '../utils/transactionMessage'
 
 const incomeCategories = [
   'Salary',
@@ -82,6 +86,15 @@ function TransactionFormPage() {
 
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+
+  const [pastedMessage, setPastedMessage] =
+    useState('')
+
+  const [messageAnalysis, setMessageAnalysis] =
+    useState<ParsedTransactionMessage | null>(null)
+
+  const [messageError, setMessageError] =
+    useState('')
 
   const categories =
     kind === 'income'
@@ -151,6 +164,90 @@ function TransactionFormPage() {
 
     setKind(nextKind)
     setCategory('')
+    setError('')
+  }
+
+  function analyzePastedMessage() {
+    setMessageError('')
+
+    if (!pastedMessage.trim()) {
+      setMessageAnalysis(null)
+      setMessageError(
+        'Paste a transaction message first.',
+      )
+      return
+    }
+
+    const analysis =
+      parseTransactionMessage(
+        pastedMessage,
+      )
+
+    setMessageAnalysis(
+      analysis,
+    )
+
+    if (
+      analysis.amountChetrum ===
+      null
+    ) {
+      setMessageError(
+        'Money Saathi could not safely identify one transaction amount. Review the message and enter the amount manually.',
+      )
+    }
+  }
+
+  function usePastedMessageDetails() {
+    if (!messageAnalysis) {
+      return
+    }
+
+    setMessageError('')
+
+    if (
+      messageAnalysis.amountChetrum !==
+      null
+    ) {
+      setAmount(
+        formatChetrumForInput(
+          messageAnalysis.amountChetrum,
+        ),
+      )
+    }
+
+    if (
+      messageAnalysis.direction !==
+      'unknown'
+    ) {
+      if (
+        messageAnalysis.direction !==
+        kind
+      ) {
+        setCategory('')
+      }
+
+      setKind(
+        messageAnalysis.direction,
+      )
+    }
+
+    if (messageAnalysis.date) {
+      if (
+        isFutureTransactionDate(
+          messageAnalysis.date,
+          today,
+        )
+      ) {
+        setMessageError(
+          'The detected date is in the future, so it was not applied. Transactions must already have happened.',
+        )
+      } else {
+        setDate(
+          messageAnalysis.date,
+        )
+      }
+    }
+
     setError('')
   }
 
@@ -269,6 +366,115 @@ function TransactionFormPage() {
             void handleSubmit(event)
           }}
         >
+          {!editingId && (
+            <details className="message-import">
+              <summary>
+                Paste transaction message
+              </summary>
+
+              <p>
+                Paste a bank, QR, wallet or payment alert.
+                Money Saathi reads it locally on this device.
+                Nothing is saved until you review and save the transaction.
+              </p>
+
+              <div className="form-field">
+                <label htmlFor="transaction-message">
+                  Message
+                </label>
+
+                <textarea
+                  id="transaction-message"
+                  maxLength={2000}
+                  rows={5}
+                  placeholder="Example: Your account was debited by Nu. 1,250 on 25/09/2026."
+                  value={pastedMessage}
+                  onChange={(event) => {
+                    setPastedMessage(
+                      event.target.value,
+                    )
+                    setMessageAnalysis(
+                      null,
+                    )
+                    setMessageError('')
+                  }}
+                />
+              </div>
+
+              <div className="message-import-actions">
+                <button
+                  type="button"
+                  className="cancel-button"
+                  onClick={analyzePastedMessage}
+                >
+                  Read message locally
+                </button>
+              </div>
+
+              {messageAnalysis && (
+                <div
+                  className="message-import-result"
+                  role="status"
+                >
+                  <strong>
+                    Detected details
+                  </strong>
+
+                  <span>
+                    Amount:{' '}
+                    {messageAnalysis.amountChetrum !== null
+                      ? formatNu(
+                          messageAnalysis.amountChetrum,
+                        )
+                      : 'Not safely identified'}
+                  </span>
+
+                  <span>
+                    Direction:{' '}
+                    {messageAnalysis.direction === 'income'
+                      ? 'Money in'
+                      : messageAnalysis.direction === 'expense'
+                        ? 'Money out'
+                        : 'Not clear'}
+                  </span>
+
+                  <span>
+                    Date:{' '}
+                    {messageAnalysis.date ??
+                      'Not identified'}
+                  </span>
+
+                  <p>
+                    Review every field before saving. A credit can be a transfer, not income.
+                    Money Saathi does not save the pasted message itself.
+                  </p>
+
+                  <button
+                    type="button"
+                    className="save-button"
+                    disabled={
+                      messageAnalysis.amountChetrum === null &&
+                      messageAnalysis.date === null &&
+                      messageAnalysis.direction === 'unknown'
+                    }
+                    onClick={usePastedMessageDetails}
+                  >
+                    Use detected details
+                  </button>
+                </div>
+              )}
+
+              {messageError && (
+                <div
+                  className="form-error"
+                  role="alert"
+                >
+                  {messageError}
+                </div>
+              )}
+            </details>
+          )}
+
           <fieldset className="kind-selector">
             <legend>Transaction type</legend>
 
