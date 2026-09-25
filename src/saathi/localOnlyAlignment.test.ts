@@ -64,7 +64,7 @@ describe('Saathi local-only alignment', () => {
     )
 
     expect(more).toContain(
-      'what local Saathi question tools may use',
+      'local records Saathi may use',
     )
 
     expect(guide).not.toContain(

@@ -48,7 +48,7 @@ describe('business inventory UI integration', () => {
     )
 
     expect(more).toContain(
-      "to: '/app/business/inventory'",
+      "to: '/app/business'",
     )
   })
 

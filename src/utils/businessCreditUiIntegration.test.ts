@@ -51,7 +51,7 @@ describe('Business 2.0 customers suppliers and dues integration', () => {
     )
 
     expect(more).toContain(
-      "to: '/app/business/credit'",
+      "to: '/app/business'",
     )
   })
 

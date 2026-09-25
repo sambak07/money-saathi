@@ -50,7 +50,7 @@ describe('Saathi inclusion foundation integration', () => {
     )
 
     expect(more).toContain(
-      "label: 'Saathi'",
+      "label: 'Ask Saathi'",
     )
   })
 

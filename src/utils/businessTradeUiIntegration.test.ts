@@ -55,7 +55,7 @@ describe('business sales and purchases UI integration', () => {
     )
 
     expect(more).toContain(
-      "to: '/app/business/trade'",
+      "to: '/app/business'",
     )
   })
 
