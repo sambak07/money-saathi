@@ -18,34 +18,44 @@ export interface ParsedTransactionMessage {
 interface AmountCandidate {
   amountChetrum: number
   index: number
-  context: string
 }
 
-const balanceWords =
-  /\b(?:available\s+balance|avl\.?\s*bal|available\s+bal|balance|closing\s+bal)\b/i
-
 const incomeWords =
-  /\b(?:credited|credit\s+to|received|deposited|refund(?:ed)?)\b/i
+  /\b(?:credited|credit(?:ed)?\s+to|received|deposited|refunded|refund\s+received|payment\s+received)\b/i
 
 const expenseWords =
-  /\b(?:debited|debit\s+from|paid|sent|withdrawn|spent|purchase(?:d)?)\b/i
+  /\b(?:debited|debit(?:ed)?\s+from|paid|sent|withdrawn|spent|purchased|purchase\s+of|payment\s+made)\b/i
+
+const balanceLabelBeforeAmount =
+  /(?:available\s+balance|available\s+bal|avl\.?\s*bal|a\/?c\s*bal(?:ance)?|closing\s+bal(?:ance)?|balance|bal)\s*[:=-]?\s*(?:nu\.?|btn|ngultrum)?\s*$/i
+
+function normalizeYear(
+  year: number,
+): number {
+  return year < 100
+    ? 2000 + year
+    : year
+}
 
 function toIsoDate(
   year: number,
   month: number,
   day: number,
 ): string | null {
+  const normalizedYear =
+    normalizeYear(year)
+
   const date =
     new Date(
       Date.UTC(
-        year,
+        normalizedYear,
         month - 1,
         day,
       ),
     )
 
   if (
-    date.getUTCFullYear() !== year ||
+    date.getUTCFullYear() !== normalizedYear ||
     date.getUTCMonth() !== month - 1 ||
     date.getUTCDate() !== day
   ) {
@@ -53,7 +63,7 @@ function toIsoDate(
   }
 
   return [
-    String(year).padStart(4, '0'),
+    String(normalizedYear).padStart(4, '0'),
     String(month).padStart(2, '0'),
     String(day).padStart(2, '0'),
   ].join('-')
@@ -77,7 +87,7 @@ function parseDate(
 
   const dayFirst =
     message.match(
-      /\b(\d{1,2})[./-](\d{1,2})[./-](20\d{2})\b/,
+      /\b(\d{1,2})[./-](\d{1,2})[./-](20\d{2}|\d{2})\b/,
     )
 
   if (dayFirst) {
@@ -117,7 +127,7 @@ function parseDate(
 
   const named =
     message.match(
-      /\b(\d{1,2})[\s-]+(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:t|tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)[\s,-]+(20\d{2})\b/i,
+      /\b(\d{1,2})[\s-]+(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:t|tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)[\s,-]+(20\d{2}|\d{2})\b/i,
     )
 
   if (!named) {
@@ -177,11 +187,29 @@ function getDirectionIndex(
     : null
 }
 
+function isBalanceCandidate(
+  message: string,
+  amountIndex: number,
+): boolean {
+  const prefix =
+    message.slice(
+      Math.max(
+        0,
+        amountIndex - 52,
+      ),
+      amountIndex,
+    )
+
+  return balanceLabelBeforeAmount.test(
+    prefix,
+  )
+}
+
 function collectAmountCandidates(
   message: string,
 ): AmountCandidate[] {
   const expressions = [
-    /(?:^|[\s(])(?:nu\.?|btn|ngultrum)\s*:?\s*([0-9][0-9,]*(?:\.\d{1,2})?)/gi,
+    /(?:^|[\s(])(?:nu\.?|btn|ngultrum)\s*[:=]?\s*([0-9][0-9,]*(?:\.\d{1,2})?)/gi,
     /(?:^|[\s(])([0-9][0-9,]*(?:\.\d{1,2})?)\s*(?:nu\.?|btn|ngultrum)\b/gi,
   ]
 
@@ -220,28 +248,9 @@ function collectAmountCandidates(
           amountOffset,
         )
 
-      const contextStart =
-        Math.max(
-          0,
-          index - 32,
-        )
-
-      const contextEnd =
-        Math.min(
-          message.length,
-          index +
-            rawAmount.length +
-            32,
-        )
-
       candidates.push({
         amountChetrum,
         index,
-        context:
-          message.slice(
-            contextStart,
-            contextEnd,
-          ),
       })
     }
   }
@@ -266,30 +275,30 @@ function collectAmountCandidates(
 function getAmount(
   message: string,
 ): number | null {
-  const all =
+  const transactionCandidates =
     collectAmountCandidates(
       message,
-    )
-
-  if (all.length === 0) {
-    return null
-  }
-
-  const transactionCandidates =
-    all.filter(
+    ).filter(
       (candidate) =>
-        !balanceWords.test(
-          candidate.context,
+        !isBalanceCandidate(
+          message,
+          candidate.index,
         ),
     )
 
-  const pool =
-    transactionCandidates.length > 0
-      ? transactionCandidates
-      : all
+  if (
+    transactionCandidates.length ===
+    0
+  ) {
+    return null
+  }
 
-  if (pool.length === 1) {
-    return pool[0].amountChetrum
+  if (
+    transactionCandidates.length ===
+    1
+  ) {
+    return transactionCandidates[0]
+      .amountChetrum
   }
 
   const directionIndex =
@@ -302,7 +311,7 @@ function getAmount(
   }
 
   const ranked =
-    [...pool].sort(
+    [...transactionCandidates].sort(
       (left, right) =>
         Math.abs(
           left.index -
