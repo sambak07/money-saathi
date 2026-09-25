@@ -35,7 +35,7 @@
 }
 
 .pwa-update-actions button {
-  min-height: 42px;
+  min-height: 44px;
   padding: 0 13px;
   border: 1px solid var(--color-brand);
   border-radius: 10px;
@@ -51,13 +51,20 @@
   color: var(--color-text);
 }
 
-@media (max-width: 480px) {
+@media (max-width: 850px) {
   .pwa-update-banner {
-    right: 12px;
-    bottom: 12px;
-    width: calc(100% - 24px);
+    top:
+      calc(12px + env(safe-area-inset-top));
+    left:
+      calc(12px + env(safe-area-inset-left));
+    right:
+      calc(12px + env(safe-area-inset-right));
+    bottom: auto;
+    width: auto;
   }
+}
 
+@media (max-width: 480px) {
   .pwa-update-actions {
     display: grid;
     grid-template-columns: 1fr 1fr;

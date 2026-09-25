@@ -34,12 +34,15 @@ const sidebarMorePrefixes = [
   '/app/calendar',
   '/app/alerts',
   '/app/loan-reminders',
+  '/app/month',
+  '/app/forecast',
 ]
 
 const planPrefixes = [
   '/app/budget',
   '/app/regular-money',
   '/app/goals',
+  '/app/debt-goals',
 ]
 
 function isWithin(

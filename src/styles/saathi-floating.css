@@ -232,7 +232,7 @@
 }
 
 .saathi-floating-suggestions button {
-  min-height: 34px;
+  min-height: 44px;
   padding: 0 10px;
 
   border: 1px solid var(--color-border);
@@ -328,6 +328,9 @@
 
 .saathi-floating-footer a {
   flex: 0 0 auto;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
 
   color: var(--color-brand);
   font-size: 11px;
@@ -336,8 +339,10 @@
 
 @media (max-width: 850px) {
   .saathi-floating-launcher {
-    right: 18px;
-    bottom: 98px;
+    right:
+      calc(18px + env(safe-area-inset-right));
+    bottom:
+      calc(98px + env(safe-area-inset-bottom));
 
     min-width: 108px;
     min-height: 48px;
@@ -350,11 +355,21 @@
   }
 
   .saathi-floating-panel {
-    right: 12px;
-    bottom: 96px;
+    left:
+      calc(12px + env(safe-area-inset-left));
+    right:
+      calc(12px + env(safe-area-inset-right));
+    bottom:
+      calc(96px + env(safe-area-inset-bottom));
 
-    width: calc(100vw - 24px);
-    max-height: calc(100vh - 116px);
+    width: auto;
+    max-height:
+      calc(
+        100vh -
+        116px -
+        env(safe-area-inset-top) -
+        env(safe-area-inset-bottom)
+      );
   }
 }
 

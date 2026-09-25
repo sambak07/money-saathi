@@ -79,11 +79,11 @@ describe('persistent Saathi assistant integration', () => {
 
   it('floats above the mobile navigation rather than covering it', () => {
     expect(css).toContain(
-      'bottom: 98px;',
+      'calc(98px + env(safe-area-inset-bottom))',
     )
 
     expect(css).toContain(
-      'bottom: 96px;',
+      'calc(96px + env(safe-area-inset-bottom))',
     )
   })
 

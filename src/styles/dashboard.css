@@ -663,7 +663,8 @@
 @media (max-width: 850px) {
   .app-layout {
     display: block;
-    padding-bottom: 96px;
+    padding-bottom:
+      calc(96px + env(safe-area-inset-bottom));
   }
 
   .app-sidebar {
@@ -686,9 +687,12 @@
     position: fixed;
     z-index: 20;
 
-    left: 12px;
-    right: 12px;
-    bottom: 12px;
+    left:
+      calc(12px + env(safe-area-inset-left));
+    right:
+      calc(12px + env(safe-area-inset-right));
+    bottom:
+      calc(12px + env(safe-area-inset-bottom));
 
     min-height: 72px;
     padding: 7px;

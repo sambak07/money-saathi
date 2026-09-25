@@ -70,11 +70,15 @@ describe('floating Saathi visual polish', () => {
 
   it('keeps the open mobile panel above the bottom navigation', () => {
     expect(css).toContain(
-      'bottom: 96px;',
+      'calc(96px + env(safe-area-inset-bottom))',
     )
 
     expect(css).toContain(
-      'max-height: calc(100vh - 116px);',
+      'env(safe-area-inset-top)',
+    )
+
+    expect(css).toContain(
+      'env(safe-area-inset-bottom)',
     )
   })
 
