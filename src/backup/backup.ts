@@ -1105,23 +1105,33 @@ function hasSnapshotArrays(
     return false
   }
 
-  const partyIds =
-    new Set(
+  const partyById =
+    new Map(
       value.businessParties.map(
-        (party) =>
+        (party) => [
           party.id,
+          party,
+        ],
       ),
     )
 
   if (
     value.businessOpenItems.some(
-      (item) =>
-        !businessIds.has(
-          item.businessId,
-        ) ||
-        !partyIds.has(
-          item.partyId,
-        ),
+      (item) => {
+        const party =
+          partyById.get(
+            item.partyId,
+          )
+
+        return (
+          !businessIds.has(
+            item.businessId,
+          ) ||
+          !party ||
+          party.businessId !==
+            item.businessId
+        )
+      },
     )
   ) {
     return false
@@ -1257,6 +1267,28 @@ export function migrateBackupPayload(
     !coreVersionOneKeys.every(
       (key) =>
         Array.isArray(
+          data[key],
+        ),
+    )
+  ) {
+    return null
+  }
+
+  const optionalBusinessCollectionKeys = [
+    'businessProfiles',
+    'businessTransactions',
+    'businessParties',
+    'businessOpenItems',
+    'businessTradeEntries',
+    'businessInventoryItems',
+    'businessTradeLines',
+  ]
+
+  if (
+    optionalBusinessCollectionKeys.some(
+      (key) =>
+        data[key] !== undefined &&
+        !Array.isArray(
           data[key],
         ),
     )

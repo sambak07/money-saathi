@@ -328,6 +328,8 @@ export async function enableAppLock(
     JSON.stringify(config),
   )
 
+  clearPinThrottle()
+
   sessionStorage.setItem(
     SESSION_UNLOCKED_KEY,
     '1',
@@ -380,6 +382,7 @@ export async function disableAppLock(
 
   localStorage.removeItem(LOCK_CONFIG_KEY)
   sessionStorage.removeItem(SESSION_UNLOCKED_KEY)
+  clearPinThrottle()
 
   notifySecurityChange()
   return true
