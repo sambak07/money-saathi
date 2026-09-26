@@ -1,4 +1,4 @@
-﻿/// <reference types="node" />
+/// <reference types="node" />
 
 import {
   readFileSync,
@@ -41,7 +41,11 @@ describe('simple business reports integration', () => {
     )
 
     expect(home).toContain(
-      'to="/app/business/reports"',
+      '/app/business/reports?businessId=',
+    )
+
+    expect(home).toMatch(
+      /encodeURIComponent\(\s*selectedBusinessId/,
     )
   })
 

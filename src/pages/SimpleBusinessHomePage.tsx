@@ -641,7 +641,11 @@ function SimpleBusinessHomePage() {
                       utilities and other business expenses are separate.
                     </small>
 
-                    <Link to="/app/business/reports">
+                    <Link
+                      to={`/app/business/reports?businessId=${encodeURIComponent(
+                        selectedBusinessId,
+                      )}`}
+                    >
                       View monthly report
                     </Link>
                   </article>

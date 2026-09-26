@@ -1,10 +1,11 @@
-﻿import {
+import {
   useEffect,
   useMemo,
   useState,
 } from 'react'
 import {
   Link,
+  useSearchParams,
 } from 'react-router-dom'
 
 import AppShell from '../components/AppShell'
@@ -27,6 +28,10 @@ import type {
 import {
   buildBusinessReport,
 } from '../utils/businessReport'
+import {
+  buildBusinessMonthlyReportCsv,
+  getBusinessMonthlyReportCsvFilename,
+} from '../utils/businessReportExport'
 import {
   getBusinessMonthRange,
 } from '../utils/businessReportPeriod'
@@ -70,6 +75,14 @@ function monthLabel(
 }
 
 function BusinessReportsPage() {
+  const [searchParams] =
+    useSearchParams()
+
+  const requestedBusinessId =
+    searchParams.get(
+      'businessId',
+    ) ?? ''
+
   const today =
     getLocalToday()
 
@@ -206,8 +219,17 @@ function BusinessReportsPage() {
           records,
         )
 
+        const initialBusiness =
+          records.find(
+            (business) =>
+              business.id ===
+              requestedBusinessId,
+          ) ??
+          records[0] ??
+          null
+
         setSelectedBusinessId(
-          records[0]?.id ??
+          initialBusiness?.id ??
             '',
         )
       } catch {
@@ -224,7 +246,9 @@ function BusinessReportsPage() {
     return () => {
       active = false
     }
-  }, [])
+  }, [
+    requestedBusinessId,
+  ])
 
   useEffect(() => {
     let active = true
@@ -304,6 +328,79 @@ function BusinessReportsPage() {
   }, [
     selectedBusinessId,
   ])
+
+  function downloadBusinessReportCsv() {
+    if (
+      !report ||
+      !period ||
+      !selectedBusiness
+    ) {
+      return
+    }
+
+    const csv =
+      buildBusinessMonthlyReportCsv({
+        businessName:
+          selectedBusiness.name,
+        month,
+        periodStart:
+          period.startDate,
+        periodEnd:
+          period.endDate,
+        today,
+        report,
+      })
+
+    const blob =
+      new Blob(
+        [
+          '\uFEFF',
+          csv,
+        ],
+        {
+          type:
+            'text/csv;charset=utf-8',
+        },
+      )
+
+    const url =
+      URL.createObjectURL(
+        blob,
+      )
+
+    const anchor =
+      document.createElement(
+        'a',
+      )
+
+    anchor.href =
+      url
+
+    anchor.download =
+      getBusinessMonthlyReportCsvFilename(
+        selectedBusiness.name,
+        month,
+      )
+
+    document.body.appendChild(
+      anchor,
+    )
+
+    anchor.click()
+    anchor.remove()
+
+    window.setTimeout(
+      () =>
+        URL.revokeObjectURL(
+          url,
+        ),
+      0,
+    )
+  }
+
+  function printBusinessReport() {
+    window.print()
+  }
 
   return (
     <AppShell>
@@ -408,6 +505,29 @@ function BusinessReportsPage() {
                   }
                 />
               </label>
+
+              <div
+                className="business-reports-export-actions"
+                aria-label="Business report downloads"
+              >
+                <button
+                  type="button"
+                  onClick={
+                    printBusinessReport
+                  }
+                >
+                  Print / Save PDF
+                </button>
+
+                <button
+                  type="button"
+                  onClick={
+                    downloadBusinessReportCsv
+                  }
+                >
+                  Download CSV
+                </button>
+              </div>
             </section>
 
             {report && period ? (
@@ -429,6 +549,210 @@ function BusinessReportsPage() {
                   <small>
                     Period: {period.startDate} to {period.endDate}
                   </small>
+                </section>
+
+                <section
+                  className="business-monthly-report-card"
+                  aria-label="Business monthly report card"
+                >
+                  <header className="business-monthly-report-card-header">
+                    <div>
+                      <span>
+                        Money Saathi · Business
+                      </span>
+
+                      <h2>
+                        Monthly Business Report
+                      </h2>
+
+                      <p>
+                        {selectedBusiness?.name ??
+                          'Business'} ·{' '}
+                        {monthLabel(
+                          month,
+                        )}
+                      </p>
+                    </div>
+
+                    <small>
+                      Period: {period.startDate} to {period.endDate}
+                    </small>
+                  </header>
+
+                  <section className="business-monthly-report-card-grid">
+                    <article>
+                      <span>
+                        Sales
+                      </span>
+
+                      <strong>
+                        {formatNu(
+                          report.registeredSalesChetrum,
+                        )}
+                      </strong>
+                    </article>
+
+                    <article>
+                      <span>
+                        Purchases
+                      </span>
+
+                      <strong>
+                        {formatNu(
+                          report.registeredPurchasesChetrum,
+                        )}
+                      </strong>
+                    </article>
+
+                    <article>
+                      <span>
+                        Cash in
+                      </span>
+
+                      <strong>
+                        {formatNu(
+                          report.recordedCashInChetrum,
+                        )}
+                      </strong>
+                    </article>
+
+                    <article>
+                      <span>
+                        Cash out
+                      </span>
+
+                      <strong>
+                        {formatNu(
+                          report.recordedCashOutChetrum,
+                        )}
+                      </strong>
+                    </article>
+                  </section>
+
+                  <section className="business-monthly-report-card-margin">
+                    <div>
+                      <span>
+                        Verified gross margin before other expenses
+                      </span>
+
+                      <strong>
+                        {formatNu(
+                          report.verifiedGrossMarginBeforeOtherBusinessExpensesChetrum,
+                        )}
+                      </strong>
+                    </div>
+
+                    <p>
+                      {report.grossMarginCoverageComplete
+                        ? 'Margin coverage is complete for recorded sales in this period.'
+                        : `Based only on verified sales. ${report.unverifiedSaleDocumentCount} ${
+                            report.unverifiedSaleDocumentCount ===
+                            1
+                              ? 'sale needs'
+                              : 'sales need'
+                          } item-line or COGS review.`}
+                    </p>
+
+                    <strong className="business-monthly-report-card-warning">
+                      This is not net profit.
+                    </strong>
+                  </section>
+
+                  <section className="business-monthly-report-card-current">
+                    <div>
+                      <p className="dashboard-eyebrow">
+                        Current position
+                      </p>
+
+                      <strong>
+                        As of {today}
+                      </strong>
+
+                      <small>
+                        These are current balances, not historical month-end balances.
+                      </small>
+                    </div>
+
+                    <dl>
+                      <div>
+                        <dt>
+                          To collect
+                        </dt>
+
+                        <dd>
+                          {formatNu(
+                            report.currentReceivablesChetrum,
+                          )}
+                        </dd>
+                      </div>
+
+                      <div>
+                        <dt>
+                          To pay
+                        </dt>
+
+                        <dd>
+                          {formatNu(
+                            report.currentPayablesChetrum,
+                          )}
+                        </dd>
+                      </div>
+
+                      <div>
+                        <dt>
+                          Estimated stock value
+                        </dt>
+
+                        <dd>
+                          {formatNu(
+                            report.estimatedStockValueChetrum,
+                          )}
+                        </dd>
+                      </div>
+                    </dl>
+                  </section>
+
+                  <section className="business-monthly-report-card-attention">
+                    <strong>
+                      Attention
+                    </strong>
+
+                    <div>
+                      <span>
+                        Overdue to collect:{' '}
+                        {formatNu(
+                          report.overdueReceivablesChetrum,
+                        )}
+                      </span>
+
+                      <span>
+                        Overdue to pay:{' '}
+                        {formatNu(
+                          report.overduePayablesChetrum,
+                        )}
+                      </span>
+
+                      <span>
+                        Low-stock items:{' '}
+                        {report.lowStockItemCount}
+                      </span>
+
+                      <span>
+                        Negative-stock items:{' '}
+                        {report.negativeStockItemCount}
+                      </span>
+                    </div>
+                  </section>
+
+                  <footer className="business-monthly-report-card-footer">
+                    <span>
+                      Sales, cash, current dues and stock remain separate.
+                    </span>
+
+                    <span>
+                      This is not an audited financial statement, tax return, GST/BST filing or full accounting ledger.
+                    </span>
+                  </footer>
                 </section>
 
                 <section className="business-reports-grid">

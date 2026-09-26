@@ -1,4 +1,4 @@
-﻿.business-reports-page {
+.business-reports-page {
   padding-bottom: 44px;
 }
 
@@ -286,5 +286,266 @@
 @media (max-width: 480px) {
   .business-reports-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* === Money Saathi 3.1K: business monthly report downloads === */
+
+.business-reports-export-actions {
+  margin-left: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.business-reports-export-actions button {
+  min-height: 44px;
+  padding: 0 13px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 11px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--font-size-small);
+  font-weight: 800;
+}
+
+.business-reports-export-actions button:first-child {
+  border-color: var(--color-brand);
+  background: var(--color-brand);
+  color: white;
+}
+
+.business-monthly-report-card {
+  margin-top: 14px;
+  padding: 20px;
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.business-monthly-report-card-header {
+  padding-bottom: 15px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.business-monthly-report-card-header > div {
+  display: grid;
+  gap: 4px;
+}
+
+.business-monthly-report-card-header > div > span {
+  color: var(--color-brand);
+  font-size: var(--font-size-small);
+  font-weight: 900;
+}
+
+.business-monthly-report-card-header h2 {
+  margin: 0;
+  font-size: clamp(24px, 4vw, 34px);
+  letter-spacing: -0.035em;
+}
+
+.business-monthly-report-card-header p,
+.business-monthly-report-card-header small {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+}
+
+.business-monthly-report-card-grid {
+  margin-top: 15px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.business-monthly-report-card-grid article {
+  min-height: 92px;
+  padding: 13px;
+  display: grid;
+  align-content: center;
+  gap: 6px;
+  border: 1px solid var(--color-border);
+  border-radius: 13px;
+  background: var(--color-surface-soft);
+}
+
+.business-monthly-report-card-grid span,
+.business-monthly-report-card-margin span,
+.business-monthly-report-card-current dt {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+}
+
+.business-monthly-report-card-grid strong {
+  font-size: var(--font-size-small);
+}
+
+.business-monthly-report-card-margin {
+  margin-top: 12px;
+  padding: 15px;
+  display: grid;
+  gap: 7px;
+  border: 1px solid var(--color-border);
+  border-radius: 13px;
+  background: var(--color-brand-soft);
+}
+
+.business-monthly-report-card-margin > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.business-monthly-report-card-margin p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  line-height: 1.5;
+}
+
+.business-monthly-report-card-warning {
+  font-size: var(--font-size-small);
+}
+
+.business-monthly-report-card-current {
+  margin-top: 12px;
+  padding: 15px;
+  display: grid;
+  grid-template-columns: minmax(180px, 0.65fr) minmax(0, 1.35fr);
+  gap: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 13px;
+}
+
+.business-monthly-report-card-current > div {
+  display: grid;
+  align-content: start;
+  gap: 5px;
+}
+
+.business-monthly-report-card-current > div > small {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-meta);
+  line-height: 1.45;
+}
+
+.business-monthly-report-card-current dl {
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.business-monthly-report-card-current dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.business-monthly-report-card-current dd {
+  margin: 0;
+  font-size: var(--font-size-small);
+  font-weight: 800;
+  text-align: right;
+}
+
+.business-monthly-report-card-attention {
+  margin-top: 12px;
+  padding: 13px 15px;
+  display: grid;
+  gap: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 13px;
+  background: var(--color-surface-soft);
+}
+
+.business-monthly-report-card-attention > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px 16px;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+}
+
+.business-monthly-report-card-footer {
+  margin-top: 14px;
+  padding-top: 12px;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-meta);
+  line-height: 1.45;
+}
+
+@media (max-width: 680px) {
+  .business-reports-export-actions {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .business-reports-export-actions button {
+    flex: 1 1 140px;
+  }
+
+  .business-monthly-report-card-header,
+  .business-monthly-report-card-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .business-monthly-report-card-grid,
+  .business-monthly-report-card-current {
+    grid-template-columns: 1fr;
+  }
+
+  .business-monthly-report-card-margin > div {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm;
+  }
+
+  body * {
+    visibility: hidden !important;
+  }
+
+  .business-monthly-report-card,
+  .business-monthly-report-card * {
+    visibility: visible !important;
+  }
+
+  .business-monthly-report-card {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .business-monthly-report-card-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .business-monthly-report-card-current {
+    grid-template-columns: minmax(180px, 0.65fr) minmax(0, 1.35fr);
   }
 }
