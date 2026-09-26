@@ -1,4 +1,4 @@
-﻿import {
+import {
   type FormEvent,
   useEffect,
   useMemo,
@@ -6,6 +6,7 @@
 } from 'react'
 import {
   Link,
+  useSearchParams,
 } from 'react-router-dom'
 
 import AppShell from '../components/AppShell'
@@ -135,6 +136,38 @@ function partyFitsKind(
 }
 
 function BusinessTradePage() {
+  const [searchParams] =
+    useSearchParams()
+
+  const importedPayment =
+    searchParams.get('source') ===
+      'message'
+
+  const importedAmountRaw =
+    searchParams.get(
+      'amountChetrum',
+    )
+
+  const importedAmountChetrum =
+    importedAmountRaw &&
+    /^\d+$/.test(
+      importedAmountRaw,
+    )
+      ? Number(
+          importedAmountRaw,
+        )
+      : null
+
+  const importedDate =
+    searchParams.get(
+      'date',
+    )
+
+  const importedIntent =
+    searchParams.get(
+      'intent',
+    )
+
   const [businesses, setBusinesses] =
     useState<BusinessProfile[]>([])
 
@@ -954,6 +987,37 @@ function BusinessTradePage() {
             </Link>
           </div>
         </header>
+
+        {importedPayment && (
+          <div
+            className="business-trade-message"
+            role="status"
+          >
+            Imported payment context:{' '}
+            {importedAmountChetrum !==
+              null &&
+            Number.isSafeInteger(
+              importedAmountChetrum,
+            )
+              ? formatNu(
+                  importedAmountChetrum,
+                )
+              : 'amount not safely identified'}
+            {importedDate
+              ? ` on ${importedDate}`
+              : ''}.
+            {' '}
+            {importedIntent ===
+            'sale'
+              ? 'Record the actual sale lines, quantities and COGS. The payment amount is not automatically the sale total.'
+              : importedIntent ===
+                  'purchase'
+                ? 'Record the actual purchased items and quantities. The payment amount is not automatically the purchase total.'
+                : 'Review the actual sale or purchase details.'}
+            {' '}
+            No trade or stock record has been created automatically.
+          </div>
+        )}
 
         {message && (
           <div

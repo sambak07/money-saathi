@@ -1,4 +1,4 @@
-﻿import {
+import {
   type FormEvent,
   useEffect,
   useMemo,
@@ -6,6 +6,7 @@
 } from 'react'
 import {
   Link,
+  useSearchParams,
 } from 'react-router-dom'
 
 import AppShell from '../components/AppShell'
@@ -90,6 +91,38 @@ function roleAllowsDirection(
 }
 
 function BusinessCreditPage() {
+  const [searchParams] =
+    useSearchParams()
+
+  const importedPayment =
+    searchParams.get('source') ===
+      'message'
+
+  const importedAmountRaw =
+    searchParams.get(
+      'amountChetrum',
+    )
+
+  const importedAmountChetrum =
+    importedAmountRaw &&
+    /^\d+$/.test(
+      importedAmountRaw,
+    )
+      ? Number(
+          importedAmountRaw,
+        )
+      : null
+
+  const importedDate =
+    searchParams.get(
+      'date',
+    )
+
+  const importedIntent =
+    searchParams.get(
+      'intent',
+    )
+
   const [today] =
     useState(() => getLocalToday())
 
@@ -877,6 +910,37 @@ function BusinessCreditPage() {
             Business cash
           </Link>
         </header>
+
+        {importedPayment && (
+          <div
+            className="business-credit-message"
+            role="status"
+          >
+            Imported payment context:{' '}
+            {importedAmountChetrum !==
+              null &&
+            Number.isSafeInteger(
+              importedAmountChetrum,
+            )
+              ? formatNu(
+                  importedAmountChetrum,
+                )
+              : 'amount not safely identified'}
+            {importedDate
+              ? ` on ${importedDate}`
+              : ''}.
+            {' '}
+            {importedIntent ===
+            'customer-payment'
+              ? 'Choose the correct customer and update only the receivable that this payment actually settles.'
+              : importedIntent ===
+                  'supplier-payment'
+                ? 'Choose the correct supplier and update only the payable that this payment actually settles.'
+                : 'Review the correct customer or supplier record.'}
+            {' '}
+            Money Saathi has not changed any due automatically.
+          </div>
+        )}
 
         {message && (
           <div

@@ -1,4 +1,4 @@
-﻿import {
+import {
   type FormEvent,
   useEffect,
   useMemo,
@@ -6,6 +6,7 @@
 } from 'react'
 import {
   Link,
+  useSearchParams,
 } from 'react-router-dom'
 
 import AppShell from '../components/AppShell'
@@ -49,6 +50,71 @@ const BUSINESS_CATEGORIES = [
 ]
 
 function BusinessPage() {
+  const [searchParams] =
+    useSearchParams()
+
+  const importedCash =
+    searchParams.get('source') ===
+      'message'
+
+  const importedDirection =
+    searchParams.get(
+      'direction',
+    )
+
+  const importedIntent =
+    searchParams.get(
+      'intent',
+    )
+
+  const importedAmountRaw =
+    searchParams.get(
+      'amountChetrum',
+    )
+
+  const importedAmountChetrum =
+    importedAmountRaw &&
+    /^\d+$/.test(
+      importedAmountRaw,
+    )
+      ? Number(
+          importedAmountRaw,
+        )
+      : null
+
+  const importedAmount =
+    importedCash &&
+    importedAmountChetrum !==
+      null &&
+    Number.isSafeInteger(
+      importedAmountChetrum,
+    ) &&
+    importedAmountChetrum >
+      0
+      ? formatChetrumForInput(
+          importedAmountChetrum,
+        )
+      : ''
+
+  const importedDateRaw =
+    searchParams.get(
+      'date',
+    )
+
+  const todayForImport =
+    getLocalToday()
+
+  const importedDate =
+    importedCash &&
+    importedDateRaw &&
+    /^\d{4}-\d{2}-\d{2}$/.test(
+      importedDateRaw,
+    ) &&
+    importedDateRaw <=
+      todayForImport
+      ? importedDateRaw
+      : todayForImport
+
   const [businesses, setBusinesses] =
     useState<BusinessProfile[]>([])
 
@@ -68,14 +134,32 @@ function BusinessPage() {
     useState<BusinessTransaction | null>(null)
 
   const [kind, setKind] =
-    useState<BusinessTransactionKind>('income')
+    useState<BusinessTransactionKind>(
+      importedCash &&
+      importedDirection ===
+        'expense'
+        ? 'expense'
+        : 'income',
+    )
 
-  const [amount, setAmount] = useState('')
+  const [amount, setAmount] =
+    useState(
+      importedAmount,
+    )
+
   const [category, setCategory] =
-    useState('Sales')
+    useState(
+      importedCash
+        ? 'Other'
+        : 'Sales',
+    )
+
   const [note, setNote] = useState('')
+
   const [date, setDate] =
-    useState(() => getLocalToday())
+    useState(
+      importedDate,
+    )
 
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
@@ -501,6 +585,31 @@ function BusinessPage() {
             </Link>
           </div>
         </header>
+
+        {importedCash && (
+          <div
+            className="business-message"
+            role="status"
+          >
+            Payment-message details were brought here for review.
+            {importedAmount
+              ? ` Amount: ${formatNu(
+                  importedAmountChetrum!,
+                )}.`
+              : ''}
+            {importedDateRaw
+              ? ` Date: ${importedDate}.`
+              : ''}
+            {' '}
+            {importedIntent ===
+            'other-income'
+              ? 'Confirm this is genuine business income that is not a sale or customer collection.'
+              : importedIntent ===
+                  'running-expense'
+                ? 'Confirm the expense category before saving.'
+                : 'Review every field before saving.'}
+          </div>
+        )}
 
         {message && (
           <div

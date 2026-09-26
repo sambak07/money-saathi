@@ -1,4 +1,5 @@
 import {
+  useMemo,
   useState,
 } from 'react'
 import {
@@ -115,7 +116,10 @@ function BusinessQuickAddPage() {
             title:
               'Cash / QR sale',
             to:
-              '/app/business/trade',
+              businessRoute(
+                '/app/business/trade',
+                'sale',
+              ),
             note:
               'Record the sale properly, including what was sold and COGS. The bank credit alone is not enough to create a sale.',
           },
@@ -123,7 +127,10 @@ function BusinessQuickAddPage() {
             title:
               'Customer payment',
             to:
-              '/app/business/credit',
+              businessRoute(
+                '/app/business/credit',
+                'customer-payment',
+              ),
             note:
               'Use this when a customer is paying an amount they already owed.',
           },
@@ -131,7 +138,10 @@ function BusinessQuickAddPage() {
             title:
               'Other business income',
             to:
-              '/app/business/cash',
+              businessRoute(
+                '/app/business/cash',
+                'other-income',
+              ),
             note:
               'Use business cash when this is genuine business money in but not a sale or debt collection.',
           },
@@ -151,7 +161,10 @@ function BusinessQuickAddPage() {
               title:
                 'Running expense',
               to:
-                '/app/business/cash',
+                businessRoute(
+                  '/app/business/cash',
+                  'running-expense',
+                ),
               note:
                 'Use for rent, transport, wages, utilities or another actual business expense.',
             },
@@ -159,7 +172,10 @@ function BusinessQuickAddPage() {
               title:
                 'Supplier payment',
               to:
-                '/app/business/credit',
+                businessRoute(
+                  '/app/business/credit',
+                  'supplier-payment',
+                ),
               note:
                 'Use this when paying an amount the business already owed a supplier.',
             },
@@ -167,7 +183,10 @@ function BusinessQuickAddPage() {
               title:
                 'Stock / goods purchase',
               to:
-                '/app/business/trade',
+                businessRoute(
+                  '/app/business/trade',
+                  'purchase',
+                ),
               note:
                 'Record the purchase properly. A bank debit alone does not establish what stock was bought.',
             },
@@ -181,6 +200,74 @@ function BusinessQuickAddPage() {
             },
           ]
         : []
+
+  const importedQuery =
+    useMemo(
+      () => {
+        if (
+          !messageAnalysis ||
+          messageAnalysis.amountChetrum ===
+            null ||
+          messageAnalysis.direction ===
+            'unknown'
+        ) {
+          return ''
+        }
+
+        const params =
+          new URLSearchParams()
+
+        params.set(
+          'source',
+          'message',
+        )
+
+        params.set(
+          'amountChetrum',
+          String(
+            messageAnalysis.amountChetrum,
+          ),
+        )
+
+        params.set(
+          'direction',
+          messageAnalysis.direction,
+        )
+
+        if (messageAnalysis.date) {
+          params.set(
+            'date',
+            messageAnalysis.date,
+          )
+        }
+
+        return params.toString()
+      },
+      [
+        messageAnalysis,
+      ],
+    )
+
+  function businessRoute(
+    route: string,
+    intent: string,
+  ): string {
+    if (!importedQuery) {
+      return route
+    }
+
+    const params =
+      new URLSearchParams(
+        importedQuery,
+      )
+
+    params.set(
+      'intent',
+      intent,
+    )
+
+    return `${route}?${params.toString()}`
+  }
 
   return (
     <AppShell>
