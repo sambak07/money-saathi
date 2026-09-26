@@ -97,3 +97,24 @@ describe('paste-message duplicate safety', () => {
     )
   })
 })
+
+
+describe('paste-message own-account transfer safety', () => {
+  it('does not let imported bank alerts silently become income or expense when marked as an internal transfer', () => {
+    expect(form).toContain(
+      'This is a transfer between my own accounts',
+    )
+
+    expect(form).toContain(
+      'Do not record an own-account transfer as income or expense.',
+    )
+
+    expect(form).toContain(
+      'Money Saathi does not yet track internal transfers',
+    )
+
+    expect(form).toContain(
+      'messageIsOwnTransfer ||',
+    )
+  })
+})

@@ -100,6 +100,9 @@ function TransactionFormPage() {
   const [messageDuplicateWarning, setMessageDuplicateWarning] =
     useState('')
 
+  const [messageIsOwnTransfer, setMessageIsOwnTransfer] =
+    useState(false)
+
   const categories =
     kind === 'income'
       ? incomeCategories
@@ -438,6 +441,7 @@ function TransactionFormPage() {
                     )
                     setMessageError('')
                     setMessageDuplicateWarning('')
+                    setMessageIsOwnTransfer(false)
                   }}
                 />
               </div>
@@ -492,13 +496,39 @@ function TransactionFormPage() {
                     Money Saathi does not save the pasted message itself.
                   </p>
 
+                  <label className="message-import-transfer-check">
+                    <input
+                      type="checkbox"
+                      checked={messageIsOwnTransfer}
+                      onChange={(event) =>
+                        setMessageIsOwnTransfer(
+                          event.target.checked,
+                        )
+                      }
+                    />
+
+                    <span>
+                      This is a transfer between my own accounts
+                    </span>
+                  </label>
+
+                  {messageIsOwnTransfer && (
+                    <p className="message-import-transfer-note">
+                      Do not record an own-account transfer as income or expense.
+                      Money Saathi does not yet track internal transfers, because doing so would distort your income and spending.
+                    </p>
+                  )}
+
                   <button
                     type="button"
                     className="save-button"
                     disabled={
-                      messageAnalysis.amountChetrum === null &&
-                      messageAnalysis.date === null &&
-                      messageAnalysis.direction === 'unknown'
+                      messageIsOwnTransfer ||
+                      (
+                        messageAnalysis.amountChetrum === null &&
+                        messageAnalysis.date === null &&
+                        messageAnalysis.direction === 'unknown'
+                      )
                     }
                     onClick={usePastedMessageDetails}
                   >

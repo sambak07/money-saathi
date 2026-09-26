@@ -1129,3 +1129,35 @@
   font-size: 13px;
   line-height: 1.5;
 }
+
+
+/* === Money Saathi 3.1E: own-account transfer safety === */
+
+.message-import-transfer-check {
+  margin-top: 4px;
+
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+
+  color: var(--color-text);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.message-import-transfer-check input {
+  width: 18px;
+  min-width: 18px;
+  height: 18px;
+  margin: 1px 0 0;
+}
+
+.message-import-transfer-note {
+  padding: 10px 12px;
+
+  border: 1px solid var(--color-border);
+  border-radius: 11px;
+
+  background: var(--color-bg);
+}
