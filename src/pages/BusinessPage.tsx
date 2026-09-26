@@ -67,6 +67,11 @@ function BusinessPage() {
       'intent',
     )
 
+  const requestedBusinessId =
+    searchParams.get(
+      'businessId',
+    ) ?? ''
+
   const importedAmountRaw =
     searchParams.get(
       'amountChetrum',
@@ -210,15 +215,21 @@ function BusinessPage() {
 
         setBusinesses(records)
 
-        const firstBusiness =
-          records[0] ?? null
+        const initialBusiness =
+          records.find(
+            (business) =>
+              business.id ===
+              requestedBusinessId,
+          ) ??
+          records[0] ??
+          null
 
         setSelectedBusinessId(
-          firstBusiness?.id ?? '',
+          initialBusiness?.id ?? '',
         )
 
         setRenameBusinessName(
-          firstBusiness?.name ?? '',
+          initialBusiness?.name ?? '',
         )
       } catch {
         if (active) {
@@ -234,7 +245,9 @@ function BusinessPage() {
     return () => {
       active = false
     }
-  }, [])
+  }, [
+    requestedBusinessId,
+  ])
 
   useEffect(() => {
     let active = true

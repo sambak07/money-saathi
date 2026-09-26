@@ -4,6 +4,7 @@ import {
 } from 'react'
 import {
   Link,
+  useSearchParams,
 } from 'react-router-dom'
 
 import AppShell from '../components/AppShell'
@@ -61,6 +62,14 @@ const quickActions = [
 ] as const
 
 function BusinessQuickAddPage() {
+  const [searchParams] =
+    useSearchParams()
+
+  const requestedBusinessId =
+    searchParams.get(
+      'businessId',
+    ) ?? ''
+
   const [pastedMessage, setPastedMessage] =
     useState('')
 
@@ -155,18 +164,45 @@ function BusinessQuickAddPage() {
       ],
     )
 
+  function workspaceRoute(
+    route: string,
+  ): string {
+    if (!requestedBusinessId) {
+      return route
+    }
+
+    const params =
+      new URLSearchParams()
+
+    params.set(
+      'businessId',
+      requestedBusinessId,
+    )
+
+    return `${route}?${params.toString()}`
+  }
+
   function businessRoute(
     route: string,
     intent: string,
   ): string {
     if (!importedQuery) {
-      return route
+      return workspaceRoute(
+        route,
+      )
     }
 
     const params =
       new URLSearchParams(
         importedQuery,
       )
+
+    if (requestedBusinessId) {
+      params.set(
+        'businessId',
+        requestedBusinessId,
+      )
+    }
 
     params.set(
       'intent',
@@ -470,7 +506,9 @@ function BusinessQuickAddPage() {
                   action.title
                 }
                 to={
-                  action.to
+                  workspaceRoute(
+                    action.to,
+                  )
                 }
                 className="business-quick-add-card"
               >

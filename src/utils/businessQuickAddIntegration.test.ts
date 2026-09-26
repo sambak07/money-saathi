@@ -1,4 +1,4 @@
-﻿/// <reference types="node" />
+/// <reference types="node" />
 
 import {
   readFileSync,
@@ -43,11 +43,19 @@ describe('business quick add integration', () => {
 
   it('makes Add the primary Business Home action', () => {
     expect(home).toContain(
-      'to="/app/business/add"',
+      'className="simple-business-primary-action"',
+    )
+
+    expect(home).toContain(
+      '/app/business/add?businessId=',
     )
 
     expect(home).toMatch(
-      /className="simple-business-primary-action"[\s\S]*to="\/app\/business\/add"[\s\S]*>\s*Add\s*<\/Link>/,
+      /encodeURIComponent\(\s*selectedBusinessId/,
+    )
+
+    expect(home).toMatch(
+      /className="simple-business-primary-action"[\s\S]*>\s*Add\s*<\/Link>/,
     )
   })
 

@@ -168,6 +168,11 @@ function BusinessTradePage() {
       'intent',
     )
 
+  const requestedBusinessId =
+    searchParams.get(
+      'businessId',
+    ) ?? ''
+
   const [businesses, setBusinesses] =
     useState<BusinessProfile[]>([])
 
@@ -465,8 +470,17 @@ function BusinessTradePage() {
           records,
         )
 
+        const initialBusiness =
+          records.find(
+            (business) =>
+              business.id ===
+              requestedBusinessId,
+          ) ??
+          records[0] ??
+          null
+
         setSelectedBusinessId(
-          records[0]?.id ??
+          initialBusiness?.id ??
             '',
         )
       } catch {
@@ -483,7 +497,9 @@ function BusinessTradePage() {
     return () => {
       active = false
     }
-  }, [])
+  }, [
+    requestedBusinessId,
+  ])
 
   useEffect(() => {
     let active = true

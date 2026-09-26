@@ -1,4 +1,4 @@
-﻿import {
+import {
   useEffect,
   useMemo,
   useState,
@@ -425,7 +425,9 @@ function SimpleBusinessHomePage() {
 
               <Link
                 className="simple-business-primary-action"
-                to="/app/business/add"
+                to={`/app/business/add?businessId=${encodeURIComponent(
+                  selectedBusinessId,
+                )}`}
               >
                 Add
               </Link>
