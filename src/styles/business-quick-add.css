@@ -1,4 +1,4 @@
-﻿.business-quick-add-page {
+.business-quick-add-page {
   padding-bottom: 44px;
 }
 
@@ -142,5 +142,204 @@
 
   .business-quick-add-card:first-child {
     grid-column: auto;
+  }
+}
+
+/* === Money Saathi 3.1F: business payment-message triage === */
+
+.business-message-import {
+  margin-top: 20px;
+  padding: 20px;
+
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.business-message-import-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.business-message-import-heading h2 {
+  margin: 2px 0 0;
+
+  font-size: clamp(22px, 3vw, 29px);
+  letter-spacing: -0.025em;
+}
+
+.business-message-import-heading > span {
+  padding: 5px 9px;
+
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+
+  background: var(--color-surface-soft);
+  color: var(--color-text-muted);
+
+  font-size: var(--font-size-meta);
+  font-weight: 800;
+}
+
+.business-message-import-copy {
+  max-width: 760px;
+  margin: 10px 0 16px;
+
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  line-height: 1.55;
+}
+
+.business-message-import-label {
+  display: block;
+  margin-bottom: 7px;
+
+  color: var(--color-text);
+  font-size: var(--font-size-small);
+  font-weight: 800;
+}
+
+.business-message-import textarea {
+  width: 100%;
+  min-height: 116px;
+  padding: 12px 14px;
+
+  resize: vertical;
+
+  border: 1px solid var(--color-border-strong);
+  border-radius: 13px;
+
+  background: white;
+  color: var(--color-text);
+
+  font: inherit;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.business-message-import textarea:focus {
+  border-color: var(--color-brand);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(23, 90, 67, 0.08);
+}
+
+.business-message-read-button {
+  min-height: 46px;
+  margin-top: 12px;
+  padding: 0 16px;
+
+  border: 1px solid var(--color-border-strong);
+  border-radius: 12px;
+
+  background: var(--color-surface);
+  color: var(--color-text);
+
+  font: inherit;
+  font-size: var(--font-size-small);
+  font-weight: 800;
+}
+
+.business-message-result {
+  margin-top: 16px;
+  padding: 16px;
+
+  display: grid;
+  gap: 13px;
+
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+
+  background: var(--color-surface-soft);
+}
+
+.business-message-result-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.business-message-result-grid > span {
+  padding: 11px;
+
+  display: grid;
+  gap: 4px;
+
+  border: 1px solid var(--color-border);
+  border-radius: 11px;
+
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+
+  font-size: var(--font-size-meta);
+}
+
+.business-message-result-grid b {
+  color: var(--color-text);
+  font-size: var(--font-size-small);
+}
+
+.business-message-result h3 {
+  margin: 2px 0 0;
+
+  font-size: var(--font-size-small);
+}
+
+.business-message-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.business-message-action {
+  min-height: 112px;
+  padding: 13px;
+
+  display: grid;
+  align-content: center;
+  gap: 6px;
+
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+
+  background: var(--color-surface);
+}
+
+.business-message-action strong {
+  color: var(--color-text);
+  font-size: var(--font-size-small);
+}
+
+.business-message-action span,
+.business-message-caution {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-meta);
+  line-height: 1.5;
+}
+
+.business-message-action-stop {
+  border-style: dashed;
+  background: transparent;
+}
+
+.business-message-caution {
+  margin: 0;
+}
+
+@media (max-width: 680px) {
+  .business-message-import {
+    padding: 16px;
+  }
+
+  .business-message-result-grid,
+  .business-message-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .business-message-read-button {
+    width: 100%;
   }
 }
