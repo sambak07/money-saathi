@@ -1,4 +1,4 @@
-﻿.reports-page {
+.reports-page {
   padding-bottom: 36px;
 }
 
@@ -400,5 +400,262 @@
   .reports-trend-line > strong {
     grid-column: 2;
     text-align: left;
+  }
+}
+
+
+/* === Money Saathi 3.1J: personal monthly report card export === */
+
+.reports-header-tools {
+  min-width: 220px;
+  display: grid;
+  gap: 10px;
+}
+
+.reports-export-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.reports-export-actions button {
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 11px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--font-size-small);
+  font-weight: 800;
+}
+
+.reports-export-actions button:first-child {
+  border-color: var(--color-brand);
+  background: var(--color-brand);
+  color: white;
+}
+
+.reports-report-card {
+  margin-top: 18px;
+  padding: 22px;
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.reports-report-card-header {
+  padding-bottom: 16px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.reports-report-card-header > div:first-child {
+  display: grid;
+  gap: 4px;
+}
+
+.reports-report-card-header > div:first-child > span {
+  color: var(--color-brand);
+  font-size: var(--font-size-small);
+  font-weight: 900;
+}
+
+.reports-report-card-header h2 {
+  margin: 0;
+  font-size: clamp(24px, 4vw, 34px);
+  letter-spacing: -0.035em;
+}
+
+.reports-report-card-header p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+}
+
+.reports-report-card-header > div:last-child {
+  display: grid;
+  justify-items: end;
+  gap: 2px;
+  text-align: right;
+}
+
+.reports-report-card-header > div:last-child strong {
+  font-size: 24px;
+}
+
+.reports-report-card-header > div:last-child span {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-meta);
+}
+
+.reports-report-card-metrics {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.reports-report-card-metrics article {
+  min-height: 92px;
+  padding: 13px;
+  display: grid;
+  align-content: center;
+  gap: 6px;
+  border: 1px solid var(--color-border);
+  border-radius: 13px;
+  background: var(--color-surface-soft);
+}
+
+.reports-report-card-metrics span {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-meta);
+}
+
+.reports-report-card-metrics strong {
+  font-size: var(--font-size-small);
+}
+
+.reports-report-card-body {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.reports-report-card-body > section {
+  padding: 15px;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+}
+
+.reports-report-card-list {
+  margin: 10px 0 0;
+  display: grid;
+  gap: 10px;
+}
+
+.reports-report-card-list > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.reports-report-card-list dt,
+.reports-report-card-list dd {
+  margin: 0;
+  font-size: var(--font-size-small);
+}
+
+.reports-report-card-list dt {
+  color: var(--color-text-secondary);
+}
+
+.reports-report-card-list dd {
+  font-weight: 800;
+  text-align: right;
+}
+
+.reports-report-card-categories {
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.reports-report-card-categories li {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  font-size: var(--font-size-small);
+}
+
+.reports-report-card-categories span {
+  color: var(--color-text-secondary);
+}
+
+.reports-report-card-empty {
+  margin: 10px 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-small);
+}
+
+.reports-report-card-footer {
+  margin-top: 16px;
+  padding-top: 12px;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-meta);
+  line-height: 1.45;
+}
+
+@media (max-width: 700px) {
+  .reports-header-tools {
+    min-width: 0;
+  }
+
+  .reports-export-actions button {
+    flex: 1 1 140px;
+  }
+
+  .reports-report-card-header,
+  .reports-report-card-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .reports-report-card-header > div:last-child {
+    justify-items: start;
+    text-align: left;
+  }
+
+  .reports-report-card-metrics,
+  .reports-report-card-body {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm;
+  }
+
+  body * {
+    visibility: hidden !important;
+  }
+
+  .reports-report-card,
+  .reports-report-card * {
+    visibility: visible !important;
+  }
+
+  .reports-report-card {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .reports-report-card-metrics {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .reports-report-card-body {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

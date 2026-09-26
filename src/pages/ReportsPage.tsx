@@ -1,4 +1,4 @@
-﻿import {
+import {
   useEffect,
   useMemo,
   useState,
@@ -12,6 +12,10 @@ import {
   formatNu,
   getLocalToday,
 } from '../utils/money'
+import {
+  buildMonthlyTransactionsCsv,
+  getMonthlyTransactionsCsvFilename,
+} from '../utils/reportExport'
 import {
   buildExpenseCategoryBreakdown,
   buildMonthlyTrend,
@@ -145,6 +149,66 @@ function ReportsPage() {
     }
   }, [selectedMonth, transactions, trendMonths])
 
+  function downloadMonthlyCsv() {
+    if (!report) {
+      return
+    }
+
+    const csv =
+      buildMonthlyTransactionsCsv(
+        report.monthTransactions,
+      )
+
+    const blob =
+      new Blob(
+        [
+          '\uFEFF',
+          csv,
+        ],
+        {
+          type:
+            'text/csv;charset=utf-8',
+        },
+      )
+
+    const url =
+      URL.createObjectURL(
+        blob,
+      )
+
+    const anchor =
+      document.createElement(
+        'a',
+      )
+
+    anchor.href =
+      url
+
+    anchor.download =
+      getMonthlyTransactionsCsvFilename(
+        selectedMonth,
+      )
+
+    document.body.appendChild(
+      anchor,
+    )
+
+    anchor.click()
+    anchor.remove()
+
+    window.setTimeout(
+      () =>
+        URL.revokeObjectURL(
+          url,
+        ),
+      0,
+    )
+  }
+
+  function printMonthlyReport() {
+    window.print()
+  }
+
   if (loading) {
     return (
       <AppShell>
@@ -192,20 +256,41 @@ function ReportsPage() {
             </p>
           </div>
 
-          <div className="reports-month-control">
-            <label htmlFor="report-month">
-              Report month
-            </label>
+          <div className="reports-header-tools">
+            <div className="reports-month-control">
+              <label htmlFor="report-month">
+                Report month
+              </label>
 
-            <input
-              id="report-month"
-              type="month"
-              value={selectedMonth}
-              max={getLocalToday().slice(0, 7)}
-              onChange={(event) =>
-                setSelectedMonth(event.target.value)
-              }
-            />
+              <input
+                id="report-month"
+                type="month"
+                value={selectedMonth}
+                max={getLocalToday().slice(0, 7)}
+                onChange={(event) =>
+                  setSelectedMonth(event.target.value)
+                }
+              />
+            </div>
+
+            <div
+              className="reports-export-actions"
+              aria-label="Monthly report downloads"
+            >
+              <button
+                type="button"
+                onClick={printMonthlyReport}
+              >
+                Print / Save PDF
+              </button>
+
+              <button
+                type="button"
+                onClick={downloadMonthlyCsv}
+              >
+                Download CSV
+              </button>
+            </div>
           </div>
         </header>
 
@@ -220,6 +305,164 @@ function ReportsPage() {
           Money Saathi. They do not infer bank balances or
           unrecorded spending.
         </div>
+
+        <section
+          className="reports-report-card"
+          aria-label="Monthly money report card"
+        >
+          <header className="reports-report-card-header">
+            <div>
+              <span>Money Saathi</span>
+              <h2>Monthly Money Report</h2>
+              <p>{getMonthLabel(selectedMonth)}</p>
+            </div>
+
+            <div>
+              <strong>
+                {report.current.transactionCount}
+              </strong>
+
+              <span>
+                recorded{' '}
+                {report.current.transactionCount === 1
+                  ? 'transaction'
+                  : 'transactions'}
+              </span>
+            </div>
+          </header>
+
+          <div className="reports-report-card-metrics">
+            <article>
+              <span>Money in</span>
+              <strong>
+                {formatNu(
+                  report.current.incomeChetrum,
+                )}
+              </strong>
+            </article>
+
+            <article>
+              <span>Money out</span>
+              <strong>
+                {formatNu(
+                  report.current.expenseChetrum,
+                )}
+              </strong>
+            </article>
+
+            <article>
+              <span>Net cash flow</span>
+              <strong>
+                {formatNu(
+                  report.current.netChetrum,
+                )}
+              </strong>
+            </article>
+
+            <article>
+              <span>Cash-flow rate</span>
+              <strong>
+                {report.cashFlowRateBps === null
+                  ? '—'
+                  : formatPercentBps(
+                      report.cashFlowRateBps,
+                    )}
+              </strong>
+            </article>
+          </div>
+
+          <div className="reports-report-card-body">
+            <section>
+              <p className="dashboard-eyebrow">
+                Snapshot
+              </p>
+
+              <dl className="reports-report-card-list">
+                <div>
+                  <dt>Largest expense category</dt>
+                  <dd>
+                    {report.topCategory
+                      ? `${report.topCategory.category} · ${formatNu(
+                          report.topCategory.amountChetrum,
+                        )}`
+                      : 'No expense data'}
+                  </dd>
+                </div>
+
+                <div>
+                  <dt>Average recorded expense</dt>
+                  <dd>
+                    {report.current.expenseChetrum > 0
+                      ? formatNu(
+                          report.averageExpenseChetrum,
+                        )
+                      : '—'}
+                  </dd>
+                </div>
+
+                <div>
+                  <dt>Previous month net</dt>
+                  <dd>
+                    {formatNu(
+                      report.previous.netChetrum,
+                    )}
+                  </dd>
+                </div>
+              </dl>
+            </section>
+
+            <section>
+              <p className="dashboard-eyebrow">
+                Top spending
+              </p>
+
+              {report.categories.length === 0 ? (
+                <p className="reports-report-card-empty">
+                  No expenses recorded.
+                </p>
+              ) : (
+                <ol className="reports-report-card-categories">
+                  {report.categories
+                    .slice(
+                      0,
+                      5,
+                    )
+                    .map(
+                      (
+                        category,
+                      ) => (
+                        <li
+                          key={
+                            category.category
+                          }
+                        >
+                          <span>
+                            {category.category}
+                          </span>
+
+                          <strong>
+                            {formatNu(
+                              category.amountChetrum,
+                            )}
+                          </strong>
+                        </li>
+                      ),
+                    )}
+                </ol>
+              )}
+            </section>
+          </div>
+
+          <footer className="reports-report-card-footer">
+            <span>
+              Based only on transactions recorded in Money Saathi.
+            </span>
+
+            <span>
+              This is a personal money summary, not a bank statement or audited financial statement.
+            </span>
+          </footer>
+        </section>
 
         <section className="reports-summary-grid">
           <article className="reports-summary-card">
