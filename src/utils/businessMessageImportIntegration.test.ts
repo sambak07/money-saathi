@@ -81,3 +81,26 @@ describe('business payment-message triage', () => {
     )
   })
 })
+
+
+describe('business payment-message runtime ordering', () => {
+  it('builds imported query context before message actions call businessRoute', () => {
+    const queryIndex =
+      page.indexOf(
+        'const importedQuery =',
+      )
+
+    const actionsIndex =
+      page.indexOf(
+        'const messageActions =',
+      )
+
+    expect(queryIndex).toBeGreaterThanOrEqual(
+      0,
+    )
+
+    expect(actionsIndex).toBeGreaterThan(
+      queryIndex,
+    )
+  })
+})

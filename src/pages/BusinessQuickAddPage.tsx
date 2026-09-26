@@ -108,6 +108,74 @@ function BusinessQuickAddPage() {
     }
   }
 
+  const importedQuery =
+    useMemo(
+      () => {
+        if (
+          !messageAnalysis ||
+          messageAnalysis.amountChetrum ===
+            null ||
+          messageAnalysis.direction ===
+            'unknown'
+        ) {
+          return ''
+        }
+
+        const params =
+          new URLSearchParams()
+
+        params.set(
+          'source',
+          'message',
+        )
+
+        params.set(
+          'amountChetrum',
+          String(
+            messageAnalysis.amountChetrum,
+          ),
+        )
+
+        params.set(
+          'direction',
+          messageAnalysis.direction,
+        )
+
+        if (messageAnalysis.date) {
+          params.set(
+            'date',
+            messageAnalysis.date,
+          )
+        }
+
+        return params.toString()
+      },
+      [
+        messageAnalysis,
+      ],
+    )
+
+  function businessRoute(
+    route: string,
+    intent: string,
+  ): string {
+    if (!importedQuery) {
+      return route
+    }
+
+    const params =
+      new URLSearchParams(
+        importedQuery,
+      )
+
+    params.set(
+      'intent',
+      intent,
+    )
+
+    return `${route}?${params.toString()}`
+  }
+
   const messageActions =
     messageAnalysis?.direction ===
       'income'
@@ -195,79 +263,11 @@ function BusinessQuickAddPage() {
                 'Own-account / owner transfer',
               to:
                 null,
-              note:
-                'Do not record this as a business expense. Moving money between your own accounts is not spending.',
+            note:
+              'Do not record this as a business expense. Moving money between your own accounts is not spending.',
             },
           ]
         : []
-
-  const importedQuery =
-    useMemo(
-      () => {
-        if (
-          !messageAnalysis ||
-          messageAnalysis.amountChetrum ===
-            null ||
-          messageAnalysis.direction ===
-            'unknown'
-        ) {
-          return ''
-        }
-
-        const params =
-          new URLSearchParams()
-
-        params.set(
-          'source',
-          'message',
-        )
-
-        params.set(
-          'amountChetrum',
-          String(
-            messageAnalysis.amountChetrum,
-          ),
-        )
-
-        params.set(
-          'direction',
-          messageAnalysis.direction,
-        )
-
-        if (messageAnalysis.date) {
-          params.set(
-            'date',
-            messageAnalysis.date,
-          )
-        }
-
-        return params.toString()
-      },
-      [
-        messageAnalysis,
-      ],
-    )
-
-  function businessRoute(
-    route: string,
-    intent: string,
-  ): string {
-    if (!importedQuery) {
-      return route
-    }
-
-    const params =
-      new URLSearchParams(
-        importedQuery,
-      )
-
-    params.set(
-      'intent',
-      intent,
-    )
-
-    return `${route}?${params.toString()}`
-  }
 
   return (
     <AppShell>
