@@ -16,28 +16,11 @@ import {
   type AlertPreferences,
 } from '../alerts/alertPreferences'
 import {
-  buildLoanReminderReferences,
-  getLoanDueReminders,
-} from '../alerts/loanDueReminders'
+  buildAlertUniverseView,
+  loadAlertUniverseData,
+  type AlertUniverseData,
+} from '../alerts/alertUniverse'
 import AppShell from '../components/AppShell'
-import {
-  getBusinessOpenItems,
-  getBusinessProfiles,
-  getFinancialSchemes,
-  getFixedDeposits,
-  getLoans,
-  getRecurringDeposits,
-  getRegularMoney,
-  getTransactions,
-} from '../storage/db'
-import {
-  getPreferences,
-} from '../settings/preferences'
-import {
-  buildMoneyAlerts,
-  countAlertLevels,
-  type BusinessDueReference,
-} from '../utils/moneyAlerts'
 import {
   formatNu,
   getLocalToday,
@@ -45,36 +28,7 @@ import {
 import {
   formatScheduleDate,
 } from '../utils/recurrence'
-import {
-  calculateSafeToSpend,
-} from '../utils/safeToSpend'
-import {
-  transactionBalanceChetrum,
-} from '../utils/simpleHome'
-
 import '../styles/alert-centre.css'
-
-interface AlertData {
-  regularMoney: Awaited<
-    ReturnType<typeof getRegularMoney>
-  >
-  transactions: Awaited<
-    ReturnType<typeof getTransactions>
-  >
-  schemes: Awaited<
-    ReturnType<typeof getFinancialSchemes>
-  >
-  loans: Awaited<
-    ReturnType<typeof getLoans>
-  >
-  fixedDeposits: Awaited<
-    ReturnType<typeof getFixedDeposits>
-  >
-  recurringDeposits: Awaited<
-    ReturnType<typeof getRecurringDeposits>
-  >
-  businessDues: BusinessDueReference[]
-}
 
 const DUE_SOON_OPTIONS:
   AlertDueSoonDays[] = [
@@ -103,7 +57,9 @@ function AlertCentrePage() {
   )
 
   const [data, setData] =
-    useState<AlertData | null>(null)
+    useState<AlertUniverseData | null>(
+      null,
+    )
 
   const [loading, setLoading] =
     useState(true)
@@ -119,73 +75,14 @@ function AlertCentrePage() {
 
     async function load() {
       try {
-        const [
-          regularMoney,
-          transactions,
-          schemes,
-          loans,
-          fixedDeposits,
-          recurringDeposits,
-          businessProfiles,
-        ] = await Promise.all([
-          getRegularMoney(),
-          getTransactions(),
-          getFinancialSchemes(),
-          getLoans(),
-          getFixedDeposits(),
-          getRecurringDeposits(),
-          getBusinessProfiles(),
-        ])
-
-        const businessDues =
-          (
-            await Promise.all(
-              businessProfiles.map(
-                async (business) => {
-                  const items =
-                    await getBusinessOpenItems(
-                      business.id,
-                    )
-
-                  return items
-                    .filter(
-                      (item) =>
-                        item.dueDate &&
-                        item.outstandingAmountChetrum >
-                          0,
-                    )
-                    .map(
-                      (item): BusinessDueReference => ({
-                        id:
-                          item.id,
-                        businessId:
-                          business.id,
-                        businessName:
-                          business.name,
-                        direction:
-                          item.direction,
-                        outstandingAmountChetrum:
-                          item.outstandingAmountChetrum,
-                        dueDate:
-                          item.dueDate,
-                      }),
-                    )
-                },
-              ),
-            )
-          ).flat()
+        const nextData =
+          await loadAlertUniverseData()
 
         if (!active) return
 
-        setData({
-          regularMoney,
-          transactions,
-          schemes,
-          loans,
-          fixedDeposits,
-          recurringDeposits,
-          businessDues,
-        })
+        setData(
+          nextData,
+        )
       } catch {
         if (active) {
           setError(
@@ -209,68 +106,13 @@ function AlertCentrePage() {
   const view = useMemo(() => {
     if (!data) return null
 
-    const recordedBalanceChetrum =
-      transactionBalanceChetrum(
-        data.transactions,
-      )
-
-    const appPreferences =
-      getPreferences()
-
-    const safe =
-      calculateSafeToSpend(
-        today,
-        recordedBalanceChetrum,
-        data.regularMoney,
-        data.transactions,
-        appPreferences.safetyBufferChetrum,
-      )
-
-    const alerts =
-      buildMoneyAlerts({
-        today,
-        dueSoonDays:
-          preferences.dueSoonDays,
-        regularMoney:
-          data.regularMoney,
-        transactions:
-          data.transactions,
-        schemes:
-          data.schemes,
-        recordedBalanceChetrum,
-        safeToSpendChetrum:
-          safe.safeToSpendChetrum,
-        upcomingCommitmentsChetrum:
-          safe.upcomingCommitmentsChetrum,
-        loanReminders:
-          buildLoanReminderReferences(
-            data.loans,
-            getLoanDueReminders(),
-          ),
-        fixedDeposits:
-          data.fixedDeposits,
-        recurringDeposits:
-          data.recurringDeposits,
-        businessDues:
-          data.businessDues,
-      })
-
-    const visibleAlerts =
-      alerts.filter(
-        (alert) =>
-          !acknowledgedIds.has(
-            alert.id,
-          ),
-      )
-
-    return {
-      alerts,
-      visibleAlerts,
-      counts:
-        countAlertLevels(
-          visibleAlerts,
-        ),
-    }
+    return buildAlertUniverseView({
+      today,
+      dueSoonDays:
+        preferences.dueSoonDays,
+      data,
+      acknowledgedIds,
+    })
   }, [
     acknowledgedIds,
     data,

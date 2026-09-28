@@ -26,6 +26,14 @@ const preferencesPath =
     ),
   )
 
+const universePath =
+  fileURLToPath(
+    new URL(
+      './alertUniverse.ts',
+      import.meta.url,
+    ),
+  )
+
 const badgeSource =
   readFileSync(
     badgePath,
@@ -38,16 +46,34 @@ const preferenceSource =
     'utf8',
   )
 
+const universeSource =
+  readFileSync(
+    universePath,
+    'utf8',
+  )
+
 describe('live alert badge', () => {
-  it('counts the same deterministic alert engine used by the Alert Centre', () => {
+  it('counts the same shared alert universe used by the Alert Centre', () => {
     expect(
       badgeSource,
+    ).toContain(
+      'loadAlertUniverseData(',
+    )
+
+    expect(
+      badgeSource,
+    ).toContain(
+      'buildAlertUniverseView({',
+    )
+
+    expect(
+      universeSource,
     ).toContain(
       'buildMoneyAlerts({',
     )
 
     expect(
-      badgeSource,
+      universeSource,
     ).toContain(
       'buildLoanReminderReferences(',
     )
@@ -58,6 +84,12 @@ describe('live alert badge', () => {
       badgeSource,
     ).toContain(
       'getAcknowledgedAlertIds(',
+    )
+
+    expect(
+      universeSource,
+    ).toContain(
+      'filterVisibleMoneyAlerts(',
     )
   })
 

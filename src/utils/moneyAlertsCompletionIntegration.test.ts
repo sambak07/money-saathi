@@ -27,6 +27,15 @@ const engine =
     'utf8',
   )
 
+const universe =
+  readFileSync(
+    new URL(
+      '../alerts/alertUniverse.ts',
+      import.meta.url,
+    ),
+    'utf8',
+  )
+
 describe('alert due-date completion integration', () => {
   it('loads recorded deposit and business due data', () => {
     for (
@@ -37,23 +46,27 @@ describe('alert due-date completion integration', () => {
         'getBusinessOpenItems(',
       ]
     ) {
-      expect(page).toContain(
+      expect(universe).toContain(
         marker,
       )
     }
   })
 
   it('feeds the new references into the existing alert engine', () => {
-    expect(page).toContain(
+    expect(universe).toContain(
       'fixedDeposits:',
     )
 
-    expect(page).toContain(
+    expect(universe).toContain(
       'recurringDeposits:',
     )
 
-    expect(page).toContain(
+    expect(universe).toContain(
       'businessDues:',
+    )
+
+    expect(page).toContain(
+      'buildAlertUniverseView({',
     )
   })
 

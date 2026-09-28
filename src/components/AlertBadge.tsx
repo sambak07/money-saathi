@@ -13,30 +13,12 @@ import {
   getAlertPreferences,
 } from '../alerts/alertPreferences'
 import {
-  buildLoanReminderReferences,
-  getLoanDueReminders,
-} from '../alerts/loanDueReminders'
-import {
-  getFinancialSchemes,
-  getLoans,
-  getRegularMoney,
-  getTransactions,
-} from '../storage/db'
-import {
-  getPreferences,
-} from '../settings/preferences'
-import {
-  buildMoneyAlerts,
-} from '../utils/moneyAlerts'
+  buildAlertUniverseView,
+  loadAlertUniverseData,
+} from '../alerts/alertUniverse'
 import {
   getLocalToday,
 } from '../utils/money'
-import {
-  calculateSafeToSpend,
-} from '../utils/safeToSpend'
-import {
-  transactionBalanceChetrum,
-} from '../utils/simpleHome'
 
 import '../styles/alert-badge.css'
 
@@ -64,90 +46,35 @@ function AlertBadge() {
     useCallback(
       async () => {
         try {
-          const [
-            regularMoney,
-            transactions,
-            schemes,
-            loans,
-          ] = await Promise.all([
-            getRegularMoney(),
-            getTransactions(),
-            getFinancialSchemes(),
-            getLoans(),
-          ])
+          const data =
+            await loadAlertUniverseData()
 
           const today =
             getLocalToday()
 
-          const appPreferences =
-            getPreferences()
-
           const alertPreferences =
             getAlertPreferences()
-
-          const recordedTransactions =
-            transactions.filter(
-              (transaction) =>
-                transaction.date <= today,
-            )
-
-          const recordedBalanceChetrum =
-            transactionBalanceChetrum(
-              recordedTransactions,
-              today,
-            )
-
-          const safe =
-            calculateSafeToSpend(
-              today,
-              recordedBalanceChetrum,
-              regularMoney,
-              recordedTransactions,
-              appPreferences.safetyBufferChetrum,
-            )
-
-          const alerts =
-            buildMoneyAlerts({
-              today,
-              dueSoonDays:
-                alertPreferences.dueSoonDays,
-              regularMoney,
-              transactions:
-                recordedTransactions,
-              schemes,
-              recordedBalanceChetrum,
-              safeToSpendChetrum:
-                safe.safeToSpendChetrum,
-              upcomingCommitmentsChetrum:
-                safe.upcomingCommitmentsChetrum,
-              loanReminders:
-                buildLoanReminderReferences(
-                  loans,
-                  getLoanDueReminders(),
-                ),
-            })
 
           const acknowledged =
             getAcknowledgedAlertIds(
               today,
             )
 
-          const visible =
-            alerts.filter(
-              (alert) =>
-                !acknowledged.has(
-                  alert.id,
-                ),
-            )
+          const view =
+            buildAlertUniverseView({
+              today,
+              dueSoonDays:
+                alertPreferences.dueSoonDays,
+              data,
+              acknowledgedIds:
+                acknowledged,
+            })
 
           setState({
-            count: visible.length,
+            count:
+              view.visibleAlerts.length,
             urgent:
-              visible.filter(
-                (alert) =>
-                  alert.level ===
-                  'urgent',
-              ).length,
+              view.counts.urgent,
           })
         } catch {
           setState(
