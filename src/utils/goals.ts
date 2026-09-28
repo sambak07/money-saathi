@@ -71,3 +71,24 @@ export function getGoalDateStatus(
 
   return `${days} ${days === 1 ? 'day' : 'days'} to target`
 }
+
+export function getGoalDateSummary(
+  goal: Goal,
+  savedChetrum: number,
+): string {
+  const dateLabel =
+    formatGoalDate(
+      goal.targetDate,
+    )
+
+  const statusLabel =
+    getGoalDateStatus(
+      goal,
+      savedChetrum,
+    )
+
+  return statusLabel ===
+    dateLabel
+    ? dateLabel
+    : `${dateLabel} · ${statusLabel}`
+}

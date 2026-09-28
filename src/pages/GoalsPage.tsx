@@ -26,7 +26,7 @@ import {
 } from '../utils/money'
 import {
   formatGoalDate,
-  getGoalDateStatus,
+  getGoalDateSummary,
   getGoalProgress,
   getGoalSaved,
 } from '../utils/goals'
@@ -479,9 +479,10 @@ function GoalsPage() {
                         <div>
                           <h3>{goal.name}</h3>
                           <p>
-                            {formatGoalDate(goal.targetDate)}
-                            {' · '}
-                            {getGoalDateStatus(goal, saved)}
+                            {getGoalDateSummary(
+                              goal,
+                              saved,
+                            )}
                           </p>
                         </div>
 
