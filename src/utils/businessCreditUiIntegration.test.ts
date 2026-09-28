@@ -47,7 +47,11 @@ describe('Business 2.0 customers suppliers and dues integration', () => {
     )
 
     expect(business).toContain(
-      'to="/app/business/credit"',
+      'businessWorkspaceRoute(',
+    )
+
+    expect(business).toContain(
+      "'/app/business/credit'",
     )
 
     expect(more).toContain(

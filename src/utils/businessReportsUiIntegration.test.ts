@@ -41,11 +41,11 @@ describe('simple business reports integration', () => {
     )
 
     expect(home).toContain(
-      '/app/business/reports?businessId=',
+      'businessWorkspaceRoute(',
     )
 
-    expect(home).toMatch(
-      /encodeURIComponent\(\s*selectedBusinessId/,
+    expect(home).toContain(
+      "'/app/business/reports'",
     )
   })
 

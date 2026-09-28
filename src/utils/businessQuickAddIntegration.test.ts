@@ -47,11 +47,15 @@ describe('business quick add integration', () => {
     )
 
     expect(home).toContain(
-      '/app/business/add?businessId=',
+      'businessWorkspaceRoute(',
+    )
+
+    expect(home).toContain(
+      "'/app/business/add'",
     )
 
     expect(home).toMatch(
-      /encodeURIComponent\(\s*selectedBusinessId/,
+      /businessWorkspaceRoute\(\s*'\/app\/business\/add',\s*selectedBusinessId/,
     )
 
     expect(home).toMatch(

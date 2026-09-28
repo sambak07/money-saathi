@@ -54,10 +54,32 @@ const tradePage =
     'utf8',
   )
 
+const inventoryPage =
+  readFileSync(
+    new URL(
+      '../pages/BusinessInventoryPage.tsx',
+      import.meta.url,
+    ),
+    'utf8',
+  )
+
+const reportsPage =
+  readFileSync(
+    new URL(
+      '../pages/BusinessReportsPage.tsx',
+      import.meta.url,
+    ),
+    'utf8',
+  )
+
 describe('business payment-message workspace scope', () => {
   it('carries the selected business from Business Home into Add', () => {
-    expect(businessHome).toMatch(
-      /businessId=\$\{encodeURIComponent\(\s*selectedBusinessId/,
+    expect(businessHome).toContain(
+      'businessWorkspaceRoute(',
+    )
+
+    expect(businessHome).toContain(
+      "'/app/business/add'",
     )
   })
 
@@ -78,17 +100,20 @@ describe('business payment-message workspace scope', () => {
   it('validates the requested workspace against existing businesses before selecting it', () => {
     for (
       const source of [
+        businessHome,
         cashPage,
         creditPage,
+        inventoryPage,
         tradePage,
+        reportsPage,
       ]
     ) {
-      expect(source).toMatch(
-        /records\.find\(\s*\(business\)\s*=>\s*business\.id ===\s*requestedBusinessId/,
+      expect(source).toContain(
+        'resolveBusinessWorkspaceId(',
       )
 
-      expect(source).toMatch(
-        /\?\?\s*records\[0\]\s*\?\?\s*null/,
+      expect(source).toContain(
+        'businessWorkspaceSearchParams(',
       )
     }
   })

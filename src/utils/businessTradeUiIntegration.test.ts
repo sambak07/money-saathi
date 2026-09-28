@@ -47,11 +47,19 @@ describe('business sales and purchases UI integration', () => {
     )
 
     expect(business).toContain(
-      'to="/app/business/trade"',
+      "'/app/business/trade'",
     )
 
     expect(inventory).toContain(
-      'to="/app/business/trade"',
+      "'/app/business/trade'",
+    )
+
+    expect(business).toContain(
+      'businessWorkspaceRoute(',
+    )
+
+    expect(inventory).toContain(
+      'businessWorkspaceRoute(',
     )
 
     expect(more).toContain(

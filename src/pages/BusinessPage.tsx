@@ -35,6 +35,11 @@ import {
 import {
   summarizeBusinessTransactions,
 } from '../utils/business'
+import {
+  businessWorkspaceRoute,
+  businessWorkspaceSearchParams,
+  resolveBusinessWorkspaceId,
+} from '../utils/businessWorkspaceNavigation'
 
 import '../styles/business.css'
 
@@ -50,7 +55,10 @@ const BUSINESS_CATEGORIES = [
 ]
 
 function BusinessPage() {
-  const [searchParams] =
+  const [
+    searchParams,
+    setSearchParams,
+  ] =
     useSearchParams()
 
   const importedCash =
@@ -178,20 +186,30 @@ function BusinessPage() {
     setBusinesses(records)
 
     const nextId =
-      preferredId &&
-      records.some(
-        (item) => item.id === preferredId,
+      resolveBusinessWorkspaceId(
+        records,
+        preferredId ??
+          requestedBusinessId,
+        selectedBusinessId,
       )
-        ? preferredId
-        : selectedBusinessId &&
-            records.some(
-              (item) =>
-                item.id === selectedBusinessId,
-            )
-          ? selectedBusinessId
-          : records[0]?.id ?? ''
 
     setSelectedBusinessId(nextId)
+
+    if (
+      nextId &&
+      nextId !==
+        requestedBusinessId
+    ) {
+      setSearchParams(
+        businessWorkspaceSearchParams(
+          searchParams,
+          nextId,
+        ),
+        {
+          replace: true,
+        },
+      )
+    }
 
     setRenameBusinessName(
       records.find(
@@ -215,21 +233,39 @@ function BusinessPage() {
 
         setBusinesses(records)
 
-        const initialBusiness =
+        const nextBusinessId =
+          resolveBusinessWorkspaceId(
+            records,
+            requestedBusinessId,
+            selectedBusinessId,
+          )
+
+        setSelectedBusinessId(
+          nextBusinessId,
+        )
+
+        if (
+          nextBusinessId &&
+          nextBusinessId !==
+            requestedBusinessId
+        ) {
+          setSearchParams(
+            businessWorkspaceSearchParams(
+              searchParams,
+              nextBusinessId,
+            ),
+            {
+              replace: true,
+            },
+          )
+        }
+
+        setRenameBusinessName(
           records.find(
             (business) =>
               business.id ===
-              requestedBusinessId,
-          ) ??
-          records[0] ??
-          null
-
-        setSelectedBusinessId(
-          initialBusiness?.id ?? '',
-        )
-
-        setRenameBusinessName(
-          initialBusiness?.name ?? '',
+              nextBusinessId,
+          )?.name ?? '',
         )
       } catch {
         if (active) {
@@ -247,6 +283,9 @@ function BusinessPage() {
     }
   }, [
     requestedBusinessId,
+    searchParams,
+    selectedBusinessId,
+    setSearchParams,
   ])
 
   useEffect(() => {
@@ -578,18 +617,38 @@ function BusinessPage() {
           </div>
 
           <div className="business-header-actions">
-            <Link to="/app/business">
+            <Link
+              to={businessWorkspaceRoute(
+                '/app/business',
+                selectedBusinessId,
+              )}
+            >
               Business Home
             </Link>
-            <Link to="/app/business/credit">
+            <Link
+              to={businessWorkspaceRoute(
+                '/app/business/credit',
+                selectedBusinessId,
+              )}
+            >
               Customers & dues
             </Link>
 
-            <Link to="/app/business/inventory">
+            <Link
+              to={businessWorkspaceRoute(
+                '/app/business/inventory',
+                selectedBusinessId,
+              )}
+            >
               Inventory
             </Link>
 
-            <Link to="/app/business/trade">
+            <Link
+              to={businessWorkspaceRoute(
+                '/app/business/trade',
+                selectedBusinessId,
+              )}
+            >
               Sales & purchases
             </Link>
 
@@ -695,6 +754,13 @@ function BusinessPage() {
 
                   setSelectedBusinessId(
                     nextId,
+                  )
+
+                  setSearchParams(
+                    businessWorkspaceSearchParams(
+                      searchParams,
+                      nextId,
+                    ),
                   )
 
                   setRenameBusinessName(

@@ -57,15 +57,23 @@ describe('business monthly report downloads', () => {
 
   it('preserves the selected business when opening reports', () => {
     expect(home).toContain(
-      '/app/business/reports?businessId=',
+      'businessWorkspaceRoute(',
+    )
+
+    expect(home).toContain(
+      "'/app/business/reports'",
     )
 
     expect(page).toMatch(
       /searchParams\.get\(\s*'businessId'/,
     )
 
-    expect(page).toMatch(
-      /records\.find\(\s*\(business\)\s*=>\s*business\.id ===\s*requestedBusinessId/,
+    expect(page).toContain(
+      'resolveBusinessWorkspaceId(',
+    )
+
+    expect(page).toContain(
+      'businessWorkspaceSearchParams(',
     )
   })
 

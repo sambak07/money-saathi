@@ -40,6 +40,11 @@ import {
   summarizeBusinessTradeEntries,
 } from '../utils/businessTrade'
 import {
+  businessWorkspaceRoute,
+  businessWorkspaceSearchParams,
+  resolveBusinessWorkspaceId,
+} from '../utils/businessWorkspaceNavigation'
+import {
   formatChetrumForInput,
   formatNu,
   getLocalToday,
@@ -136,7 +141,10 @@ function partyFitsKind(
 }
 
 function BusinessTradePage() {
-  const [searchParams] =
+  const [
+    searchParams,
+    setSearchParams,
+  ] =
     useSearchParams()
 
   const importedPayment =
@@ -470,19 +478,32 @@ function BusinessTradePage() {
           records,
         )
 
-        const initialBusiness =
-          records.find(
-            (business) =>
-              business.id ===
-              requestedBusinessId,
-          ) ??
-          records[0] ??
-          null
+        const nextBusinessId =
+          resolveBusinessWorkspaceId(
+            records,
+            requestedBusinessId,
+            selectedBusinessId,
+          )
 
         setSelectedBusinessId(
-          initialBusiness?.id ??
-            '',
+          nextBusinessId,
         )
+
+        if (
+          nextBusinessId &&
+          nextBusinessId !==
+            requestedBusinessId
+        ) {
+          setSearchParams(
+            businessWorkspaceSearchParams(
+              searchParams,
+              nextBusinessId,
+            ),
+            {
+              replace: true,
+            },
+          )
+        }
       } catch {
         if (active) {
           setError(
@@ -499,6 +520,9 @@ function BusinessTradePage() {
     }
   }, [
     requestedBusinessId,
+    searchParams,
+    selectedBusinessId,
+    setSearchParams,
   ])
 
   useEffect(() => {
@@ -990,15 +1014,30 @@ function BusinessTradePage() {
           </div>
 
           <div className="business-trade-header-actions">
-            <Link to="/app/business/inventory">
+            <Link
+              to={businessWorkspaceRoute(
+                '/app/business/inventory',
+                selectedBusinessId,
+              )}
+            >
               Inventory
             </Link>
 
-            <Link to="/app/business/credit">
+            <Link
+              to={businessWorkspaceRoute(
+                '/app/business/credit',
+                selectedBusinessId,
+              )}
+            >
               Customers & dues
             </Link>
 
-            <Link to="/app/business">
+            <Link
+              to={businessWorkspaceRoute(
+                '/app/business',
+                selectedBusinessId,
+              )}
+            >
               Business Home
             </Link>
           </div>
@@ -1065,7 +1104,12 @@ function BusinessTradePage() {
               never enter the personal ledger.
             </p>
 
-            <Link to="/app/business">
+            <Link
+              to={businessWorkspaceRoute(
+                '/app/business',
+                selectedBusinessId,
+              )}
+            >
               Open Business
             </Link>
           </section>
@@ -1084,9 +1128,20 @@ function BusinessTradePage() {
                 onChange={
                   (event) => {
                     resetForm()
+                    const nextBusinessId =
+                      event.target.value
+
                     setSelectedBusinessId(
-                      event.target.value,
+                      nextBusinessId,
                     )
+
+                    setSearchParams(
+                      businessWorkspaceSearchParams(
+                        searchParams,
+                        nextBusinessId,
+                      ),
+                    )
+
                     setMessage('')
                     setError('')
                   }

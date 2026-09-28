@@ -29,6 +29,11 @@ import {
   buildBusinessReport,
 } from '../utils/businessReport'
 import {
+  businessWorkspaceRoute,
+  businessWorkspaceSearchParams,
+  resolveBusinessWorkspaceId,
+} from '../utils/businessWorkspaceNavigation'
+import {
   buildBusinessMonthlyReportCsv,
   getBusinessMonthlyReportCsvFilename,
 } from '../utils/businessReportExport'
@@ -75,7 +80,10 @@ function monthLabel(
 }
 
 function BusinessReportsPage() {
-  const [searchParams] =
+  const [
+    searchParams,
+    setSearchParams,
+  ] =
     useSearchParams()
 
   const requestedBusinessId =
@@ -219,19 +227,32 @@ function BusinessReportsPage() {
           records,
         )
 
-        const initialBusiness =
-          records.find(
-            (business) =>
-              business.id ===
-              requestedBusinessId,
-          ) ??
-          records[0] ??
-          null
+        const nextBusinessId =
+          resolveBusinessWorkspaceId(
+            records,
+            requestedBusinessId,
+            selectedBusinessId,
+          )
 
         setSelectedBusinessId(
-          initialBusiness?.id ??
-            '',
+          nextBusinessId,
         )
+
+        if (
+          nextBusinessId &&
+          nextBusinessId !==
+            requestedBusinessId
+        ) {
+          setSearchParams(
+            businessWorkspaceSearchParams(
+              searchParams,
+              nextBusinessId,
+            ),
+            {
+              replace: true,
+            },
+          )
+        }
       } catch {
         if (active) {
           setError(
@@ -248,6 +269,9 @@ function BusinessReportsPage() {
     }
   }, [
     requestedBusinessId,
+    searchParams,
+    selectedBusinessId,
+    setSearchParams,
   ])
 
   useEffect(() => {
@@ -420,7 +444,12 @@ function BusinessReportsPage() {
             </p>
           </div>
 
-          <Link to="/app/business">
+          <Link
+            to={businessWorkspaceRoute(
+              '/app/business',
+              selectedBusinessId,
+            )}
+          >
             Business Home
           </Link>
         </header>
@@ -445,7 +474,12 @@ function BusinessReportsPage() {
               Create a business workspace before using reports.
             </p>
 
-            <Link to="/app/business/cash">
+            <Link
+            to={businessWorkspaceRoute(
+              '/app/business/cash',
+              selectedBusinessId,
+            )}
+          >
               Create business
             </Link>
           </section>
@@ -462,9 +496,20 @@ function BusinessReportsPage() {
                     }
                     onChange={
                       (event) => {
+                        const nextBusinessId =
+                          event.target.value
+
                         setSelectedBusinessId(
-                          event.target.value,
+                          nextBusinessId,
                         )
+
+                        setSearchParams(
+                          businessWorkspaceSearchParams(
+                            searchParams,
+                            nextBusinessId,
+                          ),
+                        )
+
                         setError('')
                       }
                     }
@@ -979,7 +1024,12 @@ function BusinessReportsPage() {
                   result.
                 </p>
 
-                <Link to="/app/business/trade">
+                <Link
+            to={businessWorkspaceRoute(
+              '/app/business/trade',
+              selectedBusinessId,
+            )}
+          >
                   Review sales & purchases
                 </Link>
               </section>

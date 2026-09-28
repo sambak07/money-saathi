@@ -5,6 +5,7 @@ import {
 } from 'react'
 import {
   Link,
+  useSearchParams,
 } from 'react-router-dom'
 
 import AppShell from '../components/AppShell'
@@ -28,6 +29,11 @@ import {
   buildBusinessReport,
 } from '../utils/businessReport'
 import {
+  businessWorkspaceRoute,
+  businessWorkspaceSearchParams,
+  resolveBusinessWorkspaceId,
+} from '../utils/businessWorkspaceNavigation'
+import {
   formatNu,
   getLocalToday,
 } from '../utils/money'
@@ -35,6 +41,17 @@ import {
 import '../styles/simple-business-home.css'
 
 function SimpleBusinessHomePage() {
+  const [
+    searchParams,
+    setSearchParams,
+  ] =
+    useSearchParams()
+
+  const requestedBusinessId =
+    searchParams.get(
+      'businessId',
+    ) ?? ''
+
   const [businesses, setBusinesses] =
     useState<BusinessProfile[]>([])
 
@@ -144,10 +161,32 @@ function SimpleBusinessHomePage() {
           records,
         )
 
+        const nextBusinessId =
+          resolveBusinessWorkspaceId(
+            records,
+            requestedBusinessId,
+            selectedBusinessId,
+          )
+
         setSelectedBusinessId(
-          records[0]?.id ??
-            '',
+          nextBusinessId,
         )
+
+        if (
+          nextBusinessId &&
+          nextBusinessId !==
+            requestedBusinessId
+        ) {
+          setSearchParams(
+            businessWorkspaceSearchParams(
+              searchParams,
+              nextBusinessId,
+            ),
+            {
+              replace: true,
+            },
+          )
+        }
       } catch {
         if (active) {
           setError(
@@ -162,7 +201,12 @@ function SimpleBusinessHomePage() {
     return () => {
       active = false
     }
-  }, [])
+  }, [
+    requestedBusinessId,
+    searchParams,
+    selectedBusinessId,
+    setSearchParams,
+  ])
 
   useEffect(() => {
     let active = true
@@ -353,9 +397,20 @@ function SimpleBusinessHomePage() {
                 }
                 onChange={
                   (event) => {
+                    const nextBusinessId =
+                      event.target.value
+
                     setSelectedBusinessId(
-                      event.target.value,
+                      nextBusinessId,
                     )
+
+                    setSearchParams(
+                      businessWorkspaceSearchParams(
+                        searchParams,
+                        nextBusinessId,
+                      ),
+                    )
+
                     setError('')
                   }
                 }
@@ -400,7 +455,12 @@ function SimpleBusinessHomePage() {
               money separate from personal money.
             </p>
 
-            <Link to="/app/business/cash">
+            <Link
+                  to={businessWorkspaceRoute(
+                    '/app/business/cash',
+                    selectedBusinessId,
+                  )}
+                >
               Create business
             </Link>
           </section>
@@ -425,9 +485,10 @@ function SimpleBusinessHomePage() {
 
               <Link
                 className="simple-business-primary-action"
-                to={`/app/business/add?businessId=${encodeURIComponent(
+                to={businessWorkspaceRoute(
+                  '/app/business/add',
                   selectedBusinessId,
-                )}`}
+                )}
               >
                 Add
               </Link>
@@ -548,7 +609,12 @@ function SimpleBusinessHomePage() {
               </div>
 
               <div className="simple-business-action-grid">
-                <Link to="/app/business/trade">
+                <Link
+                  to={businessWorkspaceRoute(
+                    '/app/business/trade',
+                    selectedBusinessId,
+                  )}
+                >
                   <strong>
                     Sales & purchases
                   </strong>
@@ -558,7 +624,12 @@ function SimpleBusinessHomePage() {
                   </span>
                 </Link>
 
-                <Link to="/app/business/credit">
+                <Link
+                  to={businessWorkspaceRoute(
+                    '/app/business/credit',
+                    selectedBusinessId,
+                  )}
+                >
                   <strong>
                     Dues
                   </strong>
@@ -568,7 +639,12 @@ function SimpleBusinessHomePage() {
                   </span>
                 </Link>
 
-                <Link to="/app/business/inventory">
+                <Link
+                  to={businessWorkspaceRoute(
+                    '/app/business/inventory',
+                    selectedBusinessId,
+                  )}
+                >
                   <strong>
                     Stock
                   </strong>
@@ -578,7 +654,12 @@ function SimpleBusinessHomePage() {
                   </span>
                 </Link>
 
-                <Link to="/app/business/cash">
+                <Link
+                  to={businessWorkspaceRoute(
+                    '/app/business/cash',
+                    selectedBusinessId,
+                  )}
+                >
                   <strong>
                     Cash
                   </strong>
@@ -642,9 +723,10 @@ function SimpleBusinessHomePage() {
                     </small>
 
                     <Link
-                      to={`/app/business/reports?businessId=${encodeURIComponent(
+                      to={businessWorkspaceRoute(
+                        '/app/business/reports',
                         selectedBusinessId,
-                      )}`}
+                      )}
                     >
                       View monthly report
                     </Link>
@@ -665,7 +747,12 @@ function SimpleBusinessHomePage() {
                       Estimated from recorded current unit costs.
                     </small>
 
-                    <Link to="/app/business/inventory">
+                    <Link
+                  to={businessWorkspaceRoute(
+                    '/app/business/inventory',
+                    selectedBusinessId,
+                  )}
+                >
                       View stock
                     </Link>
                   </article>
@@ -697,7 +784,12 @@ function SimpleBusinessHomePage() {
               stock or dues instead of relying on a guessed summary.
             </p>
 
-            <Link to="/app/business/trade">
+            <Link
+                  to={businessWorkspaceRoute(
+                    '/app/business/trade',
+                    selectedBusinessId,
+                  )}
+                >
               Review sales & purchases
             </Link>
           </section>

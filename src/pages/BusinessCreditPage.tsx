@@ -30,6 +30,11 @@ import {
   summarizeBusinessCredit,
 } from '../utils/businessCredit'
 import {
+  businessWorkspaceRoute,
+  businessWorkspaceSearchParams,
+  resolveBusinessWorkspaceId,
+} from '../utils/businessWorkspaceNavigation'
+import {
   formatChetrumForInput,
   formatNu,
   getLocalToday,
@@ -91,7 +96,10 @@ function roleAllowsDirection(
 }
 
 function BusinessCreditPage() {
-  const [searchParams] =
+  const [
+    searchParams,
+    setSearchParams,
+  ] =
     useSearchParams()
 
   const importedPayment =
@@ -342,19 +350,32 @@ function BusinessCreditPage() {
           records,
         )
 
-        const initialBusiness =
-          records.find(
-            (business) =>
-              business.id ===
-              requestedBusinessId,
-          ) ??
-          records[0] ??
-          null
+        const nextBusinessId =
+          resolveBusinessWorkspaceId(
+            records,
+            requestedBusinessId,
+            selectedBusinessId,
+          )
 
         setSelectedBusinessId(
-          initialBusiness?.id ??
-            '',
+          nextBusinessId,
         )
+
+        if (
+          nextBusinessId &&
+          nextBusinessId !==
+            requestedBusinessId
+        ) {
+          setSearchParams(
+            businessWorkspaceSearchParams(
+              searchParams,
+              nextBusinessId,
+            ),
+            {
+              replace: true,
+            },
+          )
+        }
       } catch {
         if (active) {
           setError(
@@ -371,6 +392,9 @@ function BusinessCreditPage() {
     }
   }, [
     requestedBusinessId,
+    searchParams,
+    selectedBusinessId,
+    setSearchParams,
   ])
 
   useEffect(() => {
@@ -922,7 +946,12 @@ function BusinessCreditPage() {
             </p>
           </div>
 
-          <Link to="/app/business">
+          <Link
+            to={businessWorkspaceRoute(
+              '/app/business',
+              selectedBusinessId,
+            )}
+          >
             Business cash
           </Link>
         </header>
@@ -989,7 +1018,12 @@ function BusinessCreditPage() {
               ledger.
             </p>
 
-            <Link to="/app/business">
+            <Link
+            to={businessWorkspaceRoute(
+              '/app/business',
+              selectedBusinessId,
+            )}
+          >
               Open Business
             </Link>
           </section>
@@ -1009,9 +1043,20 @@ function BusinessCreditPage() {
                   (event) => {
                     resetPartyForm()
                     resetOpenItemForm()
+                    const nextBusinessId =
+                      event.target.value
+
                     setSelectedBusinessId(
-                      event.target.value,
+                      nextBusinessId,
                     )
+
+                    setSearchParams(
+                      businessWorkspaceSearchParams(
+                        searchParams,
+                        nextBusinessId,
+                      ),
+                    )
+
                     setMessage('')
                     setError('')
                   }

@@ -45,7 +45,11 @@ describe('simple business home integration', () => {
     )
 
     expect(cash).toContain(
-      'to="/app/business"',
+      'businessWorkspaceRoute(',
+    )
+
+    expect(cash).toContain(
+      "'/app/business'",
     )
   })
 
@@ -99,19 +103,23 @@ describe('simple business home integration', () => {
 
   it('keeps the detailed records available as secondary actions', () => {
     expect(page).toContain(
-      'to="/app/business/trade"',
+      'businessWorkspaceRoute(',
     )
 
     expect(page).toContain(
-      'to="/app/business/cash"',
+      "'/app/business/trade'",
     )
 
     expect(page).toContain(
-      'to="/app/business/credit"',
+      "'/app/business/cash'",
     )
 
     expect(page).toContain(
-      'to="/app/business/inventory"',
+      "'/app/business/credit'",
+    )
+
+    expect(page).toContain(
+      "'/app/business/inventory'",
     )
   })
 })

@@ -6,6 +6,7 @@
 } from 'react'
 import {
   Link,
+  useSearchParams,
 } from 'react-router-dom'
 
 import AppShell from '../components/AppShell'
@@ -24,6 +25,11 @@ import {
   summarizeBusinessInventory,
 } from '../utils/businessInventory'
 import {
+  businessWorkspaceRoute,
+  businessWorkspaceSearchParams,
+  resolveBusinessWorkspaceId,
+} from '../utils/businessWorkspaceNavigation'
+import {
   formatBusinessQuantity,
   parseBusinessQuantityToMilliUnits,
 } from '../utils/businessQuantity'
@@ -38,6 +44,17 @@ import {
 import '../styles/business-inventory.css'
 
 function BusinessInventoryPage() {
+  const [
+    searchParams,
+    setSearchParams,
+  ] =
+    useSearchParams()
+
+  const requestedBusinessId =
+    searchParams.get(
+      'businessId',
+    ) ?? ''
+
   const [businesses, setBusinesses] =
     useState<BusinessProfile[]>([])
 
@@ -175,10 +192,32 @@ function BusinessInventoryPage() {
           records,
         )
 
+        const nextBusinessId =
+          resolveBusinessWorkspaceId(
+            records,
+            requestedBusinessId,
+            selectedBusinessId,
+          )
+
         setSelectedBusinessId(
-          records[0]?.id ??
-            '',
+          nextBusinessId,
         )
+
+        if (
+          nextBusinessId &&
+          nextBusinessId !==
+            requestedBusinessId
+        ) {
+          setSearchParams(
+            businessWorkspaceSearchParams(
+              searchParams,
+              nextBusinessId,
+            ),
+            {
+              replace: true,
+            },
+          )
+        }
       } catch {
         if (active) {
           setError(
@@ -193,7 +232,12 @@ function BusinessInventoryPage() {
     return () => {
       active = false
     }
-  }, [])
+  }, [
+    requestedBusinessId,
+    searchParams,
+    selectedBusinessId,
+    setSearchParams,
+  ])
 
   useEffect(() => {
     let active = true
@@ -507,15 +551,30 @@ function BusinessInventoryPage() {
           </div>
 
           <div className="business-inventory-header-actions">
-            <Link to="/app/business/trade">
+            <Link
+              to={businessWorkspaceRoute(
+                '/app/business/trade',
+                selectedBusinessId,
+              )}
+            >
               Sales & purchases
             </Link>
 
-            <Link to="/app/business/credit">
+            <Link
+              to={businessWorkspaceRoute(
+                '/app/business/credit',
+                selectedBusinessId,
+              )}
+            >
               Customers & dues
             </Link>
 
-            <Link to="/app/business">
+            <Link
+              to={businessWorkspaceRoute(
+                '/app/business',
+                selectedBusinessId,
+              )}
+            >
               Business Home
             </Link>
           </div>
@@ -551,7 +610,12 @@ function BusinessInventoryPage() {
               outside your personal money.
             </p>
 
-            <Link to="/app/business">
+            <Link
+              to={businessWorkspaceRoute(
+                '/app/business',
+                selectedBusinessId,
+              )}
+            >
               Open Business
             </Link>
           </section>
@@ -570,9 +634,20 @@ function BusinessInventoryPage() {
                 onChange={
                   (event) => {
                     resetForm()
+                    const nextBusinessId =
+                      event.target.value
+
                     setSelectedBusinessId(
-                      event.target.value,
+                      nextBusinessId,
                     )
+
+                    setSearchParams(
+                      businessWorkspaceSearchParams(
+                        searchParams,
+                        nextBusinessId,
+                      ),
+                    )
+
                     setMessage('')
                     setError('')
                   }

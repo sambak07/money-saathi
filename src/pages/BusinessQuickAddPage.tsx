@@ -324,7 +324,11 @@ function BusinessQuickAddPage() {
             </p>
           </div>
 
-          <Link to="/app/business">
+          <Link
+            to={workspaceRoute(
+              '/app/business',
+            )}
+          >
             Business Home
           </Link>
         </header>
@@ -551,19 +555,35 @@ function BusinessQuickAddPage() {
           </p>
 
           <div>
-            <Link to="/app/business/inventory">
+            <Link
+              to={workspaceRoute(
+                '/app/business/inventory',
+              )}
+            >
               Stock
             </Link>
 
-            <Link to="/app/business/credit">
+            <Link
+              to={workspaceRoute(
+                '/app/business/credit',
+              )}
+            >
               Customers & suppliers
             </Link>
 
-            <Link to="/app/business/cash">
+            <Link
+              to={workspaceRoute(
+                '/app/business/cash',
+              )}
+            >
               Business cash
             </Link>
 
-            <Link to="/app/business/trade">
+            <Link
+              to={workspaceRoute(
+                '/app/business/trade',
+              )}
+            >
               Sales & purchase register
             </Link>
           </div>

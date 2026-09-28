@@ -44,7 +44,11 @@ describe('business inventory UI integration', () => {
     )
 
     expect(business).toContain(
-      'to="/app/business/inventory"',
+      'businessWorkspaceRoute(',
+    )
+
+    expect(business).toContain(
+      "'/app/business/inventory'",
     )
 
     expect(more).toContain(
