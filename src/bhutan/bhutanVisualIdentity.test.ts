@@ -60,7 +60,11 @@ describe('Bhutan-first visual foundation', () => {
 
   it('keeps Business as a direct core sidebar destination', () => {
     expect(shell).toContain(
-      'to="/app/business"',
+      'to={businessHomeRoute}',
+    )
+
+    expect(shell).toContain(
+      "businessWorkspaceRoute(",
     )
 
     expect(shell).not.toContain(

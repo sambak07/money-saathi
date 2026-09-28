@@ -41,7 +41,7 @@ describe('desktop sidebar Business placement', () => {
 
     const business =
       shell.indexOf(
-        'to="/app/business"',
+        'to={businessHomeRoute}',
         home + 1,
       )
 
@@ -67,12 +67,38 @@ describe('desktop sidebar Business placement', () => {
   it('keeps only one desktop Business navigation link', () => {
     const occurrences =
       shell.match(
-        /to="\/app\/business"/g,
+        /to=\{businessHomeRoute\}/g,
       ) ?? []
 
     expect(
       occurrences,
     ).toHaveLength(1)
+
+    expect(shell).not.toContain(
+      'to="/app/business"',
+    )
+  })
+
+  it('preserves the active businessId when the sidebar returns to Business Home', () => {
+    expect(shell).toContain(
+      'const currentBusinessId =',
+    )
+
+    expect(shell).toMatch(
+      /new URLSearchParams\(\s*search,?\s*\)\.get\(\s*'businessId'/,
+    )
+
+    expect(shell).toContain(
+      'businessWorkspaceRoute(',
+    )
+
+    expect(shell).toMatch(
+      /businessWorkspaceRoute\(\s*'\/app\/business',\s*currentBusinessId/,
+    )
+
+    expect(shell).toContain(
+      'to={businessHomeRoute}',
+    )
   })
 
   it('does not make More active for Business routes', () => {

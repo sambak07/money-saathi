@@ -8,6 +8,10 @@ import {
   useLocation,
 } from 'react-router-dom'
 
+import {
+  businessWorkspaceRoute,
+} from '../utils/businessWorkspaceNavigation'
+
 import '../styles/dashboard.css'
 
 interface AppShellProps {
@@ -56,7 +60,23 @@ function isWithin(
 }
 
 function AppShell({ children }: AppShellProps) {
-  const { pathname } = useLocation()
+  const {
+    pathname,
+    search,
+  } = useLocation()
+
+  const currentBusinessId =
+    new URLSearchParams(
+      search,
+    ).get(
+      'businessId',
+    ) ?? ''
+
+  const businessHomeRoute =
+    businessWorkspaceRoute(
+      '/app/business',
+      currentBusinessId,
+    )
 
   const sidebarMoreActive =
     pathname === '/app/more' ||
@@ -130,7 +150,7 @@ function AppShell({ children }: AppShellProps) {
           </NavLink>
 
           <NavLink
-            to="/app/business"
+            to={businessHomeRoute}
             className={({ isActive }) =>
               isActive
                 ? 'sidebar-item active'
