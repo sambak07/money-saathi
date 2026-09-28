@@ -24,6 +24,12 @@ function readSource(
 const page =
   readSource('../pages/AskSaathiPage.tsx')
 
+const floating =
+  readSource('../components/SaathiFloatingAssistant.tsx')
+
+const access =
+  readSource('./questionDataAccess.ts')
+
 const app =
   readSource('../App.tsx')
 
@@ -45,6 +51,32 @@ describe('Ask Saathi integration', () => {
 
     expect(page).toContain(
       'external AI models',
+    )
+  })
+
+  it('enforces local data permissions on both Ask Saathi surfaces', () => {
+    expect(page).toContain(
+      'loadPermittedSaathiQuestionData',
+    )
+
+    expect(page).toContain(
+      'canUseSaathiIntent',
+    )
+
+    expect(floating).toContain(
+      'loadPermittedSaathiQuestionData',
+    )
+
+    expect(floating).toContain(
+      'canUseSaathiIntent',
+    )
+
+    expect(access).toContain(
+      'if (!sanitized.enabled)',
+    )
+
+    expect(access).not.toContain(
+      "from '../vault",
     )
   })
 

@@ -26,13 +26,16 @@ import {
   compareRecordedMonths,
 } from '../saathi/saathiTools'
 import {
-  getGoalContributions,
-  getGoals,
-  getLoans,
-  getRegularMoney,
-  getSavingsAccounts,
-  getTransactions,
-} from '../storage/db'
+  getSaathiContextPermissions,
+  type SaathiContextPermissions,
+} from '../saathi/contextPermissions'
+import {
+  canUseSaathiIntent,
+  getSaathiPermissionMessage,
+  isSaathiCategoryEnabled,
+  loadPermittedSaathiQuestionData,
+  type SaathiQuestionData,
+} from '../saathi/questionDataAccess'
 import {
   getPreferences,
 } from '../settings/preferences'
@@ -56,26 +59,8 @@ import {
 
 import '../styles/saathi-floating.css'
 
-interface FloatingData {
-  transactions: Awaited<
-    ReturnType<typeof getTransactions>
-  >
-  regularMoney: Awaited<
-    ReturnType<typeof getRegularMoney>
-  >
-  savingsAccounts: Awaited<
-    ReturnType<typeof getSavingsAccounts>
-  >
-  loans: Awaited<
-    ReturnType<typeof getLoans>
-  >
-  goals: Awaited<
-    ReturnType<typeof getGoals>
-  >
-  goalContributions: Awaited<
-    ReturnType<typeof getGoalContributions>
-  >
-}
+type FloatingData =
+  SaathiQuestionData
 
 interface FloatingMessage {
   id: number
@@ -121,6 +106,21 @@ function SaathiFloatingAssistant() {
     useState<FloatingData | null>(
       null,
     )
+
+  const [
+    permissions,
+    setPermissions,
+  ] =
+    useState<SaathiContextPermissions>(
+      () =>
+        getSaathiContextPermissions(),
+    )
+
+  const [
+    permissionRevision,
+    setPermissionRevision,
+  ] =
+    useState(0)
 
   const [
     loading,
@@ -175,6 +175,27 @@ function SaathiFloatingAssistant() {
     )
 
   useEffect(() => {
+    function handlePermissionChange() {
+      setPermissionRevision(
+        (current) =>
+          current + 1,
+      )
+    }
+
+    window.addEventListener(
+      'money-saathi-saathi-permissions-change',
+      handlePermissionChange,
+    )
+
+    return () => {
+      window.removeEventListener(
+        'money-saathi-saathi-permissions-change',
+        handlePermissionChange,
+      )
+    }
+  }, [])
+
+  useEffect(() => {
     if (!open) {
       return
     }
@@ -183,41 +204,31 @@ function SaathiFloatingAssistant() {
 
     async function load() {
       try {
-        const [
-          transactions,
-          regularMoney,
-          savingsAccounts,
-          loans,
-          goals,
-          goalContributions,
-        ] =
-          await Promise.all([
-            getTransactions(),
-            getRegularMoney(),
-            getSavingsAccounts(),
-            getLoans(),
-            getGoals(),
-            getGoalContributions(),
-          ])
+        const currentPermissions =
+          getSaathiContextPermissions()
+
+        const nextData =
+          await loadPermittedSaathiQuestionData(
+            currentPermissions,
+          )
 
         if (!active) {
           return
         }
 
-        setData({
-          transactions,
-          regularMoney,
-          savingsAccounts,
-          loans,
-          goals,
-          goalContributions,
-        })
+        setPermissions(
+          currentPermissions,
+        )
+
+        setData(
+          nextData,
+        )
 
         setLoadError('')
       } catch {
         if (active) {
           setLoadError(
-            'Saathi could not read your local Money Saathi records.',
+            'Saathi could not read the local Money Saathi records you allowed.',
           )
         }
       } finally {
@@ -235,6 +246,7 @@ function SaathiFloatingAssistant() {
   }, [
     open,
     pathname,
+    permissionRevision,
   ])
 
   useEffect(() => {
@@ -309,8 +321,14 @@ function SaathiFloatingAssistant() {
             today,
           )
 
-        const preferences =
-          getPreferences()
+        const safetyBufferChetrum =
+          isSaathiCategoryEnabled(
+            permissions,
+            'money-summary',
+          )
+            ? getPreferences()
+                .safetyBufferChetrum
+            : 0
 
         const safe =
           calculateSafeToSpend(
@@ -318,7 +336,7 @@ function SaathiFloatingAssistant() {
             recordedBalanceChetrum,
             data.regularMoney,
             recordedTransactions,
-            preferences.safetyBufferChetrum,
+            safetyBufferChetrum,
           )
 
         const liquidSavingsChetrum =
@@ -383,7 +401,10 @@ function SaathiFloatingAssistant() {
           debt,
         }
       },
-      [data],
+      [
+        data,
+        permissions,
+      ],
     )
 
   function addMessage(
@@ -445,6 +466,23 @@ function SaathiFloatingAssistant() {
     }
 
     if (
+      !canUseSaathiIntent(
+        permissions,
+        routed.intent,
+      )
+    ) {
+      addMessage(
+        'saathi',
+        getSaathiPermissionMessage(
+          permissions,
+          routed.intent,
+        ),
+      )
+
+      return
+    }
+
+    if (
       loading ||
       !view ||
       !data
@@ -475,8 +513,7 @@ function SaathiFloatingAssistant() {
             today:
               getLocalToday(),
             safetyBufferChetrum:
-              getPreferences()
-                .safetyBufferChetrum,
+              view.safetyBufferChetrum,
             transactions:
               data.transactions,
             regularMoney:

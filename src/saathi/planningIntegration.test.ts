@@ -33,6 +33,9 @@ const suggestions =
 const answers =
   source('./planningAnswers.ts')
 
+const questionDataAccess =
+  source('./questionDataAccess.ts')
+
 describe('Saathi planning integration', () => {
   it('connects both Saathi surfaces to the same deterministic planning answer engine', () => {
     expect(floating).toContain(
@@ -44,21 +47,25 @@ describe('Saathi planning integration', () => {
     )
   })
 
-  it('loads goal data locally for goal-progress answers', () => {
-    expect(floating).toContain(
+  it('loads goal data locally through the permission-gated data access layer', () => {
+    expect(questionDataAccess).toContain(
       'getGoals()',
     )
 
+    expect(questionDataAccess).toContain(
+      'getGoalContributions()',
+    )
+
+    expect(questionDataAccess).toContain(
+      "sanitized.categories[\n      'goals'",
+    )
+
     expect(floating).toContain(
-      'getGoalContributions()',
+      'loadPermittedSaathiQuestionData(',
     )
 
     expect(fullPage).toContain(
-      'getGoals()',
-    )
-
-    expect(fullPage).toContain(
-      'getGoalContributions()',
+      'loadPermittedSaathiQuestionData(',
     )
   })
 

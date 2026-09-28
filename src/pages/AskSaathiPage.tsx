@@ -26,13 +26,16 @@ import {
   assessAffordability,
 } from '../saathi/saathiTools'
 import {
-  getGoalContributions,
-  getGoals,
-  getLoans,
-  getRegularMoney,
-  getSavingsAccounts,
-  getTransactions,
-} from '../storage/db'
+  getSaathiContextPermissions,
+  type SaathiContextPermissions,
+} from '../saathi/contextPermissions'
+import {
+  canUseSaathiIntent,
+  getSaathiPermissionMessage,
+  isSaathiCategoryEnabled,
+  loadPermittedSaathiQuestionData,
+  type SaathiQuestionData,
+} from '../saathi/questionDataAccess'
 import {
   getPreferences,
 } from '../settings/preferences'
@@ -56,36 +59,42 @@ import {
 
 import '../styles/ask-saathi.css'
 
-interface AskData {
-  transactions: Awaited<
-    ReturnType<typeof getTransactions>
-  >
-  regularMoney: Awaited<
-    ReturnType<typeof getRegularMoney>
-  >
-  savingsAccounts: Awaited<
-    ReturnType<typeof getSavingsAccounts>
-  >
-  loans: Awaited<
-    ReturnType<typeof getLoans>
-  >
-  goals: Awaited<
-    ReturnType<typeof getGoals>
-  >
-  goalContributions: Awaited<
-    ReturnType<typeof getGoalContributions>
-  >
-}
+type AskData =
+  SaathiQuestionData
 
 function AskSaathiPage() {
   const [today] =
     useState(() => getLocalToday())
 
-  const [profile] =
-    useState(() => getProfile())
+  const [
+    profile,
+    setProfile,
+  ] =
+    useState<
+      ReturnType<typeof getProfile> |
+      null
+    >(null)
 
-  const [preferences] =
-    useState(() => getPreferences())
+  const [
+    safetyBufferChetrum,
+    setSafetyBufferChetrum,
+  ] =
+    useState(0)
+
+  const [
+    permissions,
+    setPermissions,
+  ] =
+    useState<SaathiContextPermissions>(
+      () =>
+        getSaathiContextPermissions(),
+    )
+
+  const [
+    permissionRevision,
+    setPermissionRevision,
+  ] =
+    useState(0)
 
   const [
     data,
@@ -151,43 +160,81 @@ function AskSaathiPage() {
     useState('')
 
   useEffect(() => {
+    function handlePermissionChange() {
+      setPermissionRevision(
+        (current) =>
+          current + 1,
+      )
+    }
+
+    window.addEventListener(
+      'money-saathi-saathi-permissions-change',
+      handlePermissionChange,
+    )
+
+    return () => {
+      window.removeEventListener(
+        'money-saathi-saathi-permissions-change',
+        handlePermissionChange,
+      )
+    }
+  }, [])
+
+  useEffect(() => {
     let active = true
 
     async function load() {
       try {
-        const [
-          transactions,
-          regularMoney,
-          savingsAccounts,
-          loans,
-          goals,
-          goalContributions,
-        ] =
-          await Promise.all([
-            getTransactions(),
-            getRegularMoney(),
-            getSavingsAccounts(),
-            getLoans(),
-            getGoals(),
-            getGoalContributions(),
-          ])
+        const currentPermissions =
+          getSaathiContextPermissions()
+
+        const nextData =
+          await loadPermittedSaathiQuestionData(
+            currentPermissions,
+          )
+
+        const nextProfile =
+          isSaathiCategoryEnabled(
+            currentPermissions,
+            'profile',
+          )
+            ? getProfile()
+            : null
+
+        const nextSafetyBufferChetrum =
+          isSaathiCategoryEnabled(
+            currentPermissions,
+            'money-summary',
+          )
+            ? getPreferences()
+                .safetyBufferChetrum
+            : 0
 
         if (!active) {
           return
         }
 
-        setData({
-          transactions,
-          regularMoney,
-          savingsAccounts,
-          loans,
-          goals,
-          goalContributions,
-        })
+        setPermissions(
+          currentPermissions,
+        )
+
+        setProfile(
+          nextProfile,
+        )
+
+        setSafetyBufferChetrum(
+          nextSafetyBufferChetrum,
+        )
+
+        setData(
+          nextData,
+        )
+
+        setError('')
       } catch {
         if (active) {
           setError(
-            'Ask Saathi could not read your local Money Saathi records.',
+            'Ask Saathi could not read the local Money Saathi records you allowed.',
           )
         }
       } finally {
@@ -202,7 +249,9 @@ function AskSaathiPage() {
     return () => {
       active = false
     }
-  }, [])
+  }, [
+    permissionRevision,
+  ])
 
   const view =
     useMemo(() => {
@@ -229,7 +278,7 @@ function AskSaathiPage() {
           recordedBalanceChetrum,
           data.regularMoney,
           recordedTransactions,
-          preferences.safetyBufferChetrum,
+          safetyBufferChetrum,
         )
 
       const liquidSavingsChetrum =
@@ -293,7 +342,7 @@ function AskSaathiPage() {
       }
     }, [
       data,
-      preferences.safetyBufferChetrum,
+      safetyBufferChetrum,
       today,
     ])
 
@@ -305,6 +354,42 @@ function AskSaathiPage() {
 
     setLearningTopic(null)
     setLocalGuidance('')
+
+    if (
+      routed.intent ===
+        'learn' &&
+      routed.learningTopic
+    ) {
+      setLearningTopic(
+        routed.learningTopic,
+      )
+
+      setLocalMessage(
+        'I understood this as a financial-learning question.',
+      )
+
+      return
+    }
+
+    if (
+      !canUseSaathiIntent(
+        permissions,
+        routed.intent,
+      )
+    ) {
+      setLocalMessage(
+        'This personal question needs local data permission.',
+      )
+
+      setLocalGuidance(
+        getSaathiPermissionMessage(
+          permissions,
+          routed.intent,
+        ),
+      )
+
+      return
+    }
 
     if (
       routed.intent ===
@@ -406,7 +491,7 @@ function AskSaathiPage() {
           {
             today,
             safetyBufferChetrum:
-              preferences.safetyBufferChetrum,
+              safetyBufferChetrum,
             transactions:
               data.transactions,
             regularMoney:
@@ -499,26 +584,42 @@ function AskSaathiPage() {
       return
     }
 
-    if (
-      routed.intent ===
-        'learn' &&
-      routed.learningTopic
-    ) {
-      setLearningTopic(
-        routed.learningTopic,
-      )
-
-      setLocalMessage(
-        'I understood this as a financial-learning question.',
-      )
-
-      return
-    }
-
     setLocalMessage(
       'I could not safely match that question yet. Try asking about spending an amount, how this month looks, a 30/60/90-day forecast, goal progress, what needs attention, what changed this month, debt, EMI, interest, budget, safety buffer, FD, insurance or digital-money safety.',
     )
   }
+
+  const activeToolIntent =
+    activeTool ===
+      'affordability'
+      ? 'affordability'
+      : activeTool ===
+          'attention'
+        ? 'attention'
+        : activeTool ===
+            'month'
+          ? 'month-change'
+          : 'debt'
+
+  const activeToolAllowed =
+    canUseSaathiIntent(
+      permissions,
+      activeToolIntent,
+    )
+
+  const allowedCategories =
+    Object.entries(
+      permissions.categories,
+    )
+      .filter(
+        ([, allowed]) =>
+          permissions.enabled &&
+          allowed,
+      )
+      .map(
+        ([category]) =>
+          category,
+      )
 
   const amountChetrum =
     parseNuInputToChetrum(
@@ -540,7 +641,7 @@ function AskSaathiPage() {
       <AppShell>
         <div className="dashboard-container">
           <div className="dashboard2-loading">
-            Ask Saathi is reading your local records…
+            Preparing Ask Saathi…
           </div>
         </div>
       </AppShell>
@@ -844,8 +945,36 @@ function AskSaathiPage() {
           </button>
         </nav>
 
+        {!activeToolAllowed && (
+          <section className="ask-saathi-panel">
+            <div>
+              <p className="dashboard-eyebrow">
+                Local data permission
+              </p>
+
+              <h2>
+                Personal data access is not enabled for this tool.
+              </h2>
+
+              <p>
+                {
+                  getSaathiPermissionMessage(
+                    permissions,
+                    activeToolIntent,
+                  )
+                }
+              </p>
+
+              <Link to="/app/saathi/privacy">
+                Review data permissions
+              </Link>
+            </div>
+          </section>
+        )}
+
         {activeTool ===
-          'affordability' && (
+          'affordability' &&
+          activeToolAllowed && (
           <section className="ask-saathi-panel">
             <div>
               <p className="dashboard-eyebrow">
@@ -948,7 +1077,8 @@ function AskSaathiPage() {
         )}
 
         {activeTool ===
-          'attention' && (
+          'attention' &&
+          activeToolAllowed && (
           <section className="ask-saathi-panel">
             <div>
               <p className="dashboard-eyebrow">
@@ -993,7 +1123,8 @@ function AskSaathiPage() {
         )}
 
         {activeTool ===
-          'month' && (
+          'month' &&
+          activeToolAllowed && (
           <section className="ask-saathi-panel">
             <div>
               <p className="dashboard-eyebrow">
@@ -1096,7 +1227,8 @@ function AskSaathiPage() {
         )}
 
         {activeTool ===
-          'debt' && (
+          'debt' &&
+          activeToolAllowed && (
           <section className="ask-saathi-panel">
             <div>
               <p className="dashboard-eyebrow">
@@ -1177,17 +1309,9 @@ function AskSaathiPage() {
             </strong>
 
             <p>
-              {view.recordedTransactions.length} recorded transaction
-              {view.recordedTransactions.length === 1 ? '' : 's'},
-              {' '}
-              {data.regularMoney.length} regular-money item
-              {data.regularMoney.length === 1 ? '' : 's'},
-              {' '}
-              {data.loans.length} loan
-              {data.loans.length === 1 ? '' : 's'},
-              {' '}
-              {data.savingsAccounts.length} Savings Account record
-              {data.savingsAccounts.length === 1 ? '' : 's'}.
+              {allowedCategories.length > 0
+                ? `Allowed local categories: ${allowedCategories.join(', ')}.`
+                : 'No personal record categories are currently available to Ask Saathi.'}
             </p>
           </div>
 
@@ -1198,23 +1322,29 @@ function AskSaathiPage() {
 
             <p>
               Money Vault, bank APIs, internet searches, external AI models,
-              future unreceived income or information you did
-              not record.
+              future unreceived income, disabled local data categories or
+              information you did not record.
             </p>
           </div>
         </section>
 
-        <section className="ask-saathi-profile-note">
-          <strong>
-            Your selected setup
-          </strong>
+        {profile &&
+          isSaathiCategoryEnabled(
+            permissions,
+            'profile',
+          ) && (
+          <section className="ask-saathi-profile-note">
+            <strong>
+              Your selected setup
+            </strong>
 
-          <p>
-            {profile.needs.length > 0
-              ? profile.needs.join(' · ')
-              : 'General Money Saathi'}
-          </p>
-        </section>
+            <p>
+              {profile.needs.length > 0
+                ? profile.needs.join(' · ')
+                : 'General Money Saathi'}
+            </p>
+          </section>
+        )}
       </div>
     </AppShell>
   )
