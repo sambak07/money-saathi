@@ -2,6 +2,7 @@
 import './styles/route-loading.css'
 import AdaptiveHomeRoute from './components/AdaptiveHomeRoute'
 import PwaUpdatePrompt from './components/PwaUpdatePrompt'
+import RouteScrollReset from './components/RouteScrollReset'
 
 
 
@@ -77,6 +78,7 @@ const MorePage = lazy(() => import('./pages/MorePage'))
 function App() {
   return (
     <BrowserRouter>
+      <RouteScrollReset />
       <PwaUpdatePrompt />
       <AppLockGate>
         <Suspense
