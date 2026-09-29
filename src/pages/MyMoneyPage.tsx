@@ -2,6 +2,7 @@
   type FormEvent,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react'
 import { Link } from 'react-router-dom'
@@ -83,6 +84,9 @@ function MyMoneyPage() {
     useState<DeleteTarget | null>(null)
   const [deleting, setDeleting] = useState(false)
 
+  const assetFormPanelRef =
+    useRef<HTMLElement | null>(null)
+
   const assetDeleteDialogRef =
     useAccessibleDialog(
       deleteTarget !== null,
@@ -92,6 +96,34 @@ function MyMoneyPage() {
         }
       },
     )
+
+  useEffect(() => {
+    if (!formMode) return
+
+    const frame =
+      window.requestAnimationFrame(
+        () => {
+          const panel =
+            assetFormPanelRef.current
+
+          if (!panel) return
+
+          panel.scrollIntoView({
+            block: 'start',
+          })
+
+          panel.focus({
+            preventScroll: true,
+          })
+        },
+      )
+
+    return () => {
+      window.cancelAnimationFrame(
+        frame,
+      )
+    }
+  }, [formMode, editingId])
 
   const [savingsName, setSavingsName] = useState('')
   const [savingsBalance, setSavingsBalance] = useState('')
@@ -623,13 +655,18 @@ function MyMoneyPage() {
         )}
 
         {formMode && (
-          <section className="asset-form-panel">
+          <section
+            ref={assetFormPanelRef}
+            className="asset-form-panel"
+            tabIndex={-1}
+            aria-labelledby="asset-form-title"
+          >
             <div className="asset-form-heading">
               <div>
                 <p className="dashboard-eyebrow">
                   {editingId ? 'Update record' : 'Add asset'}
                 </p>
-                <h2>
+                <h2 id="asset-form-title">
                   {formMode === 'savings'
                     ? 'Savings account'
                     : formMode === 'fd'
