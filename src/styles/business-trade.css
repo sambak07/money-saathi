@@ -159,6 +159,7 @@
 }
 
 .business-trade-panel {
+  min-width: 0;
   padding: 19px;
   border: 1px solid var(--color-border);
   border-radius: 18px;
@@ -354,9 +355,14 @@
 }
 
 .business-trade-register-row {
+  min-width: 0;
   padding: 14px;
   display: grid;
-  grid-template-columns: minmax(170px, 1.2fr) minmax(130px, 0.7fr) minmax(180px, 1fr) auto;
+  grid-template-columns:
+    minmax(0, 1.2fr)
+    minmax(0, 0.7fr)
+    minmax(0, 1fr)
+    auto;
   align-items: center;
   gap: 14px;
   border: 1px solid var(--color-border);
@@ -364,6 +370,7 @@
 }
 
 .business-trade-register-row > div {
+  min-width: 0;
   display: grid;
   gap: 4px;
 }
