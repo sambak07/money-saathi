@@ -681,3 +681,28 @@
     width: 150px;
   }
 }
+/* === Money Saathi 3.1: onboarding brand contrast === */
+
+/*
+ * Keep the approved image lockup unchanged, but give its dark-green
+ * wordmark a calm light surface so it remains readable on the green
+ * onboarding panel.
+ */
+.onboarding-brand {
+  width: fit-content;
+  padding: 9px 12px;
+
+  border: 1px solid rgba(214, 161, 61, 0.38);
+  border-radius: 14px;
+
+  background: var(--color-surface);
+  box-shadow:
+    0 8px 24px rgba(16, 71, 53, 0.14);
+}
+
+@media (max-width: 560px) {
+  .onboarding-brand {
+    padding: 8px 10px;
+    border-radius: 13px;
+  }
+}
