@@ -99,7 +99,19 @@ describe('business monthly report downloads', () => {
     )
 
     expect(styles).toContain(
-      'visibility: hidden !important',
+      '> :not(.business-monthly-report-card)',
+    )
+
+    expect(styles).toContain(
+      'display: none !important',
+    )
+
+    expect(styles).toContain(
+      'position: static !important',
+    )
+
+    expect(styles).not.toContain(
+      'body * {\n    visibility: hidden !important;',
     )
   })
 })

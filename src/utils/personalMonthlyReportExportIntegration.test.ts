@@ -70,7 +70,19 @@ describe('personal monthly report export integration', () => {
     )
 
     expect(styles).toContain(
-      'visibility: hidden !important',
+      '.reports-page > :not(.reports-report-card)',
+    )
+
+    expect(styles).toContain(
+      'display: none !important',
+    )
+
+    expect(styles).toContain(
+      'position: static !important',
+    )
+
+    expect(styles).not.toContain(
+      'body * {\n    visibility: hidden !important;',
     )
   })
 })

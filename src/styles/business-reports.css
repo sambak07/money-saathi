@@ -519,33 +519,71 @@
     margin: 12mm;
   }
 
-  body * {
-    visibility: hidden !important;
+  html,
+  body,
+  #root {
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
   }
 
-  .business-monthly-report-card,
-  .business-monthly-report-card * {
-    visibility: visible !important;
+  .app-layout {
+    min-height: 0 !important;
+    display: block !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
+
+  .app-sidebar,
+  .mobile-nav,
+  .skip-link,
+  .app-utility-row,
+  .saathi-floating-panel,
+  .saathi-floating-launcher {
+    display: none !important;
+  }
+
+  .app-main {
+    min-width: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
+
+  .business-reports-page {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .business-reports-page
+    > :not(.business-monthly-report-card) {
+    display: none !important;
   }
 
   .business-monthly-report-card {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    border-radius: 0;
-    box-shadow: none;
+    position: static !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }
 
   .business-monthly-report-card-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns:
+      repeat(4, minmax(0, 1fr));
   }
 
   .business-monthly-report-card-current {
-    grid-template-columns: minmax(180px, 0.65fr) minmax(0, 1.35fr);
+    grid-template-columns:
+      minmax(180px, 0.65fr)
+      minmax(0, 1.35fr);
   }
 }
