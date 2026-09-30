@@ -169,6 +169,7 @@ function BackupPage() {
     const file = event.target.files?.[0] ?? null
 
     setRestoreFile(file)
+    setRestorePassword('')
     setVerifiedPayload(null)
     setRestorePhrase('')
     setMessage('')
@@ -207,21 +208,51 @@ function BackupPage() {
     setVerifying(true)
 
     try {
-      const text = await restoreFile.text()
-      const envelope = parseEncryptedBackupText(text)
-      const payload = await decryptBackupEnvelope(
-        envelope,
-        restorePassword,
-      )
+      let fileText: string
 
-      setVerifiedPayload(payload)
-      setMessage(
-        'Backup decrypted and verified. Review the summary before restoring.',
-      )
-    } catch {
-      setError(
-        'Backup verification failed. Check the file and password.',
-      )
+      try {
+        fileText =
+          await restoreFile.text()
+      } catch {
+        setError(
+          'Money Saathi could not read this backup file.',
+        )
+        return
+      }
+
+      let envelope
+
+      try {
+        envelope =
+          parseEncryptedBackupText(
+            fileText,
+          )
+      } catch {
+        setError(
+          'This is not a supported Money Saathi encrypted backup file, or the file is damaged.',
+        )
+        return
+      }
+
+      try {
+        const payload =
+          await decryptBackupEnvelope(
+            envelope,
+            restorePassword,
+          )
+
+        setVerifiedPayload(
+          payload,
+        )
+
+        setMessage(
+          'Backup decrypted and verified. Review the summary before restoring.',
+        )
+      } catch {
+        setError(
+          'This backup could not be unlocked. Re-enter the exact password used when the backup was created. If the password is correct, the file may be damaged.',
+        )
+      }
     } finally {
       setVerifying(false)
     }
@@ -464,14 +495,22 @@ function BackupPage() {
 
                 <input
                   id="restore-password"
+                  name="money-saathi-backup-restore-password"
                   type="password"
-                  autoComplete="current-password"
+                  autoComplete="off"
+                  autoCapitalize="none"
+                  spellCheck={false}
                   minLength={8}
                   value={restorePassword}
                   onChange={(event) =>
                     setRestorePassword(event.target.value)
                   }
                 />
+
+                <small>
+                  Type the password used when this backup was created.
+                  Do not use a browser-saved password.
+                </small>
               </div>
 
               <button
