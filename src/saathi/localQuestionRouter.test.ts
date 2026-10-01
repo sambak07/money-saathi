@@ -37,6 +37,44 @@ describe('local Ask Saathi question router', () => {
     ).toBe('month-change')
   })
 
+  it('routes recorded monthly spending questions to the month view', () => {
+    expect(
+      routeLocalSaathiQuestion(
+        'How much did I spend this month?',
+      ),
+    ).toEqual({
+      intent: 'month-plan',
+      amountNu: null,
+      learningTopic: null,
+      confidence: 'high',
+    })
+
+    expect(
+      routeLocalSaathiQuestion(
+        'How much have I spent this month?',
+      ).intent,
+    ).toBe('month-plan')
+
+    expect(
+      routeLocalSaathiQuestion(
+        'What did I spend this month?',
+      ).intent,
+    ).toBe('month-plan')
+  })
+
+  it('keeps explicit future spending questions as affordability', () => {
+    expect(
+      routeLocalSaathiQuestion(
+        'Can I spend Nu. 500 this month?',
+      ),
+    ).toEqual({
+      intent: 'affordability',
+      amountNu: '500',
+      learningTopic: null,
+      confidence: 'high',
+    })
+  })
+
   it('routes debt questions without guessing an amount', () => {
     expect(
       routeLocalSaathiQuestion(

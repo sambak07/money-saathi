@@ -227,7 +227,11 @@ export function routeLocalSaathiQuestion(
     /\bhow does my month look\b/i.test(question) ||
     /\bmonth plan\b/i.test(question) ||
     /\bmonthly plan\b/i.test(question) ||
-    /\bmonth looking\b/i.test(question)
+    /\bmonth looking\b/i.test(question) ||
+    /\bhow much did i spend this month\b/i.test(question) ||
+    /\bhow much have i spent this month\b/i.test(question) ||
+    /\bwhat did i spend this month\b/i.test(question) ||
+    /\btotal spending this month\b/i.test(question)
   ) {
     return {
       intent: 'month-plan',
