@@ -304,7 +304,7 @@ export async function buildBusinessMonthlyReportPdf(
   )
 
   text(
-    'Money Saathi ? Business',
+    'Money Saathi - Business',
     left,
     17,
   )

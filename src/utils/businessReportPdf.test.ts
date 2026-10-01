@@ -121,6 +121,12 @@ describe(
         expect(
           source,
         ).toContain(
+          'Money Saathi - Business',
+        )
+
+        expect(
+          source,
+        ).toContain(
           'Backup Test Shop',
         )
 
