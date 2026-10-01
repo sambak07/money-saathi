@@ -38,6 +38,10 @@ import {
   getBusinessMonthlyReportCsvFilename,
 } from '../utils/businessReportExport'
 import {
+  buildBusinessMonthlyReportPdf,
+  getBusinessMonthlyReportPdfFilename,
+} from '../utils/businessReportPdf'
+import {
   getBusinessMonthRange,
 } from '../utils/businessReportPeriod'
 import {
@@ -422,8 +426,78 @@ function BusinessReportsPage() {
     )
   }
 
-  function printBusinessReport() {
-    window.print()
+  async function downloadBusinessReportPdf() {
+    if (
+      !report ||
+      !period ||
+      !selectedBusiness
+    ) {
+      return
+    }
+
+    try {
+      const pdf =
+        await buildBusinessMonthlyReportPdf({
+          businessName:
+            selectedBusiness.name,
+          month,
+          periodStart:
+            period.startDate,
+          periodEnd:
+            period.endDate,
+          today,
+          report,
+        })
+
+      const blob =
+        new Blob(
+          [
+            pdf,
+          ],
+          {
+            type:
+              'application/pdf',
+          },
+        )
+
+      const url =
+        URL.createObjectURL(
+          blob,
+        )
+
+      const anchor =
+        document.createElement(
+          'a',
+        )
+
+      anchor.href =
+        url
+
+      anchor.download =
+        getBusinessMonthlyReportPdfFilename(
+          selectedBusiness.name,
+          month,
+        )
+
+      document.body.appendChild(
+        anchor,
+      )
+
+      anchor.click()
+      anchor.remove()
+
+      window.setTimeout(
+        () =>
+          URL.revokeObjectURL(
+            url,
+          ),
+        0,
+      )
+    } catch {
+      setError(
+        'Money Saathi could not create this business PDF.',
+      )
+    }
   }
 
   return (
@@ -558,10 +632,12 @@ function BusinessReportsPage() {
                 <button
                   type="button"
                   onClick={
-                    printBusinessReport
+                    () => {
+                      void downloadBusinessReportPdf()
+                    }
                   }
                 >
-                  Print / Save PDF
+                  Download PDF
                 </button>
 
                 <button

@@ -37,9 +37,9 @@ const styles =
   )
 
 describe('business monthly report downloads', () => {
-  it('offers local Print/Save PDF and CSV flows', () => {
+  it('offers local direct PDF and CSV downloads', () => {
     expect(page).toContain(
-      'Print / Save PDF',
+      'Download PDF',
     )
 
     expect(page).toContain(
@@ -47,11 +47,19 @@ describe('business monthly report downloads', () => {
     )
 
     expect(page).toContain(
-      'window.print()',
+      'buildBusinessMonthlyReportPdf',
+    )
+
+    expect(page).toMatch(
+      /type:\s*'application\/pdf'/,
     )
 
     expect(page).toContain(
       'URL.createObjectURL',
+    )
+
+    expect(page).not.toContain(
+      'window.print()',
     )
   })
 
