@@ -346,7 +346,10 @@ function HelpCenterPage() {
                   </p>
                 </div>
 
-                <Link to={item.to}>
+                <Link
+                  to={item.to}
+                  aria-label={'Open ' + item.title}
+                >
                   Open
                 </Link>
               </article>
