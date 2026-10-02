@@ -427,6 +427,7 @@
 @media (max-width: 560px) {
   .site-header {
     width: min(calc(100% - 32px), var(--container));
+    flex-wrap: wrap;
   }
 
   .brand-lockup {
@@ -444,6 +445,7 @@
 
   .hero {
     width: min(calc(100% - 32px), var(--container));
+    grid-template-columns: minmax(0, 1fr);
     padding: 54px 0 58px;
     gap: 40px;
   }
@@ -459,7 +461,7 @@
 
   .hero-actions {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .primary-button,
