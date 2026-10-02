@@ -1219,3 +1219,578 @@
     padding-bottom: 54px;
   }
 }
+
+
+/* === Money Saathi 3.1.1: Bhutan-first landing trust experience === */
+
+.site-header {
+  min-height: 88px;
+}
+
+.brand-mark,
+.brand-mark img {
+  width: 186px;
+}
+
+.landing-hero-shell {
+  position: relative;
+  width: min(calc(100% - 40px), var(--container));
+  margin: 0 auto;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 34px;
+  background:
+    radial-gradient(
+      circle at 82% 18%,
+      rgba(214, 161, 61, 0.16),
+      transparent 34%
+    ),
+    rgba(255, 253, 248, 0.88);
+  box-shadow: var(--shadow-md);
+}
+
+.landing-hero-shell::after {
+  content: "";
+  position: absolute;
+  right: 4%;
+  top: 22px;
+  width: 300px;
+  height: 112px;
+  opacity: 0.045;
+  pointer-events: none;
+  background:
+    linear-gradient(var(--color-maroon), var(--color-maroon))
+      50% 86% / 58% 10% no-repeat,
+    linear-gradient(
+      145deg,
+      transparent 48%,
+      var(--color-maroon) 49% 54%,
+      transparent 55%
+    )
+      50% 15% / 84% 44% no-repeat,
+    linear-gradient(
+      215deg,
+      transparent 48%,
+      var(--color-maroon) 49% 54%,
+      transparent 55%
+    )
+      50% 15% / 84% 44% no-repeat,
+    linear-gradient(var(--color-maroon), var(--color-maroon))
+      50% 54% / 42% 8% no-repeat,
+    linear-gradient(var(--color-maroon), var(--color-maroon))
+      50% 68% / 34% 22% no-repeat;
+}
+
+.landing-logo-shadow {
+  position: absolute;
+  z-index: 0;
+  right: 5.5%;
+  top: 44px;
+  width: 122px;
+  height: 122px;
+  overflow: hidden;
+  opacity: 0.05;
+  pointer-events: none;
+  user-select: none;
+  transform: rotate(-4deg) scale(1.08);
+}
+
+.landing-logo-shadow img {
+  width: 394px;
+  max-width: none;
+  height: auto;
+  transform: translate(-5px, 4px);
+  filter: grayscale(1) sepia(0.18) contrast(1.05);
+}
+
+.hero.landing-hero {
+  width: 100%;
+  padding: 38px 48px 40px;
+  gap: 38px;
+  position: relative;
+  z-index: 1;
+}
+
+.landing-hero::before {
+  left: -190px;
+  opacity: 0.34;
+}
+
+.landing-hero .hero-subtitle {
+  margin-top: 20px;
+}
+
+.landing-hero .hero-actions {
+  margin-top: 24px;
+}
+
+.landing-hero .trust-line {
+  margin-top: 15px;
+  gap: 9px 13px;
+}
+
+.landing-hero .money-preview {
+  max-width: 470px;
+  margin-left: auto;
+}
+
+.landing-hero .preview-card {
+  padding: 22px;
+}
+
+.landing-hero .preview-summary {
+  margin-top: 20px;
+}
+
+.landing-hero .spending-bar {
+  margin-top: 20px;
+  padding-top: 18px;
+}
+
+.bhutan-first-strip {
+  width: min(calc(100% - 40px), var(--container));
+  margin: 12px auto 0;
+  padding: 14px 18px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 16px;
+  overflow: hidden;
+  position: relative;
+  border-radius: 18px;
+  background:
+    radial-gradient(
+      circle at 94% 0,
+      rgba(214, 161, 61, 0.18),
+      transparent 28%
+    ),
+    var(--color-brand);
+  color: white;
+  box-shadow: 0 12px 34px rgba(23, 90, 67, 0.13);
+}
+
+.bhutan-first-strip::after {
+  content: "";
+  position: absolute;
+  right: -18px;
+  top: -36px;
+  width: 150px;
+  height: 150px;
+  opacity: 0.1;
+  transform: rotate(12deg);
+  background:
+    repeating-linear-gradient(
+      45deg,
+      rgba(255, 255, 255, 0.9) 0 2px,
+      transparent 2px 12px
+    );
+}
+
+.bhutan-first-mark {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.11);
+  font-size: 14px;
+  font-weight: 850;
+}
+
+.bhutan-first-strip strong,
+.bhutan-first-strip span {
+  display: block;
+}
+
+.bhutan-first-strip strong {
+  font-size: 16px;
+}
+
+.bhutan-first-strip div > span {
+  margin-top: 2px;
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 12px;
+}
+
+.bhutan-first-tag {
+  position: relative;
+  z-index: 1;
+  padding: 7px 10px;
+  border: 1px solid rgba(214, 161, 61, 0.42);
+  border-radius: 999px;
+  background: rgba(214, 161, 61, 0.16);
+  color: #fff2d6;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.landing-section {
+  width: min(calc(100% - 40px), var(--container));
+  margin: 0 auto;
+  padding: 34px 0;
+}
+
+.landing-section-heading {
+  max-width: 790px;
+  margin-bottom: 17px;
+}
+
+.landing-kicker {
+  margin: 0 0 8px;
+  color: var(--color-maroon);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.landing-section-heading h2,
+.landing-security h2,
+.landing-final-cta h2 {
+  margin: 0;
+  letter-spacing: -0.04em;
+}
+
+.landing-section-heading h2 {
+  font-size: clamp(30px, 4vw, 44px);
+  line-height: 1.06;
+}
+
+.landing-section-heading > p:last-child {
+  margin: 12px 0 0;
+  color: var(--color-text-secondary);
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+.landing-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.landing-feature-card {
+  min-height: 156px;
+  padding: 18px;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.landing-feature-card::after {
+  content: "";
+  position: absolute;
+  right: -26px;
+  bottom: -32px;
+  width: 92px;
+  height: 92px;
+  opacity: 0.45;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      transparent 0 9px,
+      rgba(214, 161, 61, 0.09) 9px 11px
+    );
+}
+
+.landing-feature-card h3 {
+  margin: 12px 0 6px;
+  font-size: 18px;
+  line-height: 1.22;
+  letter-spacing: -0.02em;
+}
+
+.landing-feature-card p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  line-height: 1.56;
+}
+
+.landing-life-section {
+  padding-top: 28px;
+}
+
+.landing-life-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.landing-life-grid article {
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  background: rgba(255, 253, 248, 0.88);
+}
+
+.landing-life-grid strong,
+.landing-life-grid span {
+  display: block;
+}
+
+.landing-life-grid strong {
+  font-size: 15px;
+}
+
+.landing-life-grid span {
+  margin-top: 4px;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.landing-security {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  align-items: center;
+  gap: 24px;
+  padding: 24px;
+  border: 1px solid rgba(122, 48, 56, 0.22);
+  border-radius: 26px;
+  background:
+    linear-gradient(
+      135deg,
+      var(--color-maroon-soft),
+      rgba(255, 253, 248, 0.96)
+    );
+}
+
+.landing-security h2 {
+  font-size: clamp(28px, 3.5vw, 36px);
+  line-height: 1.08;
+}
+
+.landing-security p {
+  margin: 13px 0 0;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  line-height: 1.62;
+}
+
+.landing-never-box {
+  padding: 20px;
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  background: var(--color-surface);
+}
+
+.landing-never-box > strong {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--color-maroon);
+  font-size: 12px;
+}
+
+.landing-never-box > div {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.landing-never-box span {
+  padding: 8px 10px;
+  border: 1px solid #ead7d9;
+  border-radius: 10px;
+  background: #fff8f8;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.landing-local-warning {
+  margin: 12px 0 0;
+  padding: 15px 17px;
+  border: 1px solid rgba(149, 98, 11, 0.25);
+  border-radius: 13px;
+  background: #fff8e7;
+  color: #65470f;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.landing-final-cta {
+  width: min(calc(100% - 40px), var(--container));
+  margin: 0 auto 38px;
+  padding: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 26px;
+  border-radius: 26px;
+  color: white;
+  background:
+    radial-gradient(
+      circle at 88% 20%,
+      rgba(214, 161, 61, 0.2),
+      transparent 24%
+    ),
+    var(--color-brand);
+  box-shadow: 0 18px 46px rgba(23, 90, 67, 0.16);
+}
+
+.landing-final-cta h2 {
+  font-size: clamp(27px, 3vw, 34px);
+  line-height: 1.08;
+}
+
+.landing-final-cta p {
+  margin: 8px 0 0;
+  color: rgba(255, 255, 255, 0.77);
+}
+
+.landing-final-button {
+  min-height: 44px;
+  padding: 0 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  border: 1px solid white;
+  border-radius: 12px;
+  background: white;
+  color: var(--color-brand);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.site-footer {
+  padding-top: 18px;
+  padding-bottom: 24px;
+}
+
+@media (max-width: 900px) {
+  .brand-mark,
+  .brand-mark img {
+    width: 170px;
+  }
+
+  .hero.landing-hero {
+    padding: 32px 28px 36px;
+    gap: 28px;
+  }
+
+  .landing-logo-shadow {
+    right: 2%;
+    top: 60px;
+    width: 108px;
+    height: 108px;
+    opacity: 0.04;
+  }
+
+  .landing-logo-shadow img {
+    width: 350px;
+  }
+
+  .landing-feature-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .landing-life-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .landing-security {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .site-header {
+    min-height: 82px;
+  }
+
+  .brand-mark,
+  .brand-mark img {
+    width: 154px;
+  }
+
+  .landing-hero-shell,
+  .bhutan-first-strip,
+  .landing-section,
+  .landing-final-cta {
+    width: min(calc(100% - 32px), var(--container));
+  }
+
+  .landing-hero-shell {
+    border-radius: 24px;
+  }
+
+  .landing-hero-shell::after {
+    width: 220px;
+    height: 90px;
+    right: -18px;
+    top: 34px;
+    opacity: 0.035;
+  }
+
+  .landing-logo-shadow {
+    right: -12px;
+    top: 76px;
+    width: 88px;
+    height: 88px;
+    opacity: 0.03;
+  }
+
+  .landing-logo-shadow img {
+    width: 286px;
+    transform: translate(-4px, 3px);
+  }
+
+  .hero.landing-hero {
+    padding: 24px 18px 28px;
+    gap: 20px;
+  }
+
+  .landing-hero .hero-subtitle {
+    margin-top: 16px;
+  }
+
+  .landing-hero .hero-actions {
+    margin-top: 20px;
+  }
+
+  .bhutan-first-strip {
+    grid-template-columns: auto 1fr;
+  }
+
+  .bhutan-first-tag {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+
+  .landing-section {
+    padding: 26px 0;
+  }
+
+  .landing-feature-grid,
+  .landing-life-grid,
+  .landing-never-box > div {
+    grid-template-columns: 1fr;
+  }
+
+  .landing-feature-card {
+    min-height: auto;
+    padding: 17px;
+  }
+
+  .landing-feature-card p {
+    font-size: 13.5px;
+  }
+
+  .landing-security {
+    padding: 19px;
+  }
+
+  .landing-final-cta {
+    margin-bottom: 34px;
+    padding: 22px;
+    display: grid;
+  }
+
+  .landing-final-button {
+    width: 100%;
+  }
+}
