@@ -20,6 +20,11 @@ interface MoreGroup {
 
 const quickLinks: MoreLink[] = [
   {
+    to: '/app/help',
+    label: 'Help & User Guide',
+    description: 'Find the right feature and learn Money Saathi step by step.',
+  },
+  {
     to: '/app/month',
     label: 'My Month',
     description: 'See this month’s money position and plan.',

@@ -73,6 +73,7 @@ const VaultPage = lazy(() => import('./pages/VaultPage'))
 const SaathiGuidePage = lazy(() => import('./pages/SaathiGuidePage'))
 const SaathiPrivacyPage = lazy(() => import('./pages/SaathiPrivacyPage'))
 const AskSaathiPage = lazy(() => import('./pages/AskSaathiPage'))
+const HelpCenterPage = lazy(() => import('./pages/HelpCenterPage'))
 const MorePage = lazy(() => import('./pages/MorePage'))
 
 function App() {
@@ -152,6 +153,7 @@ function App() {
         <Route path="/app/saathi" element={<SaathiGuidePage />} />
         <Route path="/app/saathi/privacy" element={<SaathiPrivacyPage />} />
         <Route path="/app/saathi/ask" element={<AskSaathiPage />} />
+        <Route path="/app/help" element={<HelpCenterPage />} />
         <Route path="/app/more" element={<MorePage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

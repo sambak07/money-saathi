@@ -19,6 +19,7 @@ interface AppShellProps {
 }
 
 const sidebarMorePrefixes = [
+  '/app/help',
   '/app/security',
   '/app/backup',
   '/app/settings',
