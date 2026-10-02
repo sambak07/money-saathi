@@ -25,7 +25,7 @@ const tasks: HelpTask[] = [
     to: '/app/transactions/new',
     title: 'Record money I received or spent',
     description:
-      'Add actual income, expenses or transfers that have already happened.',
+      'Add actual personal income or expenses that have already happened.',
     path: 'Transactions → Add',
   },
   {
@@ -97,7 +97,7 @@ const guideItems: GuideItem[] = [
   {
     title: 'Transactions',
     useFor: 'Money that actually moved.',
-    notFor: 'Monthly limits or repeating schedules.',
+    notFor: 'Monthly limits, repeating schedules or own-account transfers.',
     to: '/app/transactions',
   },
   {
@@ -141,22 +141,32 @@ const learnLinks = [
   {
     to: '/app/security',
     label: 'App Lock',
-    description: 'Understand the local privacy PIN and lock controls.',
+    description: 'Use a local screen-access PIN. App Lock does not encrypt the main financial database.',
   },
   {
     to: '/app/backup',
     label: 'Backup & Restore',
-    description: 'Protect and restore your local Money Saathi records.',
+    description: 'Create a password-protected restorable backup. Restore replaces normal backed-up data; it does not merge.',
   },
   {
     to: '/app/saathi/privacy',
-    label: 'Saathi permissions',
-    description: 'Control which supported local records Saathi may use.',
+    label: 'Ask Saathi permissions',
+    description: 'Control record access for Ask Saathi and the floating assistant. Saathi Guide has separate local-summary behavior.',
   },
   {
     to: '/app/install',
     label: 'Install & Offline',
     description: 'Learn how Money Saathi works as an installable offline-capable app.',
+  },
+  {
+    to: '/app/vault',
+    label: 'Money Vault',
+    description: 'Store limited encrypted financial references with a separate Vault passphrase and separate Vault backup.',
+  },
+  {
+    to: '/app/data-export',
+    label: 'Export data',
+    description: 'Create readable CSV or JSON files for review. Exports are not restore backups.',
   },
   {
     to: '/app/about',
@@ -250,6 +260,9 @@ function HelpCenterPage() {
 
             <p>
               Choose your goal instead of searching through every menu.
+              Money Saathi does not have an own-account transfer record
+              type, so moving money between your own accounts should not
+              be recorded as fresh income or expense.
             </p>
           </header>
 
@@ -357,7 +370,9 @@ function HelpCenterPage() {
             <p>
               Your core financial records stay on your device. Money
               Saathi does not log in to your bank or move money from
-              your bank account.
+              your bank account. App Lock protects screen access; normal
+              encrypted backup, Money Vault and Vault backup use separate
+              protection and should not be treated as the same secret.
             </p>
           </div>
 
