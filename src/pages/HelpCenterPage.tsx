@@ -3,6 +3,7 @@
 } from 'react-router-dom'
 
 import AppShell from '../components/AppShell'
+import HelpManual from '../components/HelpManual'
 
 import '../styles/help-center.css'
 
@@ -428,6 +429,8 @@ function HelpCenterPage() {
             ))}
           </div>
         </section>
+
+        <HelpManual />
 
         <p className="help-center-footnote">
           Money Saathi is a personal finance tracking and planning tool.
